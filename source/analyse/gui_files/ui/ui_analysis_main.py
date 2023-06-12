@@ -4,7 +4,6 @@
 '''
 
 import subprocess
-import sys
 from pathlib import Path
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
 
@@ -20,7 +19,7 @@ class Ui(QtWidgets.QMainWindow):
         super().__init__()
         # load the .ui file (from the folder this .py file is in rather than
         # wherever this is executed)
-        uic.loadUi(Path(__file__).parent/'analysis_gui.ui', self)
+        uic.loadUi(Path(__file__).parent/'analysis_main.ui', self)
         # find objects from .ui file and give them a variable name
         self._findObjects()
         # connect signals to objects so they work
@@ -168,12 +167,3 @@ class ErrorWindow(QtWidgets.QWidget):
         '''
         super().closeEvent(*args, **kwargs)
         self.parent.popup_open = False
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-
-    # create and show the form
-    window = Ui()
-    window.show()
-    # run the main Qt loop
-    sys.exit(app.exec_())
