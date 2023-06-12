@@ -17,8 +17,9 @@ class Ui(QtWidgets.QMainWindow):
         '''
         # call the inherited class' __init__ method
         super().__init__()
-        # load the .ui file
-        uic.loadUi('analysis_gui.ui', self)
+        # load the .ui file (from the folder this .py file is in rather than
+        # wherever this is executed)
+        uic.loadUi(Path(__file__).parent/'analysis_gui.ui', self)
         # find objects from .ui file and give them a variable name
         self._findObjects()
         # connect signals to objects so they work
@@ -119,8 +120,9 @@ class ErrorWindow(QtWidgets.QWidget):
         
         self.setWindowTitle("Error")
         self.resize(200, 100)
+        self.image = str(Path(__file__).parent/'error.png')
         layout = QtWidgets.QHBoxLayout(self)
-        layout.addWidget(QtWidgets.QLabel(pixmap=QtGui.QPixmap('error.png'),
+        layout.addWidget(QtWidgets.QLabel(pixmap=QtGui.QPixmap(self.image),
                                           alignment=QtCore.Qt.AlignCenter))
         layout.addWidget(QtWidgets.QLabel(self.message,
                                           alignment=QtCore.Qt.AlignCenter))
