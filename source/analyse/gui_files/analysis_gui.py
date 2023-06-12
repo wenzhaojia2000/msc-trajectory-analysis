@@ -35,7 +35,7 @@ class Ui(QtWidgets.QMainWindow):
         Finds objects from the loaded .ui file and gives them names.
         '''
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
-        self.output_view = self.findChild(QtWidgets.QGraphicsView, 'output_view')
+        self.output_view = self.findChild(QtWidgets.QTextEdit, 'output_view')
         
         # tab "Analyse Convergence"
         self.analconv_push = self.findChild(QtWidgets.QPushButton, 'analconv_push')
