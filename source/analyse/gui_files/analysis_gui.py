@@ -3,6 +3,7 @@
 @author: 19081417
 '''
 
+import subprocess
 import sys
 from pathlib import Path
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
@@ -96,14 +97,48 @@ class Ui(QtWidgets.QMainWindow):
         # if the path is invalid, change to last acceptable path and open
         # error popup
         elif Path(self.dir_edit.text()).is_dir() == False and self.popup_open == False:
-            self.popup_open = True
-            self.error_window = ErrorWindow(self, "Directory does not exist or is invalid")
-            self.error_window.show()
+            self.showError("Directory does not exist or is invalid")
             self.dir_edit.undo()
         # if path is valid, resolve it (change to absolute path without ./
         # or ../, etc)
         elif Path(self.dir_edit.text()).is_dir():
             self.dir_edit.setText(str(Path(self.dir_edit.text()).resolve()))
+            
+    def showError(self, msg:str) -> None:
+        '''
+        Creates a popup window showing an error message.
+        '''
+        self.popup_open = True
+        self.error_window = ErrorWindow(self, msg)
+        self.error_window.show()
+    
+    def runCmd(self, args:list, output_view:QtWidgets.QTextEdit, wd:str = None) -> None:
+        '''
+        This function will run the shell command sent to it in the directory
+        given by wd and either shows the result in the given QTextEdit or
+        displays an error message. args should be a list represented by the
+        command split by spaces, eg. ["ls", "-A", "/home/"].
+        '''
+        # output_view argument is used instead of self.output_view in case
+        # we need to add multiple views in the future
+        try:
+            p = subprocess.run(args, universal_newlines=True, cwd=wd,
+                               timeout=10, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, check=True)
+            output_view.setText(p.stdout)
+        except subprocess.CalledProcessError as e:
+            self.showError(f"Error (CalledProcessError): {e}"
+                           f"\n\n{e.stdout}")
+        except subprocess.TimeoutExpired as e:
+            self.showError(f"Error (TimeoutExpired): {e}"
+                           f"\n\n{e.stdout}")
+        except FileNotFoundError:
+            self.showError("Error (FileNotFoundError)"
+                           "\n\nThis error is likely caused by a quantics program "
+                           "not being installed or being in an invalid directory.")
+        except Exception as e:
+            self.showError(f"Error ({type(e)})"
+                           f"\n\n{e}")
 
 class ErrorWindow(QtWidgets.QWidget):
     '''
