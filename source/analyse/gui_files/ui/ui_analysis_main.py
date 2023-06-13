@@ -89,9 +89,57 @@ class Ui(QtWidgets.QMainWindow):
         Action to perform when the 'Continue' button is pushed, which requires
         a list of the corresponding QtWidgets.QRadioButton objects.
         '''
-        for radio_button in radio_buttons:
-            if radio_button.isChecked():
-                print(radio_button.objectName())
+        wd = self.dir_edit.text()
+        # get objectName() of checked radio button (there should only be 1)
+        radio_name = [radio_button.objectName() for radio_button in radio_buttons
+                      if radio_button.isChecked()][0]
+        match radio_name:
+            case 'analconv_1': # check orthonormality of spfs in psi file
+                self.runCmd(['ortho', '-i', wd], self.output_view)
+            case 'analconv_2': # check orthonormality of spfs in restart file
+                self.runCmd(['ortho', '-r', '-i', wd], self.output_view)
+            case 'analconv_3': # plot populations of natural orbitals
+                self.runCmd(['rdcheck', 'natpop', '1', '1', '-i', wd], self.output_view)
+            case 'analconv_4': # plot populations of grid edges
+                self.runCmd(['rdgpop', '-i', wd, '0'], self.output_view)
+            case 'analconv_5': # plot time-evolution of norm of wavefunction
+                self.runCmd(['norm', '-inter', '-i', wd], self.output_view)
+            case 'analconv_6': # norm of wavefunction on restart file
+                self.runCmd(['norm', '-r', '-i', wd], self.output_view)
+
+            case 'analint_1': # analyse step size
+                self.runCmd(['rdsteps', '-i', wd], self.output_view)
+            case 'analint_2': # look at timing file
+                self.runCmd(['cat', str(Path(wd)/'timing')], self.output_view)
+            case 'analint_3': # type update file
+                self.runCmd(['rdupdate', '-i', wd], self.output_view)
+            case 'analint_4': # plot update step size
+                self.runCmd(['rdupdate', '-inter', '-i', wd], self.output_view, '1')
+
+            case 'analres_1': # plot autocorrelation function
+                self.runCmd(['rdauto', '-inter', '-i', wd], self.output_view)
+            # placeholder (13 17 ev 50 2) values for now
+            case 'analres_2': # plot FT of autocorrelation function
+                self.runCmd(['autospec', '-inter', '-FT', '-i', wd,
+                             '13', '17', 'ev', '50', '2'], self.output_view)
+            case 'analres_3': # plot spectrum from autocorrelation function
+                self.runCmd(['autospec', '-inter', '-i', wd,
+                             '13', '17', 'ev', '50', '2'], self.output_view)
+            case 'analres_4': # plot eigenvalues from matrix diagonalisation
+                self.runCmd(['rdeigval', '-inter', '-i', wd], self.output_view)
+
+            case 'analevol_1': # plot 1d density evolution
+                self.runCmd(['showd1d', '-inter', '-i', wd], self.output_view, '1')
+            case 'analevol_2': # plot 2d density evolution
+                self.runCmd(['showsys', '-i', wd], self.output_view)
+            case 'analevol_3': # plot diabatic state population
+                self.runCmd(['plstate', '-i', wd], self.output_view)
+
+            case 'analpes_1': # plot potential energy surface
+                self.runCmd(['showsys', '-pes', '-i', wd], self.output_view, '1')
+
+            case _:
+                self.showError(f'objectName {radio_name} unknown')
 
     @QtCore.pyqtSlot()
     def directoryChanged(self) -> None:
