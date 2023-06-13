@@ -30,37 +30,41 @@ class Ui(QtWidgets.QMainWindow):
         self.popup_open = False
         # set text in dir_edit to be the current working directory
         self.directoryChanged()
-        
+
     def _findObjects(self) -> None:
         '''
         Finds objects from the loaded .ui file and gives them names.
         '''
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
         self.output_view = self.findChild(QtWidgets.QTextEdit, 'output_view')
-        
+
         # tab "Analyse Convergence"
         self.analconv_push = self.findChild(QtWidgets.QPushButton, 'analconv_push')
         self.analconv_box = self.findChild(QtWidgets.QBoxLayout, 'analconv_layout')
-        self.analconv_radio = [self.analconv_box.itemAt(i).widget() for i in range(self.analconv_box.count())]
-        
+        self.analconv_radio = [self.analconv_box.itemAt(i).widget() \
+                               for i in range(self.analconv_box.count())]
+
         # tab "Analyse Integrator"
         self.analint_push = self.findChild(QtWidgets.QPushButton, 'analint_push')
         self.analint_box = self.findChild(QtWidgets.QBoxLayout, 'analint_layout')
-        self.analint_radio = [self.analint_box.itemAt(i).widget() for i in range(self.analint_box.count())]
-        
+        self.analint_radio = [self.analint_box.itemAt(i).widget() \
+                              for i in range(self.analint_box.count())]
+
         # tab "Analyse Results"
         self.analres_push = self.findChild(QtWidgets.QPushButton, 'analres_push')
         self.analres_box = self.findChild(QtWidgets.QBoxLayout, 'analres_layout')
-        self.analres_radio = [self.analres_box.itemAt(i).widget() for i in range(self.analres_box.count())]
-        
+        self.analres_radio = [self.analres_box.itemAt(i).widget() \
+                              for i in range(self.analres_box.count())]
+
         # tab "Analyse System Evolution"
         self.analevol_push = self.findChild(QtWidgets.QPushButton, 'analevol_push')
         self.analevol_box = self.findChild(QtWidgets.QBoxLayout, 'analevol_layout')
-        self.analevol_radio = [self.analevol_box.itemAt(i).widget() for i in range(self.analevol_box.count())]
-        
+        self.analevol_radio = [self.analevol_box.itemAt(i).widget() \
+                               for i in range(self.analevol_box.count())]
+
         # tab "Analyse Potential Surface"
         self.analpes_push = self.findChild(QtWidgets.QPushButton, 'analpes_push')
-        
+
     def _connectObjects(self) -> None:
         '''
         Connects named objects so they do stuff when interacted with.
@@ -69,7 +73,7 @@ class Ui(QtWidgets.QMainWindow):
         self.dir_edit.editingFinished.connect(self.directoryChanged)
         # continue buttons. the lambda functions are required as .connect()
         # requires a function object as its parameter, but we also want to
-        # set continue_pushed's parameter in the meantime
+        # set continuePushed's parameter in the meantime
         self.analconv_push.clicked.connect(lambda x: self.continuePushed(self.analconv_radio))
         self.analint_push.clicked.connect(lambda x: self.continuePushed(self.analint_radio))
         self.analres_push.clicked.connect(lambda x: self.continuePushed(self.analres_radio))
@@ -91,18 +95,18 @@ class Ui(QtWidgets.QMainWindow):
         Action to perfrom when the user edits the directory textbox.
         '''
         # set to cwd when the program is opened or everything is deleted
-        if self.dir_edit.text() == "":
+        if self.dir_edit.text() == '':
             self.dir_edit.setText(str(Path.cwd()))
         # if the path is invalid, change to last acceptable path and open
         # error popup
-        elif Path(self.dir_edit.text()).is_dir() == False and self.popup_open == False:
-            self.showError("Directory does not exist or is invalid")
+        elif Path(self.dir_edit.text()).is_dir() is False and self.popup_open is False:
+            self.showError('Directory does not exist or is invalid')
             self.dir_edit.undo()
         # if path is valid, resolve it (change to absolute path without ./
         # or ../, etc)
         elif Path(self.dir_edit.text()).is_dir():
             self.dir_edit.setText(str(Path(self.dir_edit.text()).resolve()))
-            
+
     def showError(self, msg:str) -> None:
         '''
         Creates a popup window showing an error message.
@@ -110,13 +114,13 @@ class Ui(QtWidgets.QMainWindow):
         self.popup_open = True
         self.error_window = ErrorWindow(self, msg)
         self.error_window.show()
-    
+
     def runCmd(self, args:list, output_view:QtWidgets.QTextEdit, wd:str = None) -> None:
         '''
         This function will run the shell command sent to it in the directory
         given by wd and either shows the result in the given QTextEdit or
         displays an error message. args should be a list represented by the
-        command split by spaces, eg. ["ls", "-A", "/home/"].
+        command split by spaces, eg. ['ls', '-A', '/home/'].
         '''
         # output_view argument is used instead of self.output_view in case
         # we need to add multiple views in the future
@@ -126,18 +130,18 @@ class Ui(QtWidgets.QMainWindow):
                                stderr=subprocess.STDOUT, check=True)
             output_view.setText(p.stdout)
         except subprocess.CalledProcessError as e:
-            self.showError(f"Error (CalledProcessError): {e}"
-                           f"\n\n{e.stdout}")
+            self.showError(f'Error (CalledProcessError): {e}'
+                           f'\n\n{e.stdout}')
         except subprocess.TimeoutExpired as e:
-            self.showError(f"Error (TimeoutExpired): {e}"
-                           f"\n\n{e.stdout}")
+            self.showError(f'Error (TimeoutExpired): {e}'
+                           f'\n\n{e.stdout}')
         except FileNotFoundError:
-            self.showError("Error (FileNotFoundError)"
-                           "\n\nThis error is likely caused by a quantics program "
-                           "not being installed or being in an invalid directory.")
+            self.showError('Error (FileNotFoundError)'
+                           '\n\nThis error is likely caused by a quantics program '
+                           'not being installed or being in an invalid directory.')
         except Exception as e:
-            self.showError(f"Error ({type(e)})"
-                           f"\n\n{e}")
+            self.showError(f'Error ({type(e)})'
+                           f'\n\n{e}')
 
 class ErrorWindow(QtWidgets.QWidget):
     '''
@@ -151,7 +155,7 @@ class ErrorWindow(QtWidgets.QWidget):
         super().__init__()
         self.message = message
         self.parent = ui
-        
+
         self.setWindowTitle("Error")
         self.resize(200, 100)
         self.image = str(Path(__file__).parent/'error.png')
@@ -160,7 +164,7 @@ class ErrorWindow(QtWidgets.QWidget):
                                           alignment=QtCore.Qt.AlignCenter))
         layout.addWidget(QtWidgets.QLabel(self.message,
                                           alignment=QtCore.Qt.AlignCenter))
-        
+
     def closeEvent(self, *args, **kwargs) -> None:
         '''
         Method to execute when the popup is closed.
