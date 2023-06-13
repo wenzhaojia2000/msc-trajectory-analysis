@@ -119,19 +119,21 @@ class Ui(QtWidgets.QMainWindow):
         self.error_window = ErrorWindow(self, msg)
         self.error_window.show()
 
-    def runCmd(self, args:list, output_view:QtWidgets.QTextEdit, wd:str = None) -> None:
+    def runCmd(self, args:list, output_view:QtWidgets.QTextEdit, inp:str = None) -> None:
         '''
-        This function will run the shell command sent to it in the directory
-        given by wd and either shows the result in the given QTextEdit or
-        displays an error message. args should be a list represented by the
-        command split by spaces, eg. ['ls', '-A', '/home/'].
+        This function will run the shell command sent to it and either shows
+        the result in the given QTextEdit or displays an error message. args
+        should be a list represented by the command split by spaces, eg.
+        ['ls', '-A', '/home/']. inp is an input string to feed to stdin after
+        the command execution
         '''
         # output_view argument is used instead of self.output_view in case
         # we need to add multiple views in the future
         try:
-            p = subprocess.run(args, universal_newlines=True, cwd=wd,
-                               timeout=10, stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT, check=True)
+            p = subprocess.run(args, universal_newlines=True, input=inp,
+                               cwd=self.dir_edit.text(), timeout=10,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               check=True)
             output_view.setText(p.stdout)
         except subprocess.CalledProcessError as e:
             self.showError(f'Error (CalledProcessError): {e}'
