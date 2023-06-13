@@ -64,6 +64,9 @@ class Ui(QtWidgets.QMainWindow):
 
         # tab "Analyse Potential Surface"
         self.analpes_push = self.findChild(QtWidgets.QPushButton, 'analpes_push')
+        self.analpes_box = self.findChild(QtWidgets.QBoxLayout, 'analpes_layout')
+        self.analpes_radio = [self.analpes_box.itemAt(i).widget() \
+                               for i in range(self.analpes_box.count())]
 
     def _connectObjects(self) -> None:
         '''
@@ -78,6 +81,7 @@ class Ui(QtWidgets.QMainWindow):
         self.analint_push.clicked.connect(lambda x: self.continuePushed(self.analint_radio))
         self.analres_push.clicked.connect(lambda x: self.continuePushed(self.analres_radio))
         self.analevol_push.clicked.connect(lambda x: self.continuePushed(self.analevol_radio))
+        self.analpes_push.clicked.connect(lambda x: self.continuePushed(self.analpes_radio))
 
     @QtCore.pyqtSlot()
     def continuePushed(self, radio_buttons:list) -> None:
