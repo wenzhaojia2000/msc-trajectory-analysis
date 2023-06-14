@@ -207,17 +207,19 @@ class ErrorWindow(QtWidgets.QWidget):
         the Ui's popup_open variable) and a message to display.
         '''
         super().__init__()
-        self.message = message
-        self.parent = ui
+        pixmap = QtGui.QPixmap(str(Path(__file__).parent/'error.png'))
 
         self.setWindowTitle("Error")
-        self.resize(200, 100)
-        self.image = str(Path(__file__).parent/'error.png')
+        # self.resize(300, 100)
+
+        self.parent = ui
+        self.image = QtWidgets.QLabel(pixmap=pixmap, alignment=QtCore.Qt.AlignCenter)
+        self.message = QtWidgets.QLabel(message, alignment=QtCore.Qt.AlignCenter)
+        self.message.setWordWrap(True)
+
         layout = QtWidgets.QHBoxLayout(self)
-        layout.addWidget(QtWidgets.QLabel(pixmap=QtGui.QPixmap(self.image),
-                                          alignment=QtCore.Qt.AlignCenter))
-        layout.addWidget(QtWidgets.QLabel(self.message,
-                                          alignment=QtCore.Qt.AlignCenter))
+        layout.addWidget(self.image)
+        layout.addWidget(self.message)
 
     def closeEvent(self, *args, **kwargs) -> None:
         '''
