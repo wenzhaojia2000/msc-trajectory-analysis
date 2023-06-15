@@ -33,7 +33,8 @@ class Ui(QtWidgets.QMainWindow):
 
     def _findObjects(self) -> None:
         '''
-        Finds objects from the loaded .ui file and gives them names.
+        Finds objects from the loaded .ui file, gives them names, and sets
+        some of their properties.
         '''
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
         self.output_view = self.findChild(QtWidgets.QTextEdit, 'output_view')
@@ -70,12 +71,15 @@ class Ui(QtWidgets.QMainWindow):
 
         # group box "autocorrelation options"
         self.autocol_box = self.findChild(QtWidgets.QGroupBox, 'autocorrelation_box')
-        self.autocol_box.hide() # start as hidden
         self.autocol_emin = self.findChild(QtWidgets.QDoubleSpinBox, 'emin_spinbox')
-        self.autocol_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'eax_spinbox')
+        self.autocol_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'emax_spinbox')
         self.autocol_unit = self.findChild(QtWidgets.QComboBox, 'unit_combobox')
         self.autocol_tau = self.findChild(QtWidgets.QDoubleSpinBox, 'tau_spinbox')
         self.autocol_iexp = self.findChild(QtWidgets.QSpinBox, 'iexp_spinbox')
+        # box is hidden initially
+        self.autocol_box.hide()
+        # map of autocol_unit indices to command line argument (labels are different)
+        self.autocol_unit_map = {0: "ev", 1: "au", 2: "nmwl", 3: "cm-1", 4: "kcal/mol"}
 
     def _connectObjects(self) -> None:
         '''
@@ -91,7 +95,7 @@ class Ui(QtWidgets.QMainWindow):
         self.analres_push.clicked.connect(lambda x: self.continuePushed(self.analres_radio))
         self.analevol_push.clicked.connect(lambda x: self.continuePushed(self.analevol_radio))
         self.analpes_push.clicked.connect(lambda x: self.continuePushed(self.analpes_radio))
-        
+
         # show the autocorrelation box when certain result in analyse results
         for radio in self.analres_radio:
             radio.clicked.connect(self.autocolOptionSelected)
@@ -106,6 +110,14 @@ class Ui(QtWidgets.QMainWindow):
         '''
         # working directory or abspath
         wd = self.dir_edit.text()
+        # additional arguments for autocorrelation options
+        autocol_options = [
+            str(self.autocol_emin.value()),
+            str(self.autocol_emax.value()),
+            self.autocol_unit_map[self.autocol_unit.currentIndex()],
+            str(self.autocol_tau.value()),
+            str(self.autocol_iexp.value())
+        ]
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio_button.objectName() for radio_button in radio_buttons
                       if radio_button.isChecked()][0]
@@ -134,13 +146,12 @@ class Ui(QtWidgets.QMainWindow):
 
             case 'analres_1': # plot autocorrelation function
                 self.runCmd(['rdauto', '-inter', '-i', wd], self.output_view)
-            # placeholder (13 17 ev 50 2) values for now
             case 'analres_2': # plot FT of autocorrelation function
-                self.runCmd(['autospec', '-inter', '-FT', '-i', wd,
-                             '13', '17', 'ev', '50', '2'], self.output_view)
+                self.runCmd(['autospec', '-inter', '-FT', '-i', wd] + autocol_options,
+                            self.output_view)
             case 'analres_3': # plot spectrum from autocorrelation function
-                self.runCmd(['autospec', '-inter', '-i', wd,
-                             '13', '17', 'ev', '50', '2'], self.output_view)
+                self.runCmd(['autospec', '-inter', '-i', wd] + autocol_options,
+                            self.output_view)
             case 'analres_4': # plot eigenvalues from matrix diagonalisation
                 self.runCmd(['rdeigval', '-inter', '-i', wd], self.output_view)
 
@@ -174,7 +185,7 @@ class Ui(QtWidgets.QMainWindow):
         # or ../, etc)
         elif Path(self.dir_edit.text()).is_dir():
             self.dir_edit.setText(str(Path(self.dir_edit.text()).resolve()))
-            
+
     @QtCore.pyqtSlot()
     def autocolOptionSelected(self) -> None:
         '''
