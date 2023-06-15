@@ -68,6 +68,15 @@ class Ui(QtWidgets.QMainWindow):
         self.analpes_radio = [self.analpes_box.itemAt(i).widget() \
                                for i in range(self.analpes_box.count())]
 
+        # group box "autocorrelation options"
+        self.autocol_box = self.findChild(QtWidgets.QGroupBox, 'autocorrelation_box')
+        self.autocol_box.hide() # start as hidden
+        self.autocol_emin = self.findChild(QtWidgets.QDoubleSpinBox, 'emin_spinbox')
+        self.autocol_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'eax_spinbox')
+        self.autocol_unit = self.findChild(QtWidgets.QComboBox, 'unit_combobox')
+        self.autocol_tau = self.findChild(QtWidgets.QDoubleSpinBox, 'tau_spinbox')
+        self.autocol_iexp = self.findChild(QtWidgets.QSpinBox, 'iexp_spinbox')
+
     def _connectObjects(self) -> None:
         '''
         Connects named objects so they do stuff when interacted with.
@@ -82,6 +91,12 @@ class Ui(QtWidgets.QMainWindow):
         self.analres_push.clicked.connect(lambda x: self.continuePushed(self.analres_radio))
         self.analevol_push.clicked.connect(lambda x: self.continuePushed(self.analevol_radio))
         self.analpes_push.clicked.connect(lambda x: self.continuePushed(self.analpes_radio))
+        
+        # show the autocorrelation box when certain result in analyse results
+        for radio in self.analres_radio:
+            radio.clicked.connect(self.autocolOptionSelected)
+        # in autocorrelation box, allow damping order to change if tau nonzero
+        self.autocol_tau.valueChanged.connect(self.autocolDampingChanged)
 
     @QtCore.pyqtSlot()
     def continuePushed(self, radio_buttons:list) -> None:
@@ -89,6 +104,7 @@ class Ui(QtWidgets.QMainWindow):
         Action to perform when the 'Continue' button is pushed, which requires
         a list of the corresponding QtWidgets.QRadioButton objects.
         '''
+        # working directory or abspath
         wd = self.dir_edit.text()
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio_button.objectName() for radio_button in radio_buttons
@@ -158,6 +174,27 @@ class Ui(QtWidgets.QMainWindow):
         # or ../, etc)
         elif Path(self.dir_edit.text()).is_dir():
             self.dir_edit.setText(str(Path(self.dir_edit.text()).resolve()))
+            
+    @QtCore.pyqtSlot()
+    def autocolOptionSelected(self) -> None:
+        '''
+        Shows the autocorrelation options if a valid option is checked.
+        '''
+        if self.analres_radio[1].isChecked() or self.analres_radio[2].isChecked():
+            self.autocol_box.show()
+        else:
+            self.autocol_box.hide()
+
+    @QtCore.pyqtSlot()
+    def autocolDampingChanged(self) -> None:
+        '''
+        Allows the user to change the damping order if the damping time is set
+        to non-zero (ie. damping is enabled)
+        '''
+        if self.autocol_tau.value() == 0.0:
+            self.autocol_iexp.setEnabled(False)
+        else:
+            self.autocol_iexp.setEnabled(True)
 
     def showError(self, msg:str) -> None:
         '''

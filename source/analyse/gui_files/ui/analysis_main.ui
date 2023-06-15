@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1060</width>
-    <height>600</height>
+    <height>601</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -241,6 +241,114 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="autocorrelation_box">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="title">
+             <string>Autocorrelation options</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="emin_label">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;min&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="textFormat">
+                <enum>Qt::AutoText</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="emin_spinbox"/>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="emax_label">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;max&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="emax_spinbox"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="unit_label">
+               <property name="text">
+                <string>Energy unit</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="unit_combobox">
+               <property name="currentText">
+                <string>eV</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>eV</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>au</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>nmwl</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>cm⁻¹</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>kcal mol⁻¹</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="tau_label">
+               <property name="text">
+                <string>Damping time (τ)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="tau_spinbox">
+               <property name="specialValueText">
+                <string>No damping</string>
+               </property>
+               <property name="suffix">
+                <string> fs</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="iexp_label">
+               <property name="text">
+                <string>Damping order</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="iexp_spinbox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="analres_push">
