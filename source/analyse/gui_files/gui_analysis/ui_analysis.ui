@@ -46,6 +46,18 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="2">
+       <widget class="QTextEdit" name="output_view">
+        <property name="font">
+         <font>
+          <family>Courier</family>
+         </font>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0" rowspan="2" colspan="2">
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
@@ -356,15 +368,15 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analevol_tab">
+        <widget class="QWidget" name="analsys_tab">
          <attribute name="title">
-          <string>Analyse System Evolution</string>
+          <string>Analyse System</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <layout class="QVBoxLayout" name="analevol_layout" stretch="0,0,0">
+           <layout class="QVBoxLayout" name="analsys_layout" stretch="0,0,0,0">
             <item>
-             <widget class="QRadioButton" name="analevol_1">
+             <widget class="QRadioButton" name="analsys_1">
               <property name="text">
                <string>Plot 1D density evolution</string>
               </property>
@@ -374,64 +386,30 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="analevol_2">
+             <widget class="QRadioButton" name="analsys_2">
               <property name="text">
                <string>Plot 2D density evolution</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="analevol_3">
+             <widget class="QRadioButton" name="analsys_3">
               <property name="text">
                <string>Plot diabatic state population</string>
               </property>
              </widget>
             </item>
-           </layout>
-          </item>
-          <item>
-           <spacer name="analevol_vspacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="analevol_push">
-            <property name="text">
-             <string>Continue</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="analpes_tab">
-         <attribute name="title">
-          <string>Analyse Potential Surface</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <layout class="QVBoxLayout" name="analpes_layout">
             <item>
-             <widget class="QRadioButton" name="analpes_1">
+             <widget class="QRadioButton" name="analsys_4">
               <property name="text">
                <string>Plot potential energy surface</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item>
-           <spacer name="analpes_vspacer">
+           <spacer name="analsys_vspacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
@@ -444,7 +422,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="analpes_push">
+           <widget class="QPushButton" name="analsys_push">
             <property name="text">
              <string>Continue</string>
             </property>
@@ -457,18 +435,6 @@
           <string>Compare Calculations</string>
          </attribute>
         </widget>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QTextEdit" name="output_view">
-        <property name="font">
-         <font>
-          <family>Courier</family>
-         </font>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
        </widget>
       </item>
      </layout>
