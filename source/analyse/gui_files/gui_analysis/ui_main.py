@@ -52,14 +52,21 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisBase):
         variables.
         '''
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
+        self.dir_edit_dialog = self.findChild(QtWidgets.QToolButton, 'dir_edit_dialog')
         self.output_view = self.findChild(QtWidgets.QTextEdit, 'output_view')
+
+        # set icon of the dir_edit_dialog
+        self.dir_edit_dialog.setIcon(self.style().standardIcon(
+            QtWidgets.QStyle.SP_DirLinkIcon
+        ))
 
     def connectObjects(self) -> None:
         '''
         Connects objects so they do stuff when interacted with.
         '''
         self.dir_edit.editingFinished.connect(self.directoryChanged)
-        
+        self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
+
     @QtCore.pyqtSlot()
     def directoryChanged(self) -> None:
         '''
@@ -77,7 +84,20 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisBase):
         # or ../, etc)
         elif Path(self.dir_edit.text()).is_dir():
             self.dir_edit.setText(str(Path(self.dir_edit.text()).resolve()))
-    
+
+    @QtCore.pyqtSlot()
+    def chooseDirectory(self) -> None:
+        '''
+        Allows user to choose a directory using a menu when the directory
+        button is clicked.
+        '''
+        dirname = QtWidgets.QFileDialog.getExistingDirectory(self,
+            'Open directory', self.dir_edit.text(),
+            options=QtWidgets.QFileDialog.Option.ShowDirsOnly
+        )
+        if dirname:
+            self.dir_edit.setText(dirname)
+
     def showError(self, msg:str) -> None:
         '''
         Creates a popup window showing an error message.
