@@ -76,7 +76,7 @@ class AnalysisResults(QtWidgets.QMainWindow, AnalysisBase):
                       if radio.isChecked()][0]
         match radio_name:
             case 'analres_1': # plot autocorrelation function
-                self.owner.runCmd('rdauto', '-i', abspath)
+                self.owner.runCmd('rdauto', '-inter', '-i', abspath)
             case 'analres_2': # plot FT of autocorrelation function
                 self.owner.runCmd('autospec', '-inter', '-FT', '-i', abspath, *autocol_options)
             case 'analres_3': # plot spectrum from autocorrelation function

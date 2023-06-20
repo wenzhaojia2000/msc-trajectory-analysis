@@ -53,7 +53,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisBase):
         '''
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
         self.dir_edit_dialog = self.findChild(QtWidgets.QToolButton, 'dir_edit_dialog')
-        self.output_view = self.findChild(QtWidgets.QTextEdit, 'output_view')
+        self.output_text = self.findChild(QtWidgets.QTextEdit, 'output_text')
 
         # set icon of the dir_edit_dialog
         self.dir_edit_dialog.setIcon(self.style().standardIcon(
@@ -119,7 +119,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisBase):
                                cwd=self.dir_edit.text(), timeout=10,
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                check=True)
-            self.output_view.setText(p.stdout)
+            self.output_text.setText(p.stdout)
         except subprocess.CalledProcessError as e:
             self.showError(f'Error (CalledProcessError): {e}'
                            f'\n\n{e.stdout}')
