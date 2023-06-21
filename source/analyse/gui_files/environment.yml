@@ -1,0 +1,10 @@
+# conda environment file
+# to active, use `conda env update -f environment.yml`
+
+name: quantics_gui
+dependencies:
+    - python>=3.10
+    - pip
+    - pip:
+        - PyQt5>=5.15.9
+        - pyqtgraph>=0.13.3
