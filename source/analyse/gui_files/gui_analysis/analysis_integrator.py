@@ -55,6 +55,10 @@ class AnalysisIntegrator(QtWidgets.QMainWindow, AnalysisBase):
             case 'analint_2': # look at timing file
                 self.owner.runCmd('cat', str(Path(abspath)/'timing'))
             case 'analint_3': # type update file
-                self.owner.runCmd('rdupdate', '-i', abspath)
+                out = self.owner.runCmd('rdupdate', '-i', abspath)
+                if out is not None:
+                    self.owner.plotFromText(out, xlabel="Time (fs)", title="Update file",
+                        labels=['Step size (fs)', 'Error of A-vector', 'Error of phi/spfs']
+                    )
             case 'analint_4': # plot update step size
                 self.owner.runCmd('rdupdate', '-inter', '-i', abspath, input_='1')
