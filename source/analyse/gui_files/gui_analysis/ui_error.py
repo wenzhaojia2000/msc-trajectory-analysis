@@ -5,15 +5,15 @@
 
 from pathlib import Path
 from PyQt5 import QtWidgets, QtCore, QtGui
-from .ui_base import AnalysisBase
+from .ui_base import AnalysisMainInterface
 
 class ErrorWindow(QtWidgets.QWidget):
     '''
     UI of a popup that is displayed when an error occurs.
     '''
-    def __init__(self, owner:AnalysisBase, msg:str) -> None:
+    def __init__(self, owner:AnalysisMainInterface, msg:str) -> None:
         '''
-        Iniatiation method. Requires the owner AnalysisBase (AnalysisMain)
+        Iniatiation method. Requires the owner AnalysisMainInterface
         instance to access its popup_open variable and a string to display as
         the error message.
         '''

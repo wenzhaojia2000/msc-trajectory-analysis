@@ -3,20 +3,21 @@
 @author: 19081417
 '''
 
-import numpy as np
 import re
 import subprocess
 from pathlib import Path
-from PyQt5 import QtWidgets, QtCore, uic
 
-from .ui_base import AnalysisBase
+import numpy as np
+from PyQt5 import QtWidgets, QtCore
+
+from .ui_base import AnalysisMainInterface
 from .ui_error import ErrorWindow
 from .analysis_convergence import AnalysisConvergence
 from .analysis_integrator import AnalysisIntegrator
 from .analysis_results import AnalysisResults
 from .analysis_system import AnalysisSystem
 
-class AnalysisMain(QtWidgets.QMainWindow, AnalysisBase):
+class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
     '''
     UI of the main program.
     '''
@@ -24,23 +25,15 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisBase):
         '''
         The method that is called when a Ui instance is initiated.
         '''
-        # call the inherited classes' __init__ method
-        super().__init__()
-        # load the .ui file (from the folder this .py file is in rather than
-        # wherever this is executed)
-        uic.loadUi(Path(__file__).parent/'ui_analysis.ui', self)
-        # find objects from .ui file and give them a variable name
-        self.findObjects()
-        # connect signals to objects so they work
-        self.connectObjects()
+        # find absolute path to the .ui file (so it won't look whereever the
+        # script was run)
+        ui_file = Path(__file__).parent/'ui_analysis.ui'
+        # call the inherited classes' __init__ method with the location of the
+        # ui file
+        super().__init__(ui_file=ui_file)
 
-        # bool that records whether there is a popup open (if the code tries
-        # to open a popup while there is already one open the program
-        # segfaults!)
-        self.popup_open = False
         # set text in dir_edit to be the current working directory
         self.directoryChanged()
-
         # the program is futher composed of classes which dictate
         # function for each analysis tab
         self.convergence = AnalysisConvergence(self)
@@ -227,3 +220,4 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisBase):
             else:
                 self.output_plot.plot(arr[:, 0], arr[:, j], name=labels[j-1],
                                       pen=colours[j-1])
+        return None

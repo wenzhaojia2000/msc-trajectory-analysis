@@ -4,38 +4,19 @@
 '''
 
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisBase
+from .ui_base import AnalysisMainInterface, AnalysisTabInterface
 
-class AnalysisSystem(QtWidgets.QMainWindow, AnalysisBase):
+class AnalysisSystem(QtWidgets.QWidget, AnalysisTabInterface):
     '''
     Defines functionality for the "Analyse System Evolution" tab of the
     analysis GUI.
     '''
-    def __init__(self, owner:AnalysisBase) -> None:
+    def __init__(self, owner:AnalysisMainInterface) -> None:
         '''
-        Initiation method. Requires the owner AnalysisMain instance to access
-        some of its instance variables.
+        Initiation method.
         '''
-        super().__init__()
-        self.owner = owner
-        # find and connect objects from parent's .ui file
-        self.findObjects()
-        self.connectObjects()
-
-    def findObjects(self) -> None:
-        '''
-        Finds objects related to the current tab from the parent AnalysisMain
-        instance.
-        '''
-        self.push = self.owner.findChild(QtWidgets.QPushButton, 'analsys_push')
-        self.box = self.owner.findChild(QtWidgets.QBoxLayout, 'analsys_layout')
-        self.radio = [self.box.itemAt(i).widget() for i in range(self.box.count())]
-
-    def connectObjects(self) -> None:
-        '''
-        Connects objects so they do stuff when interacted with.
-        '''
-        self.push.clicked.connect(self.continuePushed)
+        super().__init__(owner=owner, push_name='analsys_push',
+                         box_name='analsys_layout')
 
     @QtCore.pyqtSlot()
     def continuePushed(self) -> None:
