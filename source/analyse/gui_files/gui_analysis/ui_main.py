@@ -76,7 +76,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             self.dir_edit.setText(str(Path.cwd()))
         # if the path is invalid, change to last acceptable path and open
         # error popup
-        elif Path(self.dir_edit.text()).is_dir() is False and self.popup_open is False:
+        elif Path(self.dir_edit.text()).is_dir() is False:
             self.showError('Directory does not exist or is invalid')
             self.dir_edit.undo()
         # if path is valid, resolve it (change to absolute path without ./
@@ -101,8 +101,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         Creates a popup window showing an error message.
         '''
-        self.popup_open = True
-        self.error_window = ErrorWindow(self, msg)
+        self.error_window = ErrorWindow(msg)
         self.error_window.show()
 
     def runCmd(self, *args, input_:str=None) -> str:

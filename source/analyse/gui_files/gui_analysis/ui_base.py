@@ -46,15 +46,6 @@ class AnalysisMainInterface(AnalysisBase):
         self.findObjects()
         self.connectObjects()
 
-        # a bool that records whether there is a popup open that is a part of
-        # the main program. the program may then have a class instance
-        # representing a popup that modifies this bool.
-        #
-        # the variable exists as overwriting a popup variable (possibly because
-        # the program was trying to make another popup) while the previous
-        # popup is still being shown causes the program to segfault.
-        self.popup_open = False
-
 class AnalysisTabInterface(AnalysisBase):
     '''
     Abstract class of an analysis tab. The tab should have the following:
