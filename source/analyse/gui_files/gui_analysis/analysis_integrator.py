@@ -28,16 +28,15 @@ class AnalysisIntegrator(QtWidgets.QMainWindow, AnalysisBase):
         Finds objects related to the current tab from the parent AnalysisMain
         instance.
         '''
-        self.analint_push = self.owner.findChild(QtWidgets.QPushButton, 'analint_push')
-        self.analint_box = self.owner.findChild(QtWidgets.QBoxLayout, 'analint_layout')
-        self.analint_radio = [self.analint_box.itemAt(i).widget() \
-                               for i in range(self.analint_box.count())]
+        self.push = self.owner.findChild(QtWidgets.QPushButton, 'analint_push')
+        self.box = self.owner.findChild(QtWidgets.QBoxLayout, 'analint_layout')
+        self.radio = [self.box.itemAt(i).widget() for i in range(self.box.count())]
 
     def connectObjects(self) -> None:
         '''
         Connects objects so they do stuff when interacted with.
         '''
-        self.analint_push.clicked.connect(self.continuePushed)
+        self.push.clicked.connect(self.continuePushed)
 
     @QtCore.pyqtSlot()
     def continuePushed(self) -> None:
@@ -47,7 +46,7 @@ class AnalysisIntegrator(QtWidgets.QMainWindow, AnalysisBase):
         # working directory
         abspath = self.owner.dir_edit.text()
         # get objectName() of checked radio button (there should only be 1)
-        radio_name = [radio.objectName() for radio in self.analint_radio
+        radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
         match radio_name:
             case 'analint_1': # analyse step size

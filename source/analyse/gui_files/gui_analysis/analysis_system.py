@@ -27,16 +27,15 @@ class AnalysisSystem(QtWidgets.QMainWindow, AnalysisBase):
         Finds objects related to the current tab from the parent AnalysisMain
         instance.
         '''
-        self.analsys_push = self.owner.findChild(QtWidgets.QPushButton, 'analsys_push')
-        self.analsys_box = self.owner.findChild(QtWidgets.QBoxLayout, 'analsys_layout')
-        self.analsys_radio = [self.analsys_box.itemAt(i).widget() \
-                               for i in range(self.analsys_box.count())]
+        self.push = self.owner.findChild(QtWidgets.QPushButton, 'analsys_push')
+        self.box = self.owner.findChild(QtWidgets.QBoxLayout, 'analsys_layout')
+        self.radio = [self.box.itemAt(i).widget() for i in range(self.box.count())]
 
     def connectObjects(self) -> None:
         '''
         Connects objects so they do stuff when interacted with.
         '''
-        self.analsys_push.clicked.connect(self.continuePushed)
+        self.push.clicked.connect(self.continuePushed)
 
     @QtCore.pyqtSlot()
     def continuePushed(self) -> None:
@@ -46,7 +45,7 @@ class AnalysisSystem(QtWidgets.QMainWindow, AnalysisBase):
         # working directory
         abspath = self.owner.dir_edit.text()
         # get objectName() of checked radio button (there should only be 1)
-        radio_name = [radio.objectName() for radio in self.analsys_radio
+        radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
         match radio_name:
             case 'analsys_1': # plot 1d density evolution

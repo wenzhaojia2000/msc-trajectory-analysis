@@ -27,10 +27,9 @@ class AnalysisResults(QtWidgets.QMainWindow, AnalysisBase):
         Finds objects related to the current tab from the parent AnalysisMain
         instance.
         '''
-        self.analres_push = self.owner.findChild(QtWidgets.QPushButton, 'analres_push')
-        self.analres_box = self.owner.findChild(QtWidgets.QBoxLayout, 'analres_layout')
-        self.analres_radio = [self.analres_box.itemAt(i).widget() \
-                               for i in range(self.analres_box.count())]
+        self.push = self.owner.findChild(QtWidgets.QPushButton, 'analres_push')
+        self.box = self.owner.findChild(QtWidgets.QBoxLayout, 'analres_layout')
+        self.radio = [self.box.itemAt(i).widget() for i in range(self.box.count())]
 
         # group box "autocorrelation options"
         self.autocol_box = self.owner.findChild(QtWidgets.QGroupBox, 'autocorrelation_box')
@@ -48,10 +47,10 @@ class AnalysisResults(QtWidgets.QMainWindow, AnalysisBase):
         '''
         Connects objects so they do stuff when interacted with.
         '''
-        self.analres_push.clicked.connect(self.continuePushed)
+        self.push.clicked.connect(self.continuePushed)
 
         # show the autocorrelation box when certain result in analyse results
-        for radio in self.analres_radio:
+        for radio in self.radio:
             radio.clicked.connect(self.autocolOptionSelected)
         # in autocorrelation box, allow damping order to change if tau nonzero
         self.autocol_tau.valueChanged.connect(self.autocolDampingChanged)
@@ -72,7 +71,7 @@ class AnalysisResults(QtWidgets.QMainWindow, AnalysisBase):
             str(self.autocol_iexp.value())
         ]
         # get objectName() of checked radio button (there should only be 1)
-        radio_name = [radio.objectName() for radio in self.analres_radio
+        radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
         match radio_name:
             case 'analres_1': # plot autocorrelation function
@@ -89,7 +88,7 @@ class AnalysisResults(QtWidgets.QMainWindow, AnalysisBase):
         '''
         Shows the autocorrelation options if a valid option is checked.
         '''
-        if self.analres_radio[1].isChecked() or self.analres_radio[2].isChecked():
+        if self.radio[1].isChecked() or self.radio[2].isChecked():
             self.autocol_box.show()
         else:
             self.autocol_box.hide()
