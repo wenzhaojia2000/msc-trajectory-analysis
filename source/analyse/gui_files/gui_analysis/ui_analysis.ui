@@ -84,7 +84,15 @@
         <property name="tabSpacing">
          <number>4</number>
         </property>
-        <widget class="QWidget" name="analconv_tab" native="true">
+        <widget class="QWidget" name="analconv_tab">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>356</width>
+           <height>348</height>
+          </rect>
+         </property>
          <attribute name="label">
           <string>Analyse Convergence</string>
          </attribute>
@@ -160,7 +168,15 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analint_tab" native="true">
+        <widget class="QWidget" name="analint_tab">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>356</width>
+           <height>348</height>
+          </rect>
+         </property>
          <attribute name="label">
           <string>Analyse Integrator</string>
          </attribute>
@@ -222,7 +238,15 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analres_tab" native="true">
+        <widget class="QWidget" name="analres_tab">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>-4</y>
+           <width>335</width>
+           <height>352</height>
+          </rect>
+         </property>
          <attribute name="label">
           <string>Analyse Results</string>
          </attribute>
@@ -292,7 +316,14 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="emin_spinbox"/>
+              <widget class="QDoubleSpinBox" name="emin_spinbox">
+               <property name="minimum">
+                <double>-inf</double>
+               </property>
+               <property name="maximum">
+                <double>inf</double>
+               </property>
+              </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="emax_label">
@@ -302,7 +333,14 @@
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="emax_spinbox"/>
+              <widget class="QDoubleSpinBox" name="emax_spinbox">
+               <property name="minimum">
+                <double>-inf</double>
+               </property>
+               <property name="maximum">
+                <double>inf</double>
+               </property>
+              </widget>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="unit_label">
@@ -323,12 +361,12 @@
                </item>
                <item>
                 <property name="text">
-                 <string>au</string>
+                 <string>au (Hartree)</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>nmwl</string>
+                 <string>nm wavelength</string>
                 </property>
                </item>
                <item>
@@ -358,6 +396,9 @@
                <property name="suffix">
                 <string> fs</string>
                </property>
+               <property name="maximum">
+                <double>inf</double>
+               </property>
               </widget>
              </item>
              <item row="4" column="0">
@@ -375,6 +416,9 @@
                <property name="minimum">
                 <number>1</number>
                </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
               </widget>
              </item>
             </layout>
@@ -389,7 +433,15 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analsys_tab" native="true">
+        <widget class="QWidget" name="analsys_tab">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>356</width>
+           <height>348</height>
+          </rect>
+         </property>
          <attribute name="label">
           <string>Analyse System</string>
          </attribute>
@@ -451,7 +503,15 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="compcal_tab" native="true">
+        <widget class="QWidget" name="compcal_tab">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>356</width>
+           <height>348</height>
+          </rect>
+         </property>
          <attribute name="label">
           <string>Compare Calculations</string>
          </attribute>
