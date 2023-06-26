@@ -23,17 +23,15 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTabInterface):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
-        # working directory
-        abspath = self.owner.dir_edit.text()
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
         match radio_name:
             case 'analsys_1': # plot 1d density evolution
-                self.owner.runCmd('showd1d', '-inter', '-i', abspath, input_='1')
+                self.owner.runCmd('showd1d', '-inter', input_='1')
             case 'analsys_2': # plot 2d density evolution
-                self.owner.runCmd('showsys', '-i', abspath)
+                self.owner.runCmd('showsys')
             case 'analsys_3': # plot diabatic state population
-                self.owner.runCmd('plstate', '-i', abspath)
+                self.owner.runCmd('plstate')
             case 'analsys_4': # plot potential energy surface
-                self.owner.runCmd('showsys', '-pes', '-i', abspath, input_='1')
+                self.owner.runCmd('showsys', '-pes', input_='1')

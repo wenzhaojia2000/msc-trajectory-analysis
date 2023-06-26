@@ -52,8 +52,6 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTabInterface):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
-        # working directory
-        abspath = self.owner.dir_edit.text()
         # additional arguments for autocorrelation options
         autocol_options = [
             str(self.autocol_emin.value()),
@@ -67,13 +65,13 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTabInterface):
                       if radio.isChecked()][0]
         match radio_name:
             case 'analres_1': # plot autocorrelation function
-                self.owner.runCmd('rdauto', '-inter', '-i', abspath)
+                self.owner.runCmd('rdauto', '-inter')
             case 'analres_2': # plot FT of autocorrelation function
-                self.owner.runCmd('autospec', '-inter', '-FT', '-i', abspath, *autocol_options)
+                self.owner.runCmd('autospec', '-inter', '-FT', *autocol_options)
             case 'analres_3': # plot spectrum from autocorrelation function
-                self.owner.runCmd('autospec', '-inter', '-i', abspath, *autocol_options)
+                self.owner.runCmd('autospec', '-inter', *autocol_options)
             case 'analres_4': # plot eigenvalues from matrix diagonalisation
-                self.owner.runCmd('rdeigval', '-inter', '-i', abspath)
+                self.owner.runCmd('rdeigval', '-inter')
 
     @QtCore.pyqtSlot()
     def autocolOptionSelected(self) -> None:

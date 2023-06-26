@@ -23,21 +23,19 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTabInterface):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
-        # working directory
-        abspath = self.owner.dir_edit.text()
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
         match radio_name:
             case 'analconv_1': # check orthonormality of spfs in psi file
-                self.owner.runCmd('ortho', '-i', abspath)
+                self.owner.runCmd('ortho')
             case 'analconv_2': # check orthonormality of spfs in restart file
-                self.owner.runCmd('ortho', '-r', '-i', abspath)
+                self.owner.runCmd('ortho', '-r')
             case 'analconv_3': # plot populations of natural orbitals
-                self.owner.runCmd('rdcheck', 'natpop', '1', '1', '-i', abspath)
+                self.owner.runCmd('rdcheck', 'natpop', '1', '1')
             case 'analconv_4': # plot populations of grid edges
-                self.owner.runCmd('rdgpop', '-i', abspath, '0')
+                self.owner.runCmd('rdgpop', '0')
             case 'analconv_5': # plot time-evolution of norm of wavefunction
-                self.owner.runCmd('norm', '-inter', '-i', abspath)
+                self.owner.runCmd('norm', '-inter')
             case 'analconv_6': # norm of wavefunction on restart file
-                self.owner.runCmd('norm', '-r', '-i', abspath)
+                self.owner.runCmd('norm', '-r')
