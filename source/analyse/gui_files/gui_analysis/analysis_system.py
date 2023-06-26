@@ -29,10 +29,10 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                       if radio.isChecked()][0]
         match radio_name:
             case 'analsys_1': # plot 1d density evolution
-                self.owner.runCmd('showd1d', '-inter', input_='1')
+                self.runCmd('showd1d', '-inter', input='1')
             case 'analsys_2': # plot 2d density evolution
-                self.owner.runCmd('showsys')
+                self.runCmd('showsys')
             case 'analsys_3': # plot diabatic state population
-                self.owner.runCmd('plstate')
+                self.runCmd('plstate')
             case 'analsys_4': # plot potential energy surface
-                self.owner.runCmd('showsys', '-pes', input_='1')
+                self.runCmd('showsys', '-pes', input='1')

@@ -66,13 +66,13 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
                       if radio.isChecked()][0]
         match radio_name:
             case 'analres_1': # plot autocorrelation function
-                self.owner.runCmd('rdauto', '-inter')
+                self.runCmd('rdauto', '-inter')
             case 'analres_2': # plot FT of autocorrelation function
-                self.owner.runCmd('autospec', '-inter', '-FT', *autocol_options)
+                self.runCmd('autospec', '-inter', '-FT', *autocol_options)
             case 'analres_3': # plot spectrum from autocorrelation function
-                self.owner.runCmd('autospec', '-inter', *autocol_options)
+                self.runCmd('autospec', '-inter', *autocol_options)
             case 'analres_4': # plot eigenvalues from matrix diagonalisation
-                self.owner.runCmd('rdeigval', '-inter')
+                self.runCmd('rdeigval', '-inter')
 
     @QtCore.pyqtSlot()
     def autocolOptionSelected(self) -> None:

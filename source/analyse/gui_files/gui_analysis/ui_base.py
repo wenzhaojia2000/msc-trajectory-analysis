@@ -6,6 +6,8 @@
 from abc import ABC, ABCMeta, abstractmethod
 from functools import wraps
 from typing import Callable
+import subprocess
+
 from PyQt5 import QtWidgets, QtCore, uic
 
 class AnalysisMeta(type(QtCore.QObject), ABCMeta):
@@ -116,3 +118,36 @@ class AnalysisTab(AnalysisBase):
             self.push.setText("Continue")
             return value
         return wrapper
+
+    def runCmd(self, *args, input:str=None) -> str:
+        '''
+        This function will run the shell command sent to it and either returns
+        and shows the result in the main window's output's text tab or displays
+        an error message (in which case None is returned).
+
+        args should be a series of strings with commas representing spaces, eg.
+        'ls', '-A', '/home/'. The keyword input_ is the a string to feed to
+        stdin after the command execution.
+        '''
+        try:
+            p = subprocess.run(args, universal_newlines=True, input=input,
+                               cwd=self.owner.dir_edit.text(), timeout=10,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               check=True)
+            self.owner.output_text.setText(p.stdout)
+            return p.stdout
+        except subprocess.SubprocessError as e:
+            self.owner.showError(f'Error ({e.__class__.__name__}): {e}'
+                                 f'\n\n{e.stdout}')
+            return None
+        except FileNotFoundError:
+            self.owner.showError('Error (FileNotFoundError)'
+                                 '\n\nThis error is likely caused by a quantics '
+                                 'program not being installed or being in an '
+                                 'invalid directory.')
+            return None
+        except Exception as e:
+            self.owner.showError(f'Error ({e.__class__.__name__})'
+                                 f'\n\n{e}')
+            return None
+

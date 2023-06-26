@@ -4,7 +4,6 @@
 '''
 
 import re
-import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -103,41 +102,6 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         self.error_window = ErrorWindow(msg)
         self.error_window.show()
-
-    def runCmd(self, *args, input_:str=None) -> str:
-        '''
-        This function will run the shell command sent to it and either returns
-        and shows the result in the output's text tab or displays an error
-        message (in which case None is returned).
-
-        args should be a series of strings with commas representing spaces, eg.
-        'ls', '-A', '/home/'. The keyword input_ is the a string to feed to
-        stdin after the command execution.
-        '''
-        try:
-            p = subprocess.run(args, universal_newlines=True, input=input_,
-                               cwd=self.dir_edit.text(), timeout=10,
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                               check=True)
-            self.output_text.setText(p.stdout)
-            return p.stdout
-        except subprocess.CalledProcessError as e:
-            self.showError(f'Error (CalledProcessError): {e}'
-                           f'\n\n{e.stdout}')
-            return None
-        except subprocess.TimeoutExpired as e:
-            self.showError(f'Error (TimeoutExpired): {e}'
-                           f'\n\n{e.stdout}')
-            return None
-        except FileNotFoundError:
-            self.showError('Error (FileNotFoundError)'
-                           '\n\nThis error is likely caused by a quantics program '
-                           'not being installed or being in an invalid directory.')
-            return None
-        except Exception as e:
-            self.showError(f'Error ({e.__class__.__name__})'
-                           f'\n\n{e}')
-            return None
 
     def plotFromText(self, text:str, title:str="", xlabel:str="", ylabel:str="",
                      labels:list=None) -> None:

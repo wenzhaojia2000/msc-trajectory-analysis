@@ -29,14 +29,14 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
                       if radio.isChecked()][0]
         match radio_name:
             case 'analconv_1': # check orthonormality of spfs in psi file
-                self.owner.runCmd('ortho')
+                self.runCmd('ortho')
             case 'analconv_2': # check orthonormality of spfs in restart file
-                self.owner.runCmd('ortho', '-r')
+                self.runCmd('ortho', '-r')
             case 'analconv_3': # plot populations of natural orbitals
-                self.owner.runCmd('rdcheck', 'natpop', '1', '1')
+                self.runCmd('rdcheck', 'natpop', '1', '1')
             case 'analconv_4': # plot populations of grid edges
-                self.owner.runCmd('rdgpop', '0')
+                self.runCmd('rdgpop', '0')
             case 'analconv_5': # plot time-evolution of norm of wavefunction
-                self.owner.runCmd('norm', '-inter')
+                self.runCmd('norm', '-inter')
             case 'analconv_6': # norm of wavefunction on restart file
-                self.owner.runCmd('norm', '-r')
+                self.runCmd('norm', '-r')
