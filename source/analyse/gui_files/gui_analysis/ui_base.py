@@ -48,7 +48,7 @@ class AnalysisMainInterface(AnalysisBase):
         self.findObjects()
         self.connectObjects()
 
-class AnalysisTabInterface(AnalysisBase):
+class AnalysisTab(AnalysisBase):
     '''
     Abstract class of an analysis tab. The tab should have the following:
     
@@ -92,26 +92,26 @@ class AnalysisTabInterface(AnalysisBase):
         Action to perform when the tab's push button is pushed.
         '''
         raise NotImplementedError
-
+        
+    @staticmethod
     def freezeContinue(func:Callable) -> Callable:
         '''
         Freezes the tab's push button given until func is executed. Can be used
-        as a decorator using @AnalysisTabInterface.freezeContinue
-        followed by func(*args, **kwargs) or as a function using
-        AnalysisTabInterface.freezeContinue(func)(*args, **kwargs).
+        as a decorator using @AnalysisTab.freezeContinue or as a function using
+        AnalysisTab.freezeContinue(func)(self, *args, **kwargs).
         '''
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             '''
             Modification of the original function func.
             '''
-            # freeze continue until command completes
             self.push.setEnabled(False)
             self.push.setText("Busy")
-            # force pyqt to update button immediately 
+            # force pyqt to update button immediately (otherwise pyqt leaves
+            # this until the end and nothing happens)
             self.push.repaint()
             value = func(self, *args, **kwargs)
-            # unfreeze
+            # func executed, now can unfreeze
             self.push.setEnabled(True)
             self.push.setText("Continue")
             return value

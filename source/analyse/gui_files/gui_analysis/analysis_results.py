@@ -4,9 +4,9 @@
 '''
 
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisMainInterface, AnalysisTabInterface
+from .ui_base import AnalysisMainInterface, AnalysisTab
 
-class AnalysisResults(QtWidgets.QWidget, AnalysisTabInterface):
+class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
     '''
     Defines functionality for the "Analyse Results" tab of the analysis
     GUI.
@@ -48,7 +48,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTabInterface):
         self.autocol_tau.valueChanged.connect(self.autocolDampingChanged)
 
     @QtCore.pyqtSlot()
-    @AnalysisTabInterface.freezeContinue
+    @AnalysisTab.freezeContinue
     def continuePushed(self) -> None:
         '''
         Action to perform when the tab's 'Continue' button is pushed.

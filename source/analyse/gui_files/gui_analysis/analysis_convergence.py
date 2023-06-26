@@ -4,9 +4,9 @@
 '''
 
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisMainInterface, AnalysisTabInterface
+from .ui_base import AnalysisMainInterface, AnalysisTab
 
-class AnalysisConvergence(QtWidgets.QWidget, AnalysisTabInterface):
+class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
     '''
     Defines functionality for the "Analyse Convergence" tab of the analysis
     GUI.
@@ -19,7 +19,7 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTabInterface):
                          box_name='analconv_layout')
 
     @QtCore.pyqtSlot()
-    @AnalysisTabInterface.freezeContinue
+    @AnalysisTab.freezeContinue
     def continuePushed(self) -> None:
         '''
         Action to perform when the tab's 'Continue' button is pushed.
