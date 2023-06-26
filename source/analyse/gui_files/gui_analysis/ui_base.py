@@ -4,6 +4,8 @@
 '''
 
 from abc import ABC, ABCMeta, abstractmethod
+from functools import wraps
+from typing import Callable
 from PyQt5 import QtWidgets, QtCore, uic
 
 class AnalysisMeta(type(QtCore.QObject), ABCMeta):
@@ -22,14 +24,14 @@ class AnalysisBase(ABC, metaclass=AnalysisMeta):
         Obtains UI elements as instance variables, and possibly some of their
         properties.
         '''
-        raise NotImplementedError
+        # abstractmethod will automatically raise an error if method is not
+        # implemented so seperate raise NotImplementedError is redundant
 
     @abstractmethod
     def connectObjects(self) -> None:
         '''
         Connects UI elements so they do stuff when interacted with.
         '''
-        raise NotImplementedError
 
 class AnalysisMainInterface(AnalysisBase):
     '''
@@ -90,3 +92,27 @@ class AnalysisTabInterface(AnalysisBase):
         Action to perform when the tab's push button is pushed.
         '''
         raise NotImplementedError
+
+    def freezeContinue(func:Callable) -> Callable:
+        '''
+        Freezes the tab's push button given until func is executed. Can be used
+        as a decorator using @AnalysisTabInterface.freezeContinue
+        followed by func(*args, **kwargs) or as a function using
+        AnalysisTabInterface.freezeContinue(func)(*args, **kwargs).
+        '''
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            '''
+            Modification of the original function func.
+            '''
+            # freeze continue until command completes
+            self.push.setEnabled(False)
+            self.push.setText("Busy")
+            # force pyqt to update button immediately 
+            self.push.repaint()
+            value = func(self, *args, **kwargs)
+            # unfreeze
+            self.push.setEnabled(True)
+            self.push.setText("Continue")
+            return value
+        return wrapper

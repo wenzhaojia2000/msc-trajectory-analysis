@@ -3,7 +3,6 @@
 @author: 19081417
 '''
 
-from pathlib import Path
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTabInterface
 
@@ -20,6 +19,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTabInterface):
                          box_name='analint_layout')
 
     @QtCore.pyqtSlot()
+    @AnalysisTabInterface.freezeContinue
     def continuePushed(self) -> None:
         '''
         Action to perform when the tab's 'Continue' button is pushed.

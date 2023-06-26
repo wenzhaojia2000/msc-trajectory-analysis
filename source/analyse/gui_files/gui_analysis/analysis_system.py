@@ -19,6 +19,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTabInterface):
                          box_name='analsys_layout')
 
     @QtCore.pyqtSlot()
+    @AnalysisTabInterface.freezeContinue
     def continuePushed(self) -> None:
         '''
         Action to perform when the tab's 'Continue' button is pushed.

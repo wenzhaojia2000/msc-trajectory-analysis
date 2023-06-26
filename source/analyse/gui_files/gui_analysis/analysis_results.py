@@ -48,6 +48,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTabInterface):
         self.autocol_tau.valueChanged.connect(self.autocolDampingChanged)
 
     @QtCore.pyqtSlot()
+    @AnalysisTabInterface.freezeContinue
     def continuePushed(self) -> None:
         '''
         Action to perform when the tab's 'Continue' button is pushed.
