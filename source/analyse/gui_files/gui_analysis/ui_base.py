@@ -131,7 +131,8 @@ class AnalysisTab(AnalysisBase):
         '''
         try:
             p = subprocess.run(args, universal_newlines=True, input=input,
-                               cwd=self.owner.dir_edit.text(), timeout=10,
+                               cwd=self.owner.dir_edit.text(),
+                               timeout=float(self.owner.timeout.value()),
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                check=True)
             self.owner.output_text.setText(p.stdout)

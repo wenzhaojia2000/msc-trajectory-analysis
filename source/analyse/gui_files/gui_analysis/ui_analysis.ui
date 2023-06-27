@@ -242,7 +242,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-4</y>
+           <y>0</y>
            <width>335</width>
            <height>352</height>
           </rect>
@@ -313,6 +313,9 @@
                <property name="textFormat">
                 <enum>Qt::AutoText</enum>
                </property>
+               <property name="buddy">
+                <cstring>emin_spinbox</cstring>
+               </property>
               </widget>
              </item>
              <item row="0" column="1">
@@ -330,6 +333,9 @@
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;max&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
+               <property name="buddy">
+                <cstring>emax_spinbox</cstring>
+               </property>
               </widget>
              </item>
              <item row="1" column="1">
@@ -346,6 +352,9 @@
               <widget class="QLabel" name="unit_label">
                <property name="text">
                 <string>Energy unit</string>
+               </property>
+               <property name="buddy">
+                <cstring>unit_combobox</cstring>
                </property>
               </widget>
              </item>
@@ -386,6 +395,9 @@
                <property name="text">
                 <string>Damping time (τ)</string>
                </property>
+               <property name="buddy">
+                <cstring>tau_spinbox</cstring>
+               </property>
               </widget>
              </item>
              <item row="3" column="1">
@@ -405,6 +417,9 @@
               <widget class="QLabel" name="iexp_label">
                <property name="text">
                 <string>Damping order</string>
+               </property>
+               <property name="buddy">
+                <cstring>iexp_spinbox</cstring>
                </property>
               </widget>
              </item>
@@ -552,6 +567,66 @@
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
            <widget class="PlotWidget" name="output_plot" native="true"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="options_tab">
+         <attribute name="title">
+          <string>Options</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="0">
+           <widget class="QLabel" name="title_label">
+            <property name="text">
+             <string>Plot title</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="timeout_label">
+            <property name="text">
+             <string>Timeout</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="title_edit">
+            <property name="placeholderText">
+             <string>Automatic</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="timeout_spinbox">
+            <property name="specialValueText">
+             <string>No timeout</string>
+            </property>
+            <property name="suffix">
+             <string> s</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <double>86400.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>10.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <spacer name="options_vspacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

@@ -58,6 +58,10 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.output_graph.setBackground('w')
         self.output_graph.showGrid(x=True, y=True)
 
+        # additional options
+        self.timeout = self.findChild(QtWidgets.QDoubleSpinBox, 'timeout_spinbox')
+        self.title = self.findChild(QtWidgets.QLineEdit, 'title_edit')
+
     def connectObjects(self) -> None:
         '''
         Connects objects so they do stuff when interacted with.
@@ -174,7 +178,10 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         colours = ['r', 'g', 'b', 'c', 'm', 'y', 'k']
         self.output_plot.setLabel("left", ylabel, color='k')
         self.output_plot.setLabel("bottom", xlabel, color='k')
-        self.output_plot.setTitle(title, color='k', bold=True)
+        if self.title.text() == "":
+            self.output_plot.setTitle(title, color='k', bold=True)
+        else:
+            self.output_plot.setTitle(self.title.text(), color='k', bold=True)
         self.output_plot.addLegend()
         # plot a line for each row after the first (which are the x values)
         for j in range(1, arr.shape[1]):
