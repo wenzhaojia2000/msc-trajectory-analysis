@@ -3,6 +3,8 @@
 @author: 19081417
 '''
 
+import re
+import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
 
@@ -17,6 +19,26 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         '''
         super().__init__(owner=owner, push_name='analint_push',
                          box_name='analint_layout')
+    
+    def findObjects(self, push_name, box_name) -> None:
+        '''
+        Obtains UI elements as instance variables, and possibly some of their
+        properties.
+        '''
+        super().findObjects(push_name, box_name)
+        self.update_box = self.owner.findChild(QtWidgets.QGroupBox, 'update_box')
+        self.update_plot = self.owner.findChild(QtWidgets.QComboBox, 'update_combobox')
+        # box is hidden initially
+        self.update_box.hide()
+
+    def connectObjects(self) -> None:
+        '''
+        Connects UI elements so they do stuff when interacted with.
+        '''
+        super().connectObjects()
+        # show the update options box when certain result is selected
+        for radio in self.radio:
+            radio.clicked.connect(self.updateOptionSelected)
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -32,11 +54,104 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
                 self.runCmd('rdsteps')
             case 'analint_2': # look at timing file
                 self.runCmd('cat', './timing')
-            case 'analint_3': # type update file
-                out = self.runCmd('rdupdate')
-                if out is not None:
-                    self.owner.plotFromText(out, xlabel="Time (fs)", title="Update file",
-                        labels=['Step size (fs)', 'Error of A-vector', 'Error of phi/spfs']
-                    )
-            case 'analint_4': # plot update step size
-                self.runCmd('rdupdate', '-inter', input='1')
+            case 'analint_3': # plot update file step size
+                self.rdupdate(plot_error=False)
+            case 'analint_4': # plot update file errors
+                self.rdupdate(plot_error=True)
+
+    @QtCore.pyqtSlot()
+    def updateOptionSelected(self) -> None:
+        '''
+        Shows the update options if a valid option is checked.
+        '''
+        if self.radio[3].isChecked():
+            self.update_box.show()
+        else:
+            self.update_box.hide()
+
+    def rdupdate(self, plot_error:bool=False):
+        '''
+        Reads the command output of using rdupdate, which is expected to be in
+        the format
+
+        x.1    y1.1    y2.1    y3.1
+        x.2    y1.2    y2.2    y3.2
+        ...    ...     ...     ...
+        x.m    y1.m    y2.m    y3.m
+
+        where x is time, y1 is step size, y2 is error of A, y3 is error of phi.
+        Each cell should be in a numeric form that can be converted into a 
+        float like 0.123 or 1.234E-10, etc., and cells are seperated with any
+        number of spaces (or tabs).
+
+        Plots the step size is plot_error is false, otherwise plots the errors,
+        chosen by the self.update_plot combobox.
+        '''
+        output = self.runCmd('rdupdate')
+        if output is None:
+            return None
+        # overcomplicated regex to match floats
+        # [+-]?                   optionally a + or - at the beginning
+        # \d+(?:\.\d*)?           a string of digits, optionally with decimal
+        #                         point and possibly more digits
+        # (?:[eE][+-]?\d+)?       optionally an exponential (e+N, e-N) at the
+        #                         end
+        # \.\d+                   catches floats that start with decimal like
+        #                         .25
+        # [+-]?inf|nan            catches weird values like +-inf and nan
+        float_regex = re.compile(
+            r'([+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|\.\d+|[+-]?inf|nan)'
+        )
+        # assemble data matrix
+        arr = []
+        for line in output.split('\n'):
+            # find all floats in the line
+            matches = re.findall(float_regex, line)
+            # should find four floats per line (x, y1, y2, y3)
+            if len(matches) == 4:
+                # regex returns strings, need to convert into float
+                arr.append(list(map(float, matches)))
+        arr = np.array(arr)
+        if arr.size == 0:
+            # nothing found: output is likely something else eg. some text
+            # like "cannot open or read update file". in which case, don't
+            # plot anything
+            print('[AnalysisIntegrator.rdupdate] I wasn\'t given any values to plot')
+            return None
+
+        # clear plot and switch tab to show plot
+        self.owner.output_plot.clear()
+        self.owner.tab_widget.setCurrentIndex(1)
+
+        # start plotting, depending on options
+        self.owner.output_plot.setLabel('bottom', 'Time (fs)', color='k')
+        legend = self.owner.output_plot.addLegend()
+        if plot_error:
+            self.owner.output_plot.setLabel('left', 'Error', color='k')
+            self.owner.output_plot.setTitle('Update file errors', color='k', bold=True)
+            match self.update_plot.currentIndex():
+                case 0:
+                    self.owner.output_plot.plot(arr[:, 0], arr[:, 2],
+                                                name='Error of A-vector', pen='r')
+                    self.owner.output_plot.plot(arr[:, 0], arr[:, 3],
+                                                name='Error of SPFs', pen='b')
+                case 1:
+                    self.owner.output_plot.plot(arr[:, 0], arr[:, 2],
+                                                name='Error of A-vector', pen='r')
+                case 2:
+                    self.owner.output_plot.plot(arr[:, 0], arr[:, 3],
+                                                name='Error of SPFs', pen='b')
+        else:
+            self.owner.output_plot.setTitle('Update file step size', color='k', bold=True)
+            self.owner.output_plot.setLabel('left', 'Step size (fs)', color='k')
+            self.owner.output_plot.plot(arr[:, 0], arr[:, 1], name='Step size', pen='r')
+
+        if self.owner.title.text() != "":
+            self.owner.output_plot.setTitle(self.owner.title.text(), color='k', bold=True)
+        if not self.owner.legend.isChecked():
+            legend.clear()
+        if self.owner.grid.isChecked():
+            self.owner.output_plot.showGrid(x=True, y=True)
+        else:
+            self.owner.output_plot.showGrid(x=False, y=False)
+        return None

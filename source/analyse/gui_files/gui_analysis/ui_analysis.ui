@@ -59,7 +59,7 @@
        </widget>
       </item>
       <item row="1" column="0" rowspan="2" colspan="2">
-       <widget class="QToolBox" name="toolBox">
+       <widget class="QToolBox" name="toolbox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -203,14 +203,14 @@
             <item>
              <widget class="QRadioButton" name="analint_3">
               <property name="text">
-               <string>Type update file</string>
+               <string>Plot update file step size</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QRadioButton" name="analint_4">
               <property name="text">
-               <string>Plot update step size</string>
+               <string>Plot update file errors</string>
               </property>
              </widget>
             </item>
@@ -228,6 +228,41 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="update_box">
+            <property name="title">
+             <string>Update file options</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="0">
+              <widget class="QLabel" name="update_label">
+               <property name="text">
+                <string>Plot errors</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="update_combobox">
+               <item>
+                <property name="text">
+                 <string>Both</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>A-vector</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Phi/SPFs</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="analint_push">
@@ -534,7 +569,7 @@
        </widget>
       </item>
       <item row="1" column="2" colspan="2">
-       <widget class="QTabWidget" name="tabWidget">
+       <widget class="QTabWidget" name="tab_widget">
         <property name="tabPosition">
          <enum>QTabWidget::South</enum>
         </property>
@@ -575,13 +610,6 @@
           <string>Options</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="1" column="0">
-           <widget class="QLabel" name="title_label">
-            <property name="text">
-             <string>Plot title</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="timeout_label">
             <property name="text">
@@ -589,14 +617,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="title_edit">
-            <property name="placeholderText">
-             <string>Automatic</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
+          <item row="0" column="1" colspan="2">
            <widget class="QDoubleSpinBox" name="timeout_spinbox">
             <property name="specialValueText">
              <string>No timeout</string>
@@ -615,7 +636,41 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="0">
+           <widget class="QLabel" name="title_label">
+            <property name="text">
+             <string>Plot title</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="2">
+           <widget class="QLineEdit" name="title_edit">
+            <property name="placeholderText">
+             <string>Automatic</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QCheckBox" name="legend_checkbox">
+            <property name="text">
+             <string>Show legend</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QCheckBox" name="grid_checkbox">
+            <property name="text">
+             <string>Show grid</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
            <spacer name="options_vspacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -659,7 +714,7 @@
  <tabstops>
   <tabstop>dir_edit</tabstop>
   <tabstop>dir_edit_dialog</tabstop>
-  <tabstop>toolBox</tabstop>
+  <tabstop>toolbox</tabstop>
   <tabstop>analconv_1</tabstop>
   <tabstop>analconv_2</tabstop>
   <tabstop>analconv_3</tabstop>

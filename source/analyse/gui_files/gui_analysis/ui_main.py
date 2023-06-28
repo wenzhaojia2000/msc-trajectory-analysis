@@ -47,6 +47,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
         self.dir_edit_dialog = self.findChild(QtWidgets.QToolButton, 'dir_edit_dialog')
+        self.tab_widget = self.findChild(QtWidgets.QTabWidget, 'tab_widget')
         self.output_text = self.findChild(QtWidgets.QTextEdit, 'output_text')
         self.output_graph = self.findChild(QtWidgets.QWidget, 'output_plot')
 
@@ -61,6 +62,8 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # additional options
         self.timeout = self.findChild(QtWidgets.QDoubleSpinBox, 'timeout_spinbox')
         self.title = self.findChild(QtWidgets.QLineEdit, 'title_edit')
+        self.legend = self.findChild(QtWidgets.QCheckBox, 'legend_checkbox')
+        self.grid = self.findChild(QtWidgets.QCheckBox, 'grid_checkbox')
 
     def connectObjects(self) -> None:
         '''
@@ -106,88 +109,3 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         self.error_window = ErrorWindow(msg)
         self.error_window.show()
-
-    def plotFromText(self, text:str, title:str="", xlabel:str="", ylabel:str="",
-                     labels:list=None) -> None:
-        '''
-        Plots a graph into self.output_plot from the given text in the format
-
-        x.1    y1.1    y2.1    ...    yn.1
-        x.2    y1.2    y2.2    ...    yn.2
-        ...    ...     ...     ...    ...
-        x.m    y1.m    y2.m    ...    yn.m
-
-        where each cell is in a numeric form that can be converted into a float 
-        like 0.123 or 1.234E-10, etc., and cells are seperated with any number
-        of spaces (or tabs).
-
-        The title, xlabel, ylabel, and legend entries (labels) of the graph
-        can also be set. If labels is None (not set), the legend will not be
-        shown.
-        '''
-        # overcomplicated regex to match floats
-        # [+-]?                   optionally a + or - at the beginning
-        # \d+(?:\.\d*)?           a string of digits, optionally with decimal
-        #                         point and possibly more digits
-        # (?:[eE][+-]?\d+)?       optionally an exponential (e+N, e-N) at the
-        #                         end
-        # \.\d+                   catches floats that start with decimal like
-        #                         .25
-        # [+-]?inf|nan            catches weird values like +-inf and nan
-        float_regex = re.compile(
-            r'([+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|\.\d+|[+-]?inf|nan)'
-        )
-        arr = []
-        row_shape = 0
-        for line in text.split('\n'):
-            # find all floats in the line
-            matches = re.findall(float_regex, line)
-            # add to list if at least one is found
-            if matches:
-                # make sure length of rows are consistent. set row_shape from
-                # first non-empty row and exit if found to be non-consistent
-                if len(arr) == 0:
-                    row_shape = len(matches)
-                    # probably not going to happen but i only have so many
-                    # colours to choose from
-                    if row_shape > 7:
-                        self.showError('Error (ValueError)'
-                                       '\n\nToo many lines to plot!')
-                        return None
-                elif len(matches) != row_shape:
-                    print('[AnalysisMain.plotFromText] Attempted to plot invalid text')
-                    return None
-                # regex returns strings, need to convert into float
-                arr.append(list(map(float, matches)))
-
-        arr = np.array(arr)
-        # no floats found: text is likely something else eg. a bunch of text
-        # like "cannot open or read update file". in which case, don't plot
-        # anything
-        if arr.size == 0:
-            print('[AnalysisMain.plotFromText] I wasn\'t given any values to plot')
-            return None
-        # make sure there's a label for each column if it is given
-        if labels is not None and len(labels) != arr.shape[1] - 1:
-            self.showError('Error (ValueError)'
-                           '\n\n[AnalysisMain.plotFromText] Number of labels '
-                           'given does not match number of lines to plot')
-            return None
-
-        # colours for different lines
-        colours = ['r', 'g', 'b', 'c', 'm', 'y', 'k']
-        self.output_plot.setLabel("left", ylabel, color='k')
-        self.output_plot.setLabel("bottom", xlabel, color='k')
-        if self.title.text() == "":
-            self.output_plot.setTitle(title, color='k', bold=True)
-        else:
-            self.output_plot.setTitle(self.title.text(), color='k', bold=True)
-        self.output_plot.addLegend()
-        # plot a line for each row after the first (which are the x values)
-        for j in range(1, arr.shape[1]):
-            if labels is None:
-                self.output_plot.plot(arr[:, 0], arr[:, j], pen=colours[j-1])
-            else:
-                self.output_plot.plot(arr[:, 0], arr[:, j], name=labels[j-1],
-                                      pen=colours[j-1])
-        return None
