@@ -115,10 +115,10 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
 
         # start plotting, depending on options
         self.owner.graph.setLabel('bottom', 'Time (fs)', color='k')
-        legend = self.owner.graph.addLegend()
+        self.owner.toggleLegend()
         if plot_error:
             self.owner.graph.setLabel('left', 'Error', color='k')
-            self.owner.graph.setTitle('Update file errors', color='k', bold=True)
+            self.owner.changePlotTitle('Update file errors')
             match self.update_plot.currentIndex():
                 case 0:
                     self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
@@ -132,17 +132,8 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
                     self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
                                           name='Error of SPFs', pen='b')
         else:
-            self.owner.graph.setTitle('Update file step size', color='k', bold=True)
+            self.owner.changePlotTitle('Update file step size')
             self.owner.graph.setLabel('left', 'Step size (fs)', color='k')
             self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
                                   name='Step size', pen='r')
-
-        if self.owner.title.text() != "":
-            self.owner.graph.setTitle(self.owner.title.text(), color='k', bold=True)
-        if not self.owner.legend.isChecked():
-            legend.clear()
-        if self.owner.grid.isChecked():
-            self.owner.graph.showGrid(x=True, y=True)
-        else:
-            self.owner.graph.showGrid(x=False, y=False)
         return None

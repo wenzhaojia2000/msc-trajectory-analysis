@@ -39,6 +39,9 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.integrator = AnalysisIntegrator(self)
         self.results =  AnalysisResults(self)
         self.system = AnalysisSystem(self)
+        # the title of the graph if title is set to 'automatic'. set through
+        # default_title argument of self.changePlotTitle
+        self.default_title = ""
 
     def findObjects(self) -> None:
         '''
@@ -74,6 +77,16 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         self.dir_edit.editingFinished.connect(self.directoryChanged)
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
+        self.title.editingFinished.connect(self.changePlotTitle)
+        self.legend.stateChanged.connect(self.toggleLegend)
+        self.grid.stateChanged.connect(self.toggleGrid)
+
+    def showError(self, msg:str) -> None:
+        '''
+        Creates a popup window showing an error message.
+        '''
+        self.error_window = ErrorWindow(msg)
+        self.error_window.show()
 
     @QtCore.pyqtSlot()
     def directoryChanged(self) -> None:
@@ -106,9 +119,40 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         if dirname:
             self.dir_edit.setText(dirname)
 
-    def showError(self, msg:str) -> None:
+    @QtCore.pyqtSlot()
+    def changePlotTitle(self, default_title:str=None) -> None:
         '''
-        Creates a popup window showing an error message.
+        Changes the title of the graph. Sets it to the default title if
+        custom title is set to Automatic. Change the default title using the
+        default_title argument.
         '''
-        self.error_window = ErrorWindow(msg)
-        self.error_window.show()
+        if default_title is not None:
+            self.default_title = default_title
+        if self.title.text() == "":
+            self.graph.setTitle(self.default_title, color='k', bold=True)
+        else:
+            self.graph.setTitle(self.title.text(), color='k', bold=True)
+
+    @QtCore.pyqtSlot()
+    def toggleLegend(self) -> None:
+        '''
+        Toggles the plot legend on and off, depending on the status of the show
+        legend checkbox.
+        '''
+        # if legend already exists, this just returns the legend
+        legend = self.graph.addLegend()
+        if self.legend.isChecked():
+            legend.show()
+        else:
+            legend.hide()
+
+    @QtCore.pyqtSlot()
+    def toggleGrid(self) -> None:
+        '''
+        Toggles the plot grid on and off, depending on the status of the show
+        grid checkbox.
+        '''
+        if self.grid.isChecked():
+            self.graph.showGrid(x=True, y=True)
+        else:
+            self.graph.showGrid(x=False, y=False)

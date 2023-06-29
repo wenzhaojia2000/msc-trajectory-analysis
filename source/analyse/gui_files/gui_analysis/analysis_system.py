@@ -154,23 +154,14 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         finally:
             self.owner.slider.sliderMoved.connect(self.showd1dChangePlot)
         # start plotting
-        legend = self.owner.graph.addLegend()
-        self.owner.graph.setTitle('1D density evolution', color='k', bold=True)
+        self.owner.changePlotTitle('1D density evolution')
+        self.owner.toggleLegend()
         self.owner.graph.setLabel('bottom', 'x', color='k')
         self.owner.graph.setLabel('left', 'y', color='k')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 2],
                               name='Re(phi)', pen='r')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 3],
                               name='Im(phi)', pen='b')
-
-        if self.owner.title.text() != "":
-            self.owner.graph.setTitle(self.owner.title.text(), color='k', bold=True)
-        if not self.owner.legend.isChecked():
-            legend.clear()
-        if self.owner.grid.isChecked():
-            self.owner.graph.showGrid(x=True, y=True)
-        else:
-            self.owner.graph.showGrid(x=False, y=False)
         return None
     
     @QtCore.pyqtSlot()
