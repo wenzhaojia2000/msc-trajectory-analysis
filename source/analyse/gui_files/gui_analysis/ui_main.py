@@ -48,16 +48,19 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
         self.dir_edit_dialog = self.findChild(QtWidgets.QToolButton, 'dir_edit_dialog')
         self.tab_widget = self.findChild(QtWidgets.QTabWidget, 'tab_widget')
-        self.output_text = self.findChild(QtWidgets.QTextEdit, 'output_text')
-        self.output_graph = self.findChild(QtWidgets.QWidget, 'output_plot')
+        self.text = self.findChild(QtWidgets.QTextEdit, 'output_text')
+        self.graph = self.findChild(QtWidgets.QWidget, 'output_plot')
+        self.slider = self.findChild(QtWidgets.QSlider, 'output_slider')
 
         # set icon of the dir_edit_dialog
         self.dir_edit_dialog.setIcon(self.style().standardIcon(
             QtWidgets.QStyle.SP_DirLinkIcon
         ))
         # set properties of output_graph
-        self.output_graph.setBackground('w')
-        self.output_graph.showGrid(x=True, y=True)
+        self.graph.setBackground('w')
+        self.graph.showGrid(x=True, y=True)
+        # hide slider initially
+        self.slider.hide()
 
         # additional options
         self.timeout = self.findChild(QtWidgets.QDoubleSpinBox, 'timeout_spinbox')

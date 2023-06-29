@@ -6,6 +6,7 @@
 from abc import ABC, ABCMeta, abstractmethod
 from functools import wraps
 from typing import Callable
+import re
 import subprocess
 
 from PyQt5 import QtWidgets, QtCore, uic
@@ -49,6 +50,9 @@ class AnalysisMainInterface(AnalysisBase):
         # following requires implementation of the abstract methods
         self.findObjects()
         self.connectObjects()
+        # data which may be displayed by the window, and may or may not be
+        # interacted with by some its widgets
+        self.data = None
 
 class AnalysisTab(AnalysisBase):
     '''
@@ -57,6 +61,20 @@ class AnalysisTab(AnalysisBase):
     - One QBoxLayout instance, containing at least one radio button
     - One QPushButton instance (confirming radio button selection)
     '''
+    # overcomplicated regex to match floats. class variable which can be used
+    # in derived class methods.
+    # [+-]?                   optionally a + or - at the beginning
+    # \d+(?:\.\d*)?           a string of digits, optionally with decimal
+    #                         point and possibly more digits
+    # (?:[eE][+-]?\d+)?       optionally an exponential (e+N, e-N) at the
+    #                         end
+    # \.\d+                   catches floats that start with decimal like
+    #                         .25
+    # [+-]?inf|nan            catches weird values like +-inf and nan
+    float_regex = re.compile(
+        r'([+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|\.\d+|[+-]?inf|nan)'
+    )
+    
     def __init__(self, owner:AnalysisMainInterface, push_name:str, box_name:str,
                  *args, **kwargs) -> None:
         '''
@@ -135,7 +153,7 @@ class AnalysisTab(AnalysisBase):
                                timeout=float(self.owner.timeout.value()),
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                check=True)
-            self.owner.output_text.setText(p.stdout)
+            self.owner.text.setText(p.stdout)
             return p.stdout
         except subprocess.SubprocessError as e:
             self.owner.showError(f'Error ({e.__class__.__name__}): {e}'

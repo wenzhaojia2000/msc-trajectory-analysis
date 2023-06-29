@@ -69,7 +69,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         else:
             self.update_box.hide()
 
-    def rdupdate(self, plot_error:bool=False):
+    def rdupdate(self, plot_error:bool=False) -> None:
         '''
         Reads the command output of using rdupdate, which is expected to be in
         the format
@@ -90,29 +90,17 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         output = self.runCmd('rdupdate')
         if output is None:
             return None
-        # overcomplicated regex to match floats
-        # [+-]?                   optionally a + or - at the beginning
-        # \d+(?:\.\d*)?           a string of digits, optionally with decimal
-        #                         point and possibly more digits
-        # (?:[eE][+-]?\d+)?       optionally an exponential (e+N, e-N) at the
-        #                         end
-        # \.\d+                   catches floats that start with decimal like
-        #                         .25
-        # [+-]?inf|nan            catches weird values like +-inf and nan
-        float_regex = re.compile(
-            r'([+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|\.\d+|[+-]?inf|nan)'
-        )
         # assemble data matrix
         arr = []
         for line in output.split('\n'):
             # find all floats in the line
-            matches = re.findall(float_regex, line)
+            matches = re.findall(self.float_regex, line)
             # should find four floats per line (x, y1, y2, y3)
             if len(matches) == 4:
                 # regex returns strings, need to convert into float
                 arr.append(list(map(float, matches)))
-        arr = np.array(arr)
-        if arr.size == 0:
+        self.owner.data = np.array(arr)
+        if self.owner.data.size == 0:
             # nothing found: output is likely something else eg. some text
             # like "cannot open or read update file". in which case, don't
             # plot anything
@@ -120,38 +108,41 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
             return None
 
         # clear plot and switch tab to show plot
-        self.owner.output_plot.clear()
+        self.owner.graph.clear()
+        self.owner.graph.getPlotItem().enableAutoRange()
         self.owner.tab_widget.setCurrentIndex(1)
+        self.owner.slider.hide()
 
         # start plotting, depending on options
-        self.owner.output_plot.setLabel('bottom', 'Time (fs)', color='k')
-        legend = self.owner.output_plot.addLegend()
+        self.owner.graph.setLabel('bottom', 'Time (fs)', color='k')
+        legend = self.owner.graph.addLegend()
         if plot_error:
-            self.owner.output_plot.setLabel('left', 'Error', color='k')
-            self.owner.output_plot.setTitle('Update file errors', color='k', bold=True)
+            self.owner.graph.setLabel('left', 'Error', color='k')
+            self.owner.graph.setTitle('Update file errors', color='k', bold=True)
             match self.update_plot.currentIndex():
                 case 0:
-                    self.owner.output_plot.plot(arr[:, 0], arr[:, 2],
-                                                name='Error of A-vector', pen='r')
-                    self.owner.output_plot.plot(arr[:, 0], arr[:, 3],
-                                                name='Error of SPFs', pen='b')
+                    self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
+                                          name='Error of A-vector', pen='r')
+                    self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
+                                          name='Error of SPFs', pen='b')
                 case 1:
-                    self.owner.output_plot.plot(arr[:, 0], arr[:, 2],
-                                                name='Error of A-vector', pen='r')
+                    self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
+                                          name='Error of A-vector', pen='r')
                 case 2:
-                    self.owner.output_plot.plot(arr[:, 0], arr[:, 3],
-                                                name='Error of SPFs', pen='b')
+                    self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
+                                          name='Error of SPFs', pen='b')
         else:
-            self.owner.output_plot.setTitle('Update file step size', color='k', bold=True)
-            self.owner.output_plot.setLabel('left', 'Step size (fs)', color='k')
-            self.owner.output_plot.plot(arr[:, 0], arr[:, 1], name='Step size', pen='r')
+            self.owner.graph.setTitle('Update file step size', color='k', bold=True)
+            self.owner.graph.setLabel('left', 'Step size (fs)', color='k')
+            self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
+                                  name='Step size', pen='r')
 
         if self.owner.title.text() != "":
-            self.owner.output_plot.setTitle(self.owner.title.text(), color='k', bold=True)
+            self.owner.graph.setTitle(self.owner.title.text(), color='k', bold=True)
         if not self.owner.legend.isChecked():
             legend.clear()
         if self.owner.grid.isChecked():
-            self.owner.output_plot.showGrid(x=True, y=True)
+            self.owner.graph.showGrid(x=True, y=True)
         else:
-            self.owner.output_plot.showGrid(x=False, y=False)
+            self.owner.graph.showGrid(x=False, y=False)
         return None

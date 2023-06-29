@@ -545,6 +545,43 @@
            </spacer>
           </item>
           <item>
+           <widget class="QGroupBox" name="den1d_box">
+            <property name="title">
+             <string>1D density options</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="0" column="0" rowspan="2">
+              <widget class="QLabel" name="dof_label">
+               <property name="text">
+                <string>Degree of freedom</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="dof_spinbox">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1" rowspan="2">
+              <widget class="QSpinBox" name="state_spinbox">
+               <property name="specialValueText">
+                <string>Sum over states</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="state_label">
+               <property name="text">
+                <string>State</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="analsys_push">
             <property name="text">
              <string>Continue</string>
@@ -602,6 +639,13 @@
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
            <widget class="PlotWidget" name="output_plot" native="true"/>
+          </item>
+          <item>
+           <widget class="QSlider" name="output_slider">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
