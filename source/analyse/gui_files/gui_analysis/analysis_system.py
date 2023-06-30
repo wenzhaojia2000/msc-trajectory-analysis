@@ -37,7 +37,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         super().connectObjects()
         # show the update options box when certain result is selected
         for radio in self.radio:
-            radio.clicked.connect(self.den1dOptionSelected)
+            radio.clicked.connect(self.optionSelected)
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -60,9 +60,9 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                 self.runCmd('showsys', '-pes', input='1')
 
     @QtCore.pyqtSlot()
-    def den1dOptionSelected(self) -> None:
+    def optionSelected(self) -> None:
         '''
-        Shows the 1D density options if a valid option is checked.
+        Shows per-analysis options if a valid option is checked.
         '''
         if self.radio[0].isChecked():
             self.den1d_box.show()
@@ -84,7 +84,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         x.2n    t.2    y1.2n    y2.2n
         ...                              <- empty lines
         x.mn    t.m    y1.mn    y2.mn
-                                         <- empty line
+                                         <- empty line(s) at end of file
 
         where x is position, t is time, and y1, y2 are the real and imag parts
         of the spf (?). Any lines starting with "set" or "plot" are ignored.

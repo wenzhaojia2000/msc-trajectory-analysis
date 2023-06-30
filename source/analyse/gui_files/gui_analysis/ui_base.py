@@ -169,4 +169,3 @@ class AnalysisTab(AnalysisBase):
             self.owner.showError(f'Error ({e.__class__.__name__})'
                                  f'\n\n{e}')
             return None
-

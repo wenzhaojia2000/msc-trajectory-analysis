@@ -3,10 +3,7 @@
 @author: 19081417
 '''
 
-import re
 from pathlib import Path
-
-import numpy as np
 from PyQt5 import QtWidgets, QtCore
 
 from .ui_base import AnalysisMainInterface

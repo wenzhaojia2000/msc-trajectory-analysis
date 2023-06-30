@@ -43,7 +43,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         super().connectObjects()
         # show the autocorrelation box when certain result in analyse results
         for radio in self.radio:
-            radio.clicked.connect(self.autocolOptionSelected)
+            radio.clicked.connect(self.optionSelected)
         # in autocorrelation box, allow damping order to change if tau nonzero
         self.autocol_tau.valueChanged.connect(self.autocolDampingChanged)
 
@@ -75,9 +75,9 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
                 self.runCmd('rdeigval', '-inter')
 
     @QtCore.pyqtSlot()
-    def autocolOptionSelected(self) -> None:
+    def optionSelected(self) -> None:
         '''
-        Shows the autocorrelation options if a valid option is checked.
+        Shows per-analysis options if a valid option is checked.
         '''
         if self.radio[1].isChecked() or self.radio[2].isChecked():
             self.autocol_box.show()

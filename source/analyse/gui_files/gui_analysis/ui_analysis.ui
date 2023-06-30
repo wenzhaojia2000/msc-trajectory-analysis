@@ -230,6 +230,59 @@
            </spacer>
           </item>
           <item>
+           <widget class="QGroupBox" name="timing_box">
+            <property name="title">
+             <string>Timing file options</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_6">
+             <item row="0" column="0">
+              <widget class="QLabel" name="timing_label">
+               <property name="text">
+                <string>Plot/Sort by</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="timing_combobox">
+               <property name="currentText">
+                <string>CPU</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Subroutine name</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Calls</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>CPU/Call</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>CPU</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>%CPU</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Clock</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <widget class="QGroupBox" name="update_box">
             <property name="title">
              <string>Update file options</string>
