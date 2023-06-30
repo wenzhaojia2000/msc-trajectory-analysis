@@ -69,7 +69,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        options = {1: self.timing_box, 2: self.update_box}
+        options = {1: self.timing_box, 3: self.update_box}
         for radio, box in options.items():
             if self.radio[radio].isChecked():
                 box.show()
@@ -97,7 +97,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         Plots a bar graph of the column selected by the user, and also outputs
         the timing file sorted by the selected column in the text tab.
         '''
-        filepath = Path('./timing')
+        filepath = Path(self.owner.dir_edit.text())/'timing'
         if filepath.is_file() is False:
             self.owner.showError('FileNotFound: Cannot find timing file in directory')
             return None
@@ -140,14 +140,11 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         # display sorted text
         text = "\n".join([line[-1] for line in self.owner.data])
         self.owner.text.setText(f'{pre}\n{text}\n\n{post}')
-        # clear plot
-        self.owner.graph.clear()
-        self.owner.graph.getPlotItem().enableAutoRange()
-        self.owner.slider.hide()
+        self.owner.resetPlot()
 
         # start plotting
         self.owner.changePlotTitle('Subroutine timings')
-        self.owner.toggleLegend()
+        self.owner.graph.setLabel('left', '')
         # this is a horizontal bar chart so everything is spun 90 deg. can't
         # do a normal vertical one as pyqtgraph can't rotate tick names (yet)
         if self.timing_sort.currentIndex() == 0:
@@ -205,16 +202,10 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
             print('[AnalysisIntegrator.rdupdate] I wasn\'t given any values to plot')
             return None
         self.owner.data = np.array(arr)
-
-        # clear plot and switch tab to show plot
-        self.owner.graph.clear()
-        self.owner.graph.getPlotItem().enableAutoRange()
-        self.owner.tab_widget.setCurrentIndex(1)
-        self.owner.slider.hide()
+        self.owner.resetPlot(True)
 
         # start plotting, depending on options
         self.owner.graph.setLabel('bottom', 'Time (fs)', color='k')
-        self.owner.toggleLegend()
         if plot_error:
             self.owner.graph.setLabel('left', 'Error', color='k')
             self.owner.changePlotTitle('Update file errors')

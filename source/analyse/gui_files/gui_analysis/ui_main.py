@@ -153,3 +153,18 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             self.graph.showGrid(x=True, y=True)
         else:
             self.graph.showGrid(x=False, y=False)
+
+    def resetPlot(self, switch_to_plot:bool=False) -> None:
+        '''
+        Resets the graph for replotting. Call this method before plotting
+        something new. Optionally can switch the tab menu so users can see the
+        new plot.
+        '''
+        self.graph.clear()
+        self.graph.getPlotItem().enableAutoRange()
+        self.graph.getAxis('bottom').setTicks(None)
+        self.graph.getAxis('left').setTicks(None)
+        self.toggleLegend()
+        self.slider.hide()
+        if switch_to_plot:
+            self.tab_widget.setCurrentIndex(1)

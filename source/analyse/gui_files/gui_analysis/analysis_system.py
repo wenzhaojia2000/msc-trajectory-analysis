@@ -3,6 +3,7 @@
 @author: 19081417
 '''
 
+from pathlib import Path
 import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
@@ -106,14 +107,14 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
 
         # find filename of command output
         if self.state.value() == 1:
-            filename = f'den1d_{den1d_options[0]}'
+            filepath = Path(self.owner.dir_edit.text())/f'den1d_{den1d_options[0]}'
         else:
-            filename = f'den1d_{"_".join(den1d_options)}'
+            filepath = Path(self.owner.dir_edit.text())/f'den1d_{"_".join(den1d_options)}'
         # arr is the entire data array, consisting of blocks, a compoent of arr
         # which represents the values at one given time.
         arr = []
         block = []
-        with open(filename, mode='r', encoding='utf-8') as f:
+        with open(filepath, mode='r', encoding='utf-8') as f:
             for line in f:
                 # ignore lines starting with set or plot
                 if line.startswith('set') or line.startswith('plot'):
@@ -137,11 +138,8 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             print('[AnalysisIntegrator.showd1d] I wasn\'t given any values to plot')
             return None
         self.owner.data = arr
+        self.owner.resetPlot(True)
 
-        # clear plot and switch tab to show plot
-        self.owner.graph.clear()
-        self.owner.graph.getPlotItem().enableAutoRange()
-        self.owner.tab_widget.setCurrentIndex(1)
         # show slider, set max value and value, and plot depending on position
         self.owner.slider.show()
         self.owner.slider.setMaximum(len(self.owner.data)-1)
@@ -155,7 +153,6 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             self.owner.slider.sliderMoved.connect(self.showd1dChangePlot)
         # start plotting
         self.owner.changePlotTitle('1D density evolution')
-        self.owner.toggleLegend()
         self.owner.graph.setLabel('bottom', 'x', color='k')
         self.owner.graph.setLabel('left', 'y', color='k')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 2],
