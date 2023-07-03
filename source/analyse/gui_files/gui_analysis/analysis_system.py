@@ -133,8 +133,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                     continue
                 block.append(list(map(float, matches)))
         if len(arr) == 0:
-            # nothing found: output is likely an error message in which case,
-            # don't plot anything
+            # nothing found?
             print('[AnalysisIntegrator.showd1d] I wasn\'t given any values to plot')
             return None
         self.owner.data = arr

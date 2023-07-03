@@ -170,12 +170,12 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         Reads the command output of using rdupdate, which is expected to be in
         the format
 
-        x.1    y1.1    y2.1    y3.1
-        x.2    y1.2    y2.2    y3.2
+        t.1    y1.1    y2.1    y3.1
+        t.2    y1.2    y2.2    y3.2
         ...    ...     ...     ...
-        x.m    y1.m    y2.m    y3.m
+        t.m    y1.m    y2.m    y3.m
 
-        where x is time, y1 is step size, y2 is error of A, y3 is error of phi.
+        where t is time, y1 is step size, y2 is error of A, y3 is error of phi.
         Each cell should be in a numeric form that can be converted into a 
         float like 0.123 or 1.234E-10, etc., and cells are seperated with any
         number of spaces (or tabs).
@@ -191,7 +191,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         for line in output.split('\n'):
             # find all floats in the line
             matches = re.findall(self.float_regex, line)
-            # should find four floats per line (x, y1, y2, y3)
+            # should find four floats per line (t, y1, y2, y3)
             if len(matches) == 4:
                 # regex returns strings, need to convert into float
                 arr.append(list(map(float, matches)))

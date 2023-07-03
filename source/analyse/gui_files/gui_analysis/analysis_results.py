@@ -3,6 +3,9 @@
 @author: 19081417
 '''
 
+from pathlib import Path
+import re
+import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
 
@@ -66,7 +69,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
                       if radio.isChecked()][0]
         match radio_name:
             case 'analres_1': # plot autocorrelation function
-                self.runCmd('rdauto', '-inter')
+                self.rdauto()
             case 'analres_2': # plot FT of autocorrelation function
                 self.runCmd('autospec', '-inter', '-FT', *autocol_options)
             case 'analres_3': # plot spectrum from autocorrelation function
@@ -94,3 +97,59 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
             self.autocol_iexp.setEnabled(False)
         else:
             self.autocol_iexp.setEnabled(True)
+            
+    def rdauto(self, plot_error:bool=False) -> None:
+        '''
+        Reads the auto file, which is expected to be in the format
+
+        t.1    y1.1    y2.1    y3.1
+        t.2    y1.2    y2.2    y3.2
+        ...    ...     ...     ...
+        t.m    y1.m    y2.m    y3.m
+
+        where x is time, and y1, y2, y3 are the real, imaginary, and absolute
+        value of the autocorrelation function. Headers are ignored. Each cell
+        should be in a numeric form that can be converted into a float like
+        0.123 or 1.234E-10, etc., and cells are seperated with any number of
+        spaces (or tabs).
+
+        Plots the autocorrelation function. Note that this function does not
+        use the 'rdauto' command, as it essentially just prints out the auto
+        file anyway.
+        '''
+        filepath = Path(self.owner.dir_edit.text())/'auto'
+        if filepath.is_file() is False:
+            self.owner.showError('FileNotFound: Cannot find auto file in directory')
+            return None
+        # reset text
+        self.owner.text.setText("")
+        # assemble data matrix
+        arr = []
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            for line in f:
+                # append line to text view (without \n at end)
+                self.owner.text.append(line[:-1])
+                # find all floats in the line
+                matches = re.findall(self.float_regex, line)
+                # should find four floats per line (t, y1, y2, y3)
+                if len(matches) == 4:
+                    # regex returns strings, need to convert into float
+                    arr.append(list(map(float, matches)))
+        if len(arr) == 0:
+            # nothing found?
+            print('[AnalysisResults.rdauto] I wasn\'t given any values to plot')
+            return None
+        self.owner.data = np.array(arr)
+        self.owner.resetPlot(True)
+
+        # start plotting
+        self.owner.graph.setLabel('bottom', 'Time (fs)', color='k')
+        self.owner.graph.setLabel('left', 'C(t)', color='k')
+        self.owner.changePlotTitle('Autocorrelation function')
+        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
+                              name='Real autocorrelation function', pen='r')
+        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
+                              name='Imag. autocorrelation function', pen='b')
+        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
+                              name='Abs. autocorrelation function', pen='g')
+        return None
