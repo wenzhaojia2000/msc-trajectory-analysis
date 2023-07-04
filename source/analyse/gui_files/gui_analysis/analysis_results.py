@@ -29,6 +29,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         super().findObjects(push_name, box_name)
         # group box "autocorrelation options"
         self.autocol_box = self.owner.findChild(QtWidgets.QGroupBox, 'autocorrelation_box')
+        self.autocol_prefac = self.owner.findChild(QtWidgets.QComboBox, 'prefac_combobox')
         self.autocol_emin = self.owner.findChild(QtWidgets.QDoubleSpinBox, 'emin_spinbox')
         self.autocol_emax = self.owner.findChild(QtWidgets.QDoubleSpinBox, 'emax_spinbox')
         self.autocol_unit = self.owner.findChild(QtWidgets.QComboBox, 'unit_combobox')
@@ -36,8 +37,6 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         self.autocol_iexp = self.owner.findChild(QtWidgets.QSpinBox, 'iexp_spinbox')
         # box is hidden initially
         self.autocol_box.hide()
-        # map of autocol_unit indices to command line argument (labels are different)
-        self.autocol_unit_map = {0: "ev", 1: "au", 2: "nmwl", 3: "cm-1", 4: "kcal/mol"}
 
     def connectObjects(self) -> None:
         '''
@@ -56,25 +55,15 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
-        # additional arguments for autocorrelation options
-        autocol_options = [
-            str(self.autocol_emin.value()),
-            str(self.autocol_emax.value()),
-            self.autocol_unit_map[self.autocol_unit.currentIndex()],
-            str(self.autocol_tau.value()),
-            str(self.autocol_iexp.value())
-        ]
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
         match radio_name:
             case 'analres_1': # plot autocorrelation function
                 self.rdauto()
-            case 'analres_2': # plot FT of autocorrelation function
-                self.runCmd('autospec', '-inter', '-FT', *autocol_options)
-            case 'analres_3': # plot spectrum from autocorrelation function
-                self.runCmd('autospec', '-inter', *autocol_options)
-            case 'analres_4': # plot eigenvalues from matrix diagonalisation
+            case 'analres_2': # plot spectrum from autocorrelation function
+                self.autospec()
+            case 'analres_3': # plot eigenvalues from matrix diagonalisation
                 self.runCmd('rdeigval', '-inter')
 
     @QtCore.pyqtSlot()
@@ -82,7 +71,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        if self.radio[1].isChecked() or self.radio[2].isChecked():
+        if self.radio[1].isChecked():
             self.autocol_box.show()
         else:
             self.autocol_box.hide()
@@ -152,4 +141,72 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
                               name='Imag. autocorrelation function', pen='b')
         self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
                               name='Abs. autocorrelation function', pen='g')
+        return None
+
+    def autospec(self):
+        '''
+        Reads the command output of using autospec, which is expected to be in
+        the format
+
+        E.1    g0.1    g1.1    g2.1
+        E.2    g0.2    g1.2    g2.2
+        ...    ...     ...     ...
+        E.m    g0.m    g1.m    g2.m
+
+        where E is energy, and gn are the spectra of the various filter
+        functions. Lines starting with '#' are ignored. Each cell should be in
+        a numeric form that can be converted into a float like 0.123 or
+        1.234E-10, etc., and cells are seperated with any number of spaces (or
+        tabs).
+
+        Plots the spectrum of the autocorrelation function.
+        '''
+        # map of autocol_unit indices to command line argument (labels are different)
+        autocol_unit_map = {0: "ev", 1: "au", 2: "nmwl", 3: "cm-1", 4: "kcal/mol"}
+        # additional arguments for autocorrelation options
+        autocol_options = [
+            str(self.autocol_emin.value()),
+            str(self.autocol_emax.value()),
+            autocol_unit_map[self.autocol_unit.currentIndex()],
+            str(self.autocol_tau.value()),
+            str(self.autocol_iexp.value())
+        ]
+        match self.autocol_prefac.currentIndex():
+            case 0:
+                output = self.runCmd('autospec', '-FT', *autocol_options)
+            case 1:
+                output = self.runCmd('autospec', '-EP', *autocol_options)
+        if output is None:
+            return None
+
+        arr = []
+        filepath = Path(self.owner.dir_edit.text())/'spectrum.pl'
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            for line in f:
+                # ignore lines starting with #
+                if line.startswith('#'):
+                    continue
+                # find all floats in the line
+                matches = re.findall(self.float_regex, line)
+                # should find 4 floats per line, if not, ignore that line
+                if len(matches) != 4:
+                    continue
+                arr.append(list(map(float, matches)))
+        if len(arr) == 0:
+            # nothing found?
+            print('[AnalysisResults.autospec] I wasn\'t given any values to plot')
+            return None
+        self.owner.data = np.array(arr)
+        self.owner.resetPlot(True)
+
+        # start plotting
+        self.owner.graph.setLabel('bottom', f'Energy ({self.autocol_unit.currentText()})', color='k')
+        self.owner.graph.setLabel('left', 'Spectrum', color='k')
+        self.owner.changePlotTitle('Autocorrelation spectrum')
+        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
+                              name='g0', pen='r')
+        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
+                              name='g1', pen='b')
+        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
+                              name='g2', pen='g')
         return None

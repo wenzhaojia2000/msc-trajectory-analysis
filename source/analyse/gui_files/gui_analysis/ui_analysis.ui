@@ -330,9 +330,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-6</y>
            <width>335</width>
-           <height>352</height>
+           <height>354</height>
           </rect>
          </property>
          <attribute name="label">
@@ -340,7 +340,7 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <layout class="QVBoxLayout" name="analres_layout" stretch="0,0,0,0">
+           <layout class="QVBoxLayout" name="analres_layout" stretch="0,0,0">
             <item>
              <widget class="QRadioButton" name="analres_1">
               <property name="text">
@@ -354,19 +354,12 @@
             <item>
              <widget class="QRadioButton" name="analres_2">
               <property name="text">
-               <string>Plot Fourier transform of autocorrelation function</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="analres_3">
-              <property name="text">
                <string>Plot spectrum from autocorrelation function</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="analres_4">
+             <widget class="QRadioButton" name="analres_3">
               <property name="text">
                <string>Plot eigenvalues from matrix diagonalisation</string>
               </property>
@@ -394,6 +387,27 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
              <item row="0" column="0">
+              <widget class="QLabel" name="prefac_label">
+               <property name="text">
+                <string>Prefactor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="prefac_combobox">
+               <item>
+                <property name="text">
+                 <string>None (Fourier Transform)</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Energy prefactor</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="0">
               <widget class="QLabel" name="emin_label">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;min&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -406,7 +420,7 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="emin_spinbox">
                <property name="minimum">
                 <double>-inf</double>
@@ -416,7 +430,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="emax_label">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;max&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -426,7 +440,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QDoubleSpinBox" name="emax_spinbox">
                <property name="minimum">
                 <double>-inf</double>
@@ -436,7 +450,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="unit_label">
                <property name="text">
                 <string>Energy unit</string>
@@ -446,7 +460,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="3" column="1">
               <widget class="QComboBox" name="unit_combobox">
                <property name="currentText">
                 <string>eV</string>
@@ -478,7 +492,7 @@
                </item>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="4" column="0">
               <widget class="QLabel" name="tau_label">
                <property name="text">
                 <string>Damping time (τ)</string>
@@ -488,7 +502,7 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="4" column="1">
               <widget class="QDoubleSpinBox" name="tau_spinbox">
                <property name="specialValueText">
                 <string>No damping</string>
@@ -501,7 +515,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="5" column="0">
               <widget class="QLabel" name="iexp_label">
                <property name="text">
                 <string>Damping order</string>
@@ -511,7 +525,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
+             <item row="5" column="1">
               <widget class="QSpinBox" name="iexp_spinbox">
                <property name="enabled">
                 <bool>false</bool>
@@ -827,7 +841,6 @@
   <tabstop>analres_1</tabstop>
   <tabstop>analres_2</tabstop>
   <tabstop>analres_3</tabstop>
-  <tabstop>analres_4</tabstop>
   <tabstop>emin_spinbox</tabstop>
   <tabstop>emax_spinbox</tabstop>
   <tabstop>unit_combobox</tabstop>
