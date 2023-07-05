@@ -144,13 +144,13 @@ class AnalysisTab(AnalysisBase):
         an error message (in which case None is returned).
 
         args should be a series of strings with commas representing spaces, eg.
-        'ls', '-A', '/home/'. The keyword input_ is the a string to feed to
+        'ls', '-A', '/home/'. The keyword input is the a string to feed to
         stdin after the command execution.
         '''
         try:
             p = subprocess.run(args, universal_newlines=True, input=input,
                                cwd=self.owner.dir_edit.text(),
-                               timeout=float(self.owner.timeout.value()),
+                               timeout=float(self.owner.timeout_spinbox.value()),
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                check=True)
             self.owner.text.setText(p.stdout)

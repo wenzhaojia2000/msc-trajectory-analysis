@@ -53,6 +53,8 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.text = self.findChild(QtWidgets.QTextEdit, 'output_text')
         self.graph = self.findChild(QtWidgets.QWidget, 'output_plot')
         self.slider = self.findChild(QtWidgets.QSlider, 'output_slider')
+        self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
+        self.timeout_menu = self.findChild(QtWidgets.QMenu, 'timeout_menu')
 
         # set icon of the dir_edit_dialog
         self.dir_edit_dialog.setIcon(self.style().standardIcon(
@@ -61,15 +63,23 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # hide slider initially
         self.slider.hide()
 
-        # additional options
-        self.timeout = self.findChild(QtWidgets.QDoubleSpinBox, 'timeout_spinbox')
-
     def connectObjects(self) -> None:
         '''
         Connects objects so they do stuff when interacted with.
         '''
         self.dir_edit.editingFinished.connect(self.directoryChanged)
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
+        self.menu_dir.triggered.connect(self.chooseDirectory)
+
+        # add a timeout spinbox to the timeout menu
+        self.timeout_spinbox = QtWidgets.QDoubleSpinBox(self)
+        self.timeout_spinbox.setSuffix(' s')
+        self.timeout_spinbox.setMaximum(86400)
+        self.timeout_spinbox.setValue(60)
+        self.timeout_spinbox.setDecimals(1)
+        timeout_action = QtWidgets.QWidgetAction(self)
+        timeout_action.setDefaultWidget(self.timeout_spinbox)
+        self.timeout_menu.addAction(timeout_action)
 
     def tweakGraph(self) -> None:
         '''
