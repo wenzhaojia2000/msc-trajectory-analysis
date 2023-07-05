@@ -28,6 +28,8 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # ui file
         super().__init__(ui_file=ui_file)
 
+        # set properties of the plot graph
+        self.tweakGraph()
         # set text in dir_edit to be the current working directory
         self.directoryChanged()
         # the program is futher composed of classes which dictate
@@ -56,17 +58,11 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.dir_edit_dialog.setIcon(self.style().standardIcon(
             QtWidgets.QStyle.SP_DirLinkIcon
         ))
-        # set properties of output_graph
-        self.graph.setBackground('w')
-        self.graph.showGrid(x=True, y=True)
         # hide slider initially
         self.slider.hide()
 
         # additional options
         self.timeout = self.findChild(QtWidgets.QDoubleSpinBox, 'timeout_spinbox')
-        self.title = self.findChild(QtWidgets.QLineEdit, 'title_edit')
-        self.legend = self.findChild(QtWidgets.QCheckBox, 'legend_checkbox')
-        self.grid = self.findChild(QtWidgets.QCheckBox, 'grid_checkbox')
 
     def connectObjects(self) -> None:
         '''
@@ -74,9 +70,39 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         self.dir_edit.editingFinished.connect(self.directoryChanged)
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
-        self.title.editingFinished.connect(self.changePlotTitle)
-        self.legend.stateChanged.connect(self.toggleLegend)
-        self.grid.stateChanged.connect(self.toggleGrid)
+
+    def tweakGraph(self) -> None:
+        '''
+        Sets the properties of self.graph, the pyqtgraph widget. Adds custom
+        menus to the pyqtgraph context menu, which is opened when right-
+        clicking on the graph.
+        '''
+        self.graph.setBackground('w')
+        self.graph.showGrid(x=True, y=True)
+        # these are the default menus that come with pyqtplot
+        # context_menu: the menu that pops up when right click on plot
+        # plot_menu: the submenu in the context_menu called 'plot options'
+        context_menu = self.graph.getPlotItem().vb.menu
+        plot_menu = self.graph.getPlotItem().ctrlMenu
+
+        # save video action (off by default)
+        self.save_video = context_menu.addAction("Save video")
+        self.save_video.setVisible(False)
+        # custom title action
+        plot_menu.addSeparator()
+        title_menu = plot_menu.addMenu("Custom title")
+        self.title_edit = QtWidgets.QLineEdit(self)
+        self.title_edit.setPlaceholderText('Automatic')
+        self.title_edit.setMinimumWidth(180)
+        self.title_edit.editingFinished.connect(self.changePlotTitle)
+        title_action = QtWidgets.QWidgetAction(self)
+        title_action.setDefaultWidget(self.title_edit)
+        title_menu.addAction(title_action)
+        # show legend action
+        self.legend_checkbox = plot_menu.addAction("Show Legend")
+        self.legend_checkbox.setCheckable(True)
+        self.legend_checkbox.setChecked(True)
+        self.legend_checkbox.triggered.connect(self.toggleLegend)
 
     def showError(self, msg:str) -> None:
         '''
@@ -125,10 +151,10 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         if default_title is not None:
             self.default_title = default_title
-        if self.title.text() == "":
+        if self.title_edit.text() == "":
             self.graph.setTitle(self.default_title, color='k', bold=True)
         else:
-            self.graph.setTitle(self.title.text(), color='k', bold=True)
+            self.graph.setTitle(self.title_edit.text(), color='k', bold=True)
 
     @QtCore.pyqtSlot()
     def toggleLegend(self) -> None:
@@ -138,21 +164,10 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         # if legend already exists, this just returns the legend
         legend = self.graph.addLegend()
-        if self.legend.isChecked():
+        if self.legend_checkbox.isChecked():
             legend.show()
         else:
             legend.hide()
-
-    @QtCore.pyqtSlot()
-    def toggleGrid(self) -> None:
-        '''
-        Toggles the plot grid on and off, depending on the status of the show
-        grid checkbox.
-        '''
-        if self.grid.isChecked():
-            self.graph.showGrid(x=True, y=True)
-        else:
-            self.graph.showGrid(x=False, y=False)
 
     def resetPlot(self, switch_to_plot:bool=False) -> None:
         '''
@@ -166,5 +181,6 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.graph.getAxis('left').setTicks(None)
         self.toggleLegend()
         self.slider.hide()
+        self.save_video.setVisible(False)
         if switch_to_plot:
             self.tab_widget.setCurrentIndex(1)
