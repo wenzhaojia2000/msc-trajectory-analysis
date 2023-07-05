@@ -30,11 +30,8 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         super().findObjects(push_name, box_name)
         self.timing_box = self.owner.findChild(QtWidgets.QGroupBox, 'timing_box')
         self.timing_sort = self.owner.findChild(QtWidgets.QComboBox, 'timing_combobox')
-        self.update_box = self.owner.findChild(QtWidgets.QGroupBox, 'update_box')
-        self.update_plot = self.owner.findChild(QtWidgets.QComboBox, 'update_combobox')
-        # boxes are hidden initially
+        # box is hidden initially
         self.timing_box.hide()
-        self.update_box.hide()
 
     def connectObjects(self) -> None:
         '''
@@ -69,7 +66,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        options = {1: self.timing_box, 3: self.update_box}
+        options = {1: self.timing_box}
         for radio, box in options.items():
             if self.radio[radio].isChecked():
                 box.show()
@@ -209,18 +206,10 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         if plot_error:
             self.owner.graph.setLabel('left', 'Error', color='k')
             self.owner.changePlotTitle('Update file errors')
-            match self.update_plot.currentIndex():
-                case 0:
-                    self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
-                                          name='Error of A-vector', pen='r')
-                    self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
-                                          name='Error of SPFs', pen='b')
-                case 1:
-                    self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
-                                          name='Error of A-vector', pen='r')
-                case 2:
-                    self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
-                                          name='Error of SPFs', pen='b')
+            self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
+                                  name='Error of A-vector', pen='r')
+            self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
+                                  name='Error of SPFs', pen='b')
         else:
             self.owner.changePlotTitle('Update file step size')
             self.owner.graph.setLabel('left', 'Step size (fs)', color='k')

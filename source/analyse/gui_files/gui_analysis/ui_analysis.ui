@@ -245,7 +245,7 @@
              <item row="0" column="1">
               <widget class="QComboBox" name="timing_combobox">
                <property name="currentText">
-                <string>CPU</string>
+                <string>Subroutine name</string>
                </property>
                <item>
                 <property name="text">
@@ -283,41 +283,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="update_box">
-            <property name="title">
-             <string>Update file options</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_4">
-             <item row="0" column="0">
-              <widget class="QLabel" name="update_label">
-               <property name="text">
-                <string>Plot errors</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="update_combobox">
-               <item>
-                <property name="text">
-                 <string>Both</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>A-vector</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Phi/SPFs</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="analint_push">
             <property name="text">
              <string>Continue</string>
@@ -330,7 +295,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-6</y>
+           <y>0</y>
            <width>335</width>
            <height>354</height>
           </rect>

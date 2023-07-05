@@ -71,10 +71,12 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        if self.radio[1].isChecked():
-            self.autocol_box.show()
-        else:
-            self.autocol_box.hide()
+        options = {1: self.autocol_box}
+        for radio, box in options.items():
+            if self.radio[radio].isChecked():
+                box.show()
+            else:
+                box.hide()
 
     @QtCore.pyqtSlot()
     def autocolDampingChanged(self) -> None:

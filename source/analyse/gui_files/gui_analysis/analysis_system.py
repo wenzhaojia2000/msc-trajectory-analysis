@@ -65,10 +65,12 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        if self.radio[0].isChecked():
-            self.den1d_box.show()
-        else:
-            self.den1d_box.hide()
+        options = {0: self.den1d_box}
+        for radio, box in options.items():
+            if self.radio[radio].isChecked():
+                box.show()
+            else:
+                box.hide()
 
     def showd1d(self) -> None:
         '''
@@ -139,7 +141,9 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         self.owner.data = arr
         self.owner.resetPlot(True)
 
-        # show slider, set max value and value, and plot depending on position
+        # show slider and save video option, set max value, and plot depending
+        # on position
+        self.owner.save_video.setVisible(True)
         self.owner.slider.show()
         self.owner.slider.setMaximum(len(self.owner.data)-1)
         self.owner.slider.setSliderPosition(0)
