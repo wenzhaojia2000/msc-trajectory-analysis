@@ -89,6 +89,10 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         self.graph.setBackground('w')
         self.graph.showGrid(x=True, y=True)
+        # remove the top axis and tick marks, so adding a label to the top axis
+        # looks like a subtitle
+        self.graph.getAxis('top').setPen((0, 0, 0, 0))
+        self.graph.getAxis('top').setStyle(tickLength=0, showValues=False)
         # these are the default menus that come with pyqtplot
         # context_menu: the menu that pops up when right click on plot
         # plot_menu: the submenu in the context_menu called 'plot options'
@@ -187,6 +191,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         self.graph.clear()
         self.graph.getPlotItem().enableAutoRange()
+        self.graph.setLabels(top='', bottom='', left='')
         self.graph.getAxis('bottom').setTicks(None)
         self.graph.getAxis('left').setTicks(None)
         self.toggleLegend()

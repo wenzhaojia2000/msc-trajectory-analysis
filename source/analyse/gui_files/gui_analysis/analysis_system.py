@@ -148,16 +148,17 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         self.owner.slider.setMaximum(len(self.owner.data)-1)
         self.owner.slider.setSliderPosition(0)
         try:
-            self.owner.slider.sliderMoved.disconnect()
+            self.owner.slider.valueChanged.disconnect()
         except TypeError:
             # happens if slider has no connections
             pass
         finally:
-            self.owner.slider.sliderMoved.connect(self.showd1dChangePlot)
+            self.owner.slider.valueChanged.connect(self.showd1dChangePlot)
         # start plotting
         self.owner.changePlotTitle('1D density evolution')
         self.owner.graph.setLabel('bottom', 'x', color='k')
         self.owner.graph.setLabel('left', 'y', color='k')
+        self.owner.graph.setLabel('top', f't={self.owner.data[0][0][1]}', color='k')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 2],
                               name='Re(phi)', pen='r')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 3],
@@ -175,6 +176,8 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         if self.owner.data and len(data_items) == 2:
             re, im = data_items
             if re.name() == 'Re(phi)' and im.name() == 'Im(phi)':
+                self.owner.graph.setLabel('top', f't={self.owner.data[slider_pos][0][1]} fs',
+                                          color='k')
                 re.setData(self.owner.data[slider_pos][:, 0],
                            self.owner.data[slider_pos][:, 2])
                 im.setData(self.owner.data[slider_pos][:, 0],
