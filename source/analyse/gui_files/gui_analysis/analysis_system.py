@@ -138,6 +138,9 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             # nothing found?
             print('[AnalysisIntegrator.showd1d] I wasn\'t given any values to plot')
             return None
+        if self.owner.keep_files.isChecked() is False:
+            # delete intermediate file
+            filepath.unlink()
         self.owner.data = arr
         self.owner.resetPlot(True)
 

@@ -198,6 +198,9 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
             # nothing found?
             print('[AnalysisResults.autospec] I wasn\'t given any values to plot')
             return None
+        if self.owner.keep_files.isChecked() is False:
+            # delete intermediate file
+            filepath.unlink()
         self.owner.data = np.array(arr)
         self.owner.resetPlot(True)
 

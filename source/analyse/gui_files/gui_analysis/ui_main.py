@@ -53,8 +53,9 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.text = self.findChild(QtWidgets.QTextEdit, 'output_text')
         self.graph = self.findChild(QtWidgets.QWidget, 'output_plot')
         self.slider = self.findChild(QtWidgets.QSlider, 'output_slider')
-        self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
         self.timeout_menu = self.findChild(QtWidgets.QMenu, 'timeout_menu')
+        self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
+        self.keep_files = self.findChild(QtWidgets.QAction, 'keep_files_checkbox')
 
         # set icon of the dir_edit_dialog
         self.dir_edit_dialog.setIcon(self.style().standardIcon(

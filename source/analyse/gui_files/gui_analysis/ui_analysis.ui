@@ -244,8 +244,8 @@
              </item>
              <item row="0" column="1">
               <widget class="QComboBox" name="timing_combobox">
-               <property name="currentText">
-                <string>Subroutine name</string>
+               <property name="currentIndex">
+                <number>3</number>
                </property>
                <item>
                 <property name="text">
@@ -712,6 +712,7 @@
      </property>
     </widget>
     <addaction name="timeout_menu"/>
+    <addaction name="keep_files_checkbox"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_options"/>
@@ -720,6 +721,14 @@
   <action name="menu_dir">
    <property name="text">
     <string>&amp;Open directory</string>
+   </property>
+  </action>
+  <action name="keep_files_checkbox">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Keep intermediate files</string>
    </property>
   </action>
  </widget>
