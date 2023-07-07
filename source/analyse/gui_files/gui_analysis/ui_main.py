@@ -152,7 +152,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         dirname = QtWidgets.QFileDialog.getExistingDirectory(self,
             'Open directory', self.dir_edit.text(),
-            options=QtWidgets.QFileDialog.Option.ShowDirsOnly
+            options=QtWidgets.QFileDialog.Options()
         )
         if dirname:
             self.dir_edit.setText(dirname)

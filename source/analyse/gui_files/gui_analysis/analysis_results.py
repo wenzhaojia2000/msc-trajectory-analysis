@@ -35,6 +35,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         self.autocol_unit = self.owner.findChild(QtWidgets.QComboBox, 'unit_combobox')
         self.autocol_tau = self.owner.findChild(QtWidgets.QDoubleSpinBox, 'tau_spinbox')
         self.autocol_iexp = self.owner.findChild(QtWidgets.QSpinBox, 'iexp_spinbox')
+        self.autocol_func = self.owner.findChild(QtWidgets.QComboBox, 'filfunc_combobox')
         # box is hidden initially
         self.autocol_box.hide()
 
@@ -173,6 +174,10 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
             str(self.autocol_tau.value()),
             str(self.autocol_iexp.value())
         ]
+        # need -lin flag if user selects g3, g4 or g5
+        if self.autocol_func.currentIndex() > 2:
+            autocol_options.insert(0, '-lin')
+        # choose prefactor
         match self.autocol_prefac.currentIndex():
             case 0:
                 output = self.runCmd('autospec', '-FT', *autocol_options)
@@ -208,10 +213,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         self.owner.graph.setLabel('bottom', f'Energy ({self.autocol_unit.currentText()})', color='k')
         self.owner.graph.setLabel('left', 'Spectrum', color='k')
         self.owner.changePlotTitle('Autocorrelation spectrum')
-        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
-                              name='g0', pen='r')
-        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
-                              name='g1', pen='b')
-        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
-                              name='g2', pen='g')
+        self.owner.graph.plot(self.owner.data[:, 0],
+                              self.owner.data[:, self.autocol_func.currentIndex()%3+1],
+                              name='Autocorrelation spectrum', pen='r')
         return None

@@ -159,15 +159,15 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             self.owner.slider.valueChanged.connect(self.showd1dChangePlot)
         # start plotting
         self.owner.changePlotTitle('1D density evolution')
-        self.owner.graph.setLabel('bottom', 'x', color='k')
-        self.owner.graph.setLabel('left', 'y', color='k')
+        self.owner.graph.setLabel('bottom', 'rd (au)', color='k')
+        self.owner.graph.setLabel('left', 'V (eV)', color='k')
         self.owner.graph.setLabel('top', f't={self.owner.data[0][0][1]}', color='k')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 2],
                               name='Re(phi)', pen='r')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 3],
                               name='Im(phi)', pen='b')
         return None
-    
+
     @QtCore.pyqtSlot()
     def showd1dChangePlot(self) -> None:
         '''

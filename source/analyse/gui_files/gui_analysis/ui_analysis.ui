@@ -297,7 +297,7 @@
            <x>0</x>
            <y>0</y>
            <width>335</width>
-           <height>354</height>
+           <height>383</height>
           </rect>
          </property>
          <attribute name="label">
@@ -437,7 +437,7 @@
                </item>
                <item>
                 <property name="text">
-                 <string>au (Hartree)</string>
+                 <string>au/Hartree</string>
                 </property>
                </item>
                <item>
@@ -501,6 +501,47 @@
                <property name="maximum">
                 <number>100</number>
                </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="filfunc_label">
+               <property name="text">
+                <string>Filter function</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QComboBox" name="filfunc_combobox">
+               <item>
+                <property name="text">
+                 <string>g0</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>g1</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>g2</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>g3</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>g4 (g'0)</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>g5 (g'1)</string>
+                </property>
+               </item>
               </widget>
              </item>
             </layout>
