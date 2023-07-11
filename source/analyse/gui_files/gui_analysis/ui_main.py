@@ -160,13 +160,10 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
     @QtCore.pyqtSlot()
     def changePlotTitle(self, default_title:str=None) -> None:
         '''
-        Changes the title of the graph. Sets it to the default title if
-        custom title is set to Automatic. Change the default title using the
-        default_title argument.
+        Changes the title of the graph, by setting it to the default title if
+        custom title is set to Automatic, or whatever the user wrote otherwise.
         '''
-        if default_title is not None:
-            self.default_title = default_title
-        if self.title_edit.text() == "":
+        if self.title_edit.text() == '':
             self.graph.setTitle(self.default_title, color='k', bold=True)
         else:
             self.graph.setTitle(self.title_edit.text(), color='k', bold=True)
@@ -184,11 +181,12 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         else:
             legend.hide()
 
-    def resetPlot(self, switch_to_plot:bool=False) -> None:
+    def resetPlot(self, switch_to_plot:bool=False, animated:bool=False) -> None:
         '''
         Resets the graph for replotting. Call this method before plotting
-        something new. Optionally can switch the tab menu so users can see the
-        new plot.
+        something new. Use switch_to_plot to switch the tab menu so users can
+        see the new plot. Use animated to enable the slider and 'save video'
+        options to prepare for an animated plot.
         '''
         self.graph.clear()
         self.graph.getPlotItem().enableAutoRange()
@@ -196,7 +194,29 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.graph.getAxis('bottom').setTicks(None)
         self.graph.getAxis('left').setTicks(None)
         self.toggleLegend()
-        self.slider.hide()
-        self.save_video.setVisible(False)
+        if animated:
+            self.slider.show()
+            self.save_video.setVisible(True)
+        else:
+            self.slider.hide()
+            self.save_video.setVisible(False)
         if switch_to_plot:
             self.tab_widget.setCurrentIndex(1)
+
+    def setPlotLabels(self, **kwargs) -> None:
+        '''
+        Sets the plot title using the title=... keyword and axis labels using
+        left=..., right=..., top=...
+
+        Use this function instead of self.graph.setLabels() to still allow the
+        user to customise the plot title (by calling self.changePlotTitle
+        instead of self.graph.setTitle).
+        '''
+        for key, value in kwargs.items():
+            if key == 'title':
+                self.default_title = value
+                self.changePlotTitle()
+            else:
+                if isinstance(value, str):
+                    value = (value,)
+                self.graph.setLabel(key, *value, color='k')

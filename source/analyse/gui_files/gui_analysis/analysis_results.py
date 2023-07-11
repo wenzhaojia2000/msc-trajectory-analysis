@@ -132,18 +132,17 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
             print('[AnalysisResults.rdauto] I wasn\'t given any values to plot')
             return None
         self.owner.data = np.array(arr)
-        self.owner.resetPlot(True)
 
         # start plotting
-        self.owner.graph.setLabel('bottom', 'Time (fs)', color='k')
-        self.owner.graph.setLabel('left', 'C(t)', color='k')
-        self.owner.changePlotTitle('Autocorrelation function')
+        self.owner.resetPlot(True)
+        self.owner.setPlotLabels(title='Autocorrelation function',
+                                 bottom='Time (fs)', left='C(t)')
         self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
-                              name='Real autocorrelation function', pen='r')
+                              name='Real autocorrelation', pen='r')
         self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
-                              name='Imag. autocorrelation function', pen='b')
+                              name='Imag. autocorrelation', pen='b')
         self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
-                              name='Abs. autocorrelation function', pen='g')
+                              name='Abs. autocorrelation', pen='g')
         return None
 
     def autospec(self):
@@ -207,12 +206,12 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
             # delete intermediate file
             filepath.unlink()
         self.owner.data = np.array(arr)
-        self.owner.resetPlot(True)
 
         # start plotting
-        self.owner.graph.setLabel('bottom', f'Energy ({self.autocol_unit.currentText()})', color='k')
-        self.owner.graph.setLabel('left', 'Spectrum', color='k')
-        self.owner.changePlotTitle('Autocorrelation spectrum')
+        self.owner.resetPlot(True)
+        self.owner.setPlotLabels(title='Autocorrelation spectrum',
+                                 bottom=f'Energy ({self.autocol_unit.currentText()})',
+                                 left='Spectrum')
         self.owner.graph.plot(self.owner.data[:, 0],
                               self.owner.data[:, self.autocol_func.currentIndex()%3+1],
                               name='Autocorrelation spectrum', pen='r')

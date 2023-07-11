@@ -142,12 +142,8 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             # delete intermediate file
             filepath.unlink()
         self.owner.data = arr
-        self.owner.resetPlot(True)
 
-        # show slider and save video option, set max value, and plot depending
-        # on position
-        self.owner.save_video.setVisible(True)
-        self.owner.slider.show()
+        # adjust slider properties, connect to showd1dChangePlot slot
         self.owner.slider.setMaximum(len(self.owner.data)-1)
         self.owner.slider.setSliderPosition(0)
         try:
@@ -158,10 +154,10 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         finally:
             self.owner.slider.valueChanged.connect(self.showd1dChangePlot)
         # start plotting
-        self.owner.changePlotTitle('1D density evolution')
-        self.owner.graph.setLabel('bottom', 'rd (au)', color='k')
-        self.owner.graph.setLabel('left', 'V (eV)', color='k')
-        self.owner.graph.setLabel('top', f't={self.owner.data[0][0][1]}', color='k')
+        self.owner.resetPlot(True, animated=True)
+        self.owner.setPlotLabels(title='1D density evolution',
+                                 bottom='rd (au)', left='V (ev)',
+                                 top=f't={self.owner.data[0][0][1]}')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 2],
                               name='Re(phi)', pen='r')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 3],
@@ -179,8 +175,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         if self.owner.data and len(data_items) == 2:
             re, im = data_items
             if re.name() == 'Re(phi)' and im.name() == 'Im(phi)':
-                self.owner.graph.setLabel('top', f't={self.owner.data[slider_pos][0][1]} fs',
-                                          color='k')
+                self.owner.setPlotLabels(top=f't={self.owner.data[slider_pos][0][1]} fs')
                 re.setData(self.owner.data[slider_pos][:, 0],
                            self.owner.data[slider_pos][:, 2])
                 im.setData(self.owner.data[slider_pos][:, 0],
