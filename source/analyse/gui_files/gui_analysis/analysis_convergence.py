@@ -37,6 +37,6 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
             case 'analconv_4': # plot populations of grid edges
                 self.runCmd('rdgpop', '0')
             case 'analconv_5': # plot time-evolution of norm of wavefunction
-                self.runCmd('norm', '-inter')
+                self.runCmd('norm')
             case 'analconv_6': # norm of wavefunction on restart file
                 self.runCmd('norm', '-r')

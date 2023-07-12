@@ -4,7 +4,7 @@
 '''
 
 from pathlib import Path
-import re
+# import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
@@ -51,7 +51,6 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                       if radio.isChecked()][0]
         match radio_name:
             case 'analsys_1': # plot 1d density evolution
-                # self.runCmd('showd1d', '-inter', input='1')
                 self.showd1d()
             case 'analsys_2': # plot 2d density evolution
                 self.runCmd('showsys')
@@ -75,7 +74,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
     def showd1d(self) -> None:
         '''
         Reads the file output of using showd1d -T, which is expected to be
-        in the format
+        in the format, where each cell is a float,
 
         x.11    t.1    y1.11    y2.11
         x.12    t.1    y1.12    y2.12
@@ -92,9 +91,6 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         where x is position, t is time, and y1, y2 are the real and imag parts
         of the spf (?). Any lines starting with "set" or "plot" are ignored.
         Time intervals t.1 ... t.m are expected to increase linearly upwards.
-        Each cell should be in a numeric form that can be converted into a
-        float like 0.123 or 1.234E-10, etc., and cells are seperated with any
-        number of spaces (or tabs).
 
         Plots the density over position with a scroll bar to scroll through
         time.
@@ -112,36 +108,15 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             filepath = Path(self.owner.dir_edit.text())/f'den1d_{den1d_options[0]}'
         else:
             filepath = Path(self.owner.dir_edit.text())/f'den1d_{"_".join(den1d_options)}'
-        # arr is the entire data array, consisting of blocks, a compoent of arr
-        # which represents the values at one given time.
-        arr = []
-        block = []
+        # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            for line in f:
-                # ignore lines starting with set or plot
-                if line.startswith('set') or line.startswith('plot'):
-                    continue
-                # new line. add block to arr and start a new block
-                if line == "\n":
-                    block = np.array(block)
-                    if block.size != 0:
-                        arr.append(block)
-                    block = []
-                    continue
-                # find all floats in the line
-                matches = re.findall(self.float_regex, line)
-                # should find 4 floats per line, if not, ignore that line
-                if len(matches) != 4:
-                    continue
-                block.append(list(map(float, matches)))
-        if len(arr) == 0:
-            # nothing found?
-            print('[AnalysisIntegrator.showd1d] I wasn\'t given any values to plot')
-            return None
+            self.readFloats(f, 4, ignore_regex=r'^plot|^set', check=True)
+            # split the matrix into chunks depending on its time column
+            n_interval = np.unique(self.owner.data[:, 1]).size
+            self.owner.data = np.split(self.owner.data, n_interval)
         if self.owner.keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
-        self.owner.data = arr
 
         # adjust slider properties, connect to showd1dChangePlot slot
         self.owner.slider.setMaximum(len(self.owner.data)-1)

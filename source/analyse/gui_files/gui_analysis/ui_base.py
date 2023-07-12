@@ -8,6 +8,7 @@ from functools import wraps
 from typing import Callable
 import re
 import subprocess
+import numpy as np
 
 from PyQt5 import QtWidgets, QtCore, uic
 
@@ -169,3 +170,62 @@ class AnalysisTab(AnalysisBase):
             self.owner.showError(f'Error ({e.__class__.__name__})'
                                  f'\n\n{e}')
             return None
+
+    def readFloats(self, iterable:list, floats_per_line:int=None,
+                   ignore_regex:re.Pattern|str=None, check:bool=False,
+                   write_text:bool=False) -> None:
+        '''
+        Function that reads a file or list of strings that is formatted in a
+        'grid', ie. in the form
+        
+        a1.1   a1.2   a1.3   ...   a1.n
+        a2.1   a2.2   a2.3   ...   a2.n
+        ...    ...    ...    ...   ...
+        am.1   am.2   am.3   ...   am.n
+        
+        and returns floats found in it in an numpy array. Each cell should be
+        in a numeric form that can be converted into a float like 0.123 or
+        1.234E-10, etc., and cells are seperated with any number of spaces (or
+        tabs).
+
+        iterable must be an iterable: if it is a string, use string.split('\n')
+        before using this function.
+        
+        The function only adds a row to the final array if and only if there
+        are `floats_per_line` floats in the line. If None, matches any number.
+        
+        If ignore_regex is set, the function ignores lines that match the
+        regex.
+        
+        If check is True, raises an exception if the function cannot find any
+        floats.
+        
+        If write_text is True, writes the file or iterable into the 'Text'
+        output tab.
+        '''
+        data = []
+        if write_text:
+            # clear text view if write_text is true
+            self.owner.text.setText("")
+        for line in iterable:
+            # write line to text view if write_text is true
+            if write_text:
+                self.owner.text.append(line[:-1])
+            # ignore finding floats on this line if matches regex
+            if ignore_regex and re.search(ignore_regex, line):
+                continue
+            # should find this number of floats per line, if not, ignore
+            # that line
+            matches = re.findall(self.float_regex, line)
+            if floats_per_line and len(matches) != floats_per_line:
+                continue
+            # regex returns strings, need to convert into float
+            data.append(list(map(float, matches)))
+        if len(data) == 0:
+            # nothing found
+            if check:
+                raise ValueError('No floats found in iterable')
+            else:
+                print('[readFloats] No floats found in iterable')
+        self.owner.data = np.array(data)
+        return None

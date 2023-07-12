@@ -4,8 +4,6 @@
 '''
 
 from pathlib import Path
-import re
-import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
 
@@ -65,7 +63,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
             case 'analres_2': # plot spectrum from autocorrelation function
                 self.autospec()
             case 'analres_3': # plot eigenvalues from matrix diagonalisation
-                self.runCmd('rdeigval', '-inter')
+                self.runCmd('rdeigval')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
@@ -92,7 +90,8 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
             
     def rdauto(self, plot_error:bool=False) -> None:
         '''
-        Reads the auto file, which is expected to be in the format
+        Reads the auto file, which is expected to be in the format, where each
+        cell is a float,
 
         t.1    y1.1    y2.1    y3.1
         t.2    y1.2    y2.2    y3.2
@@ -100,10 +99,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         t.m    y1.m    y2.m    y3.m
 
         where x is time, and y1, y2, y3 are the real, imaginary, and absolute
-        value of the autocorrelation function. Headers are ignored. Each cell
-        should be in a numeric form that can be converted into a float like
-        0.123 or 1.234E-10, etc., and cells are seperated with any number of
-        spaces (or tabs).
+        value of the autocorrelation function. Headers are ignored.
 
         Plots the autocorrelation function. Note that this function does not
         use the 'rdauto' command, as it essentially just prints out the auto
@@ -116,22 +112,8 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         # reset text
         self.owner.text.setText("")
         # assemble data matrix
-        arr = []
         with open(filepath, mode='r', encoding='utf-8') as f:
-            for line in f:
-                # append line to text view (without \n at end)
-                self.owner.text.append(line[:-1])
-                # find all floats in the line
-                matches = re.findall(self.float_regex, line)
-                # should find four floats per line (t, y1, y2, y3)
-                if len(matches) == 4:
-                    # regex returns strings, need to convert into float
-                    arr.append(list(map(float, matches)))
-        if len(arr) == 0:
-            # nothing found?
-            print('[AnalysisResults.rdauto] I wasn\'t given any values to plot')
-            return None
-        self.owner.data = np.array(arr)
+            self.readFloats(f, 4, write_text=True, check=True)
 
         # start plotting
         self.owner.resetPlot(True)
@@ -148,7 +130,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
     def autospec(self):
         '''
         Reads the command output of using autospec, which is expected to be in
-        the format
+        the format, where each cell is a float,
 
         E.1    g0.1    g1.1    g2.1
         E.2    g0.2    g1.2    g2.2
@@ -156,10 +138,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         E.m    g0.m    g1.m    g2.m
 
         where E is energy, and gn are the spectra of the various filter
-        functions. Lines starting with '#' are ignored. Each cell should be in
-        a numeric form that can be converted into a float like 0.123 or
-        1.234E-10, etc., and cells are seperated with any number of spaces (or
-        tabs).
+        functions. Lines starting with '#' are ignored.
 
         Plots the spectrum of the autocorrelation function.
         '''
@@ -185,27 +164,13 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         if output is None:
             return None
 
-        arr = []
         filepath = Path(self.owner.dir_edit.text())/'spectrum.pl'
+        # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            for line in f:
-                # ignore lines starting with #
-                if line.startswith('#'):
-                    continue
-                # find all floats in the line
-                matches = re.findall(self.float_regex, line)
-                # should find 4 floats per line, if not, ignore that line
-                if len(matches) != 4:
-                    continue
-                arr.append(list(map(float, matches)))
-        if len(arr) == 0:
-            # nothing found?
-            print('[AnalysisResults.autospec] I wasn\'t given any values to plot')
-            return None
+            self.readFloats(f, 4, r'^#', check=True)
         if self.owner.keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
-        self.owner.data = np.array(arr)
 
         # start plotting
         self.owner.resetPlot(True)

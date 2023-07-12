@@ -5,7 +5,6 @@
 
 from pathlib import Path
 import re
-import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from pyqtgraph import BarGraphItem
 from .ui_base import AnalysisMainInterface, AnalysisTab
@@ -165,7 +164,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
     def rdupdate(self, plot_error:bool=False) -> None:
         '''
         Reads the command output of using rdupdate, which is expected to be in
-        the format
+        the format, where each cell is a float,
 
         t.1    y1.1    y2.1    y3.1
         t.2    y1.2    y2.2    y3.2
@@ -173,9 +172,6 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         t.m    y1.m    y2.m    y3.m
 
         where t is time, y1 is step size, y2 is error of A, y3 is error of phi.
-        Each cell should be in a numeric form that can be converted into a 
-        float like 0.123 or 1.234E-10, etc., and cells are seperated with any
-        number of spaces (or tabs).
 
         Plots the step size is plot_error is false, otherwise plots the errors,
         chosen by the self.update_plot combobox.
@@ -184,21 +180,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         if output is None:
             return None
         # assemble data matrix
-        arr = []
-        for line in output.split('\n'):
-            # find all floats in the line
-            matches = re.findall(self.float_regex, line)
-            # should find four floats per line (t, y1, y2, y3)
-            if len(matches) == 4:
-                # regex returns strings, need to convert into float
-                arr.append(list(map(float, matches)))
-        if len(arr) == 0:
-            # nothing found: output is likely something else eg. some text
-            # like "cannot open or read update file". in which case, don't
-            # plot anything
-            print('[AnalysisIntegrator.rdupdate] I wasn\'t given any values to plot')
-            return None
-        self.owner.data = np.array(arr)
+        self.readFloats(output.split('\n'), 4)
 
         # start plotting, depending on options
         self.owner.resetPlot(True)
