@@ -177,12 +177,12 @@ class AnalysisTab(AnalysisBase):
         '''
         Function that reads a file or list of strings that is formatted in a
         'grid', ie. in the form
-        
+
         a1.1   a1.2   a1.3   ...   a1.n
         a2.1   a2.2   a2.3   ...   a2.n
         ...    ...    ...    ...   ...
         am.1   am.2   am.3   ...   am.n
-        
+
         and returns floats found in it in an numpy array. Each cell should be
         in a numeric form that can be converted into a float like 0.123 or
         1.234E-10, etc., and cells are seperated with any number of spaces (or
@@ -190,16 +190,16 @@ class AnalysisTab(AnalysisBase):
 
         iterable must be an iterable: if it is a string, use string.split('\n')
         before using this function.
-        
+
         The function only adds a row to the final array if and only if there
         are `floats_per_line` floats in the line. If None, matches any number.
-        
+
         If ignore_regex is set, the function ignores lines that match the
         regex.
-        
+
         If check is True, raises an exception if the function cannot find any
         floats.
-        
+
         If write_text is True, writes the file or iterable into the 'Text'
         output tab.
         '''

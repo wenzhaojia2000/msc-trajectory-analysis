@@ -4,7 +4,11 @@
 '''
 
 from pathlib import Path
+import shutil
+import subprocess
+
 from PyQt5 import QtWidgets, QtCore
+from pyqtgraph.exporters import ImageExporter
 
 from .ui_base import AnalysisMainInterface
 from .ui_error import ErrorWindow
@@ -102,6 +106,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
 
         # save video action (off by default)
         self.save_video = context_menu.addAction("Save video")
+        self.save_video.triggered.connect(self.saveVideo)
         self.save_video.setVisible(False)
         # custom title action
         plot_menu.addSeparator()
@@ -180,6 +185,50 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             legend.show()
         else:
             legend.hide()
+
+    @QtCore.pyqtSlot()
+    def saveVideo(self) -> None:
+        '''
+        Saves an .mp4 file of the current plot (which should be animated with
+        slider control). Requires ffmpeg installed on the command line.
+        '''
+        # make sure user has ffmpeg installed
+        try:
+            subprocess.run(['ffmpeg', '-version'])
+        except FileNotFoundError:
+            self.showError('Please install ffmpeg to call this function.')
+            return None
+        except subprocess.SubprocessError as e:
+            self.owner.showError(f'Error ({e.__class__.__name__}): {e}'
+                                 f'\n\n{e.stdout}')
+            return None
+        # obtain a savename for the file
+        savename, _ = QtWidgets.QFileDialog.getSaveFileName(self,
+            "Save File", self.dir_edit.text() + '/Untitled.mp4',
+            "Video (*.mp4);;All files (*)"
+        )
+        if savename == "":
+            # user cancels operation
+            return None
+        # add .mp4 suffix to savename if not already
+        savename = str(Path(savename).with_suffix('.mp4'))
+        # create a temporary directory in the same folder as chosen
+        temp_directory = Path(savename).parent/'frames'
+        temp_directory.mkdir(parents=True, exist_ok=True)
+
+        # export image for each frame, into the temporary directory
+        exporter = ImageExporter(self.graph.plotItem)
+        for i in range(self.slider.minimum(), self.slider.maximum()+1):
+            self.slider.setSliderPosition(i)
+            exporter.export(str(temp_directory/f'{i:05}.png'))
+
+        # run ffmpeg to generate video https://stackoverflow.com/questions/24961127
+        args = ['ffmpeg', '-framerate', '30', '-pattern_type', 'glob', '-i',
+                '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', str(savename)]
+        subprocess.run(args, cwd=temp_directory)
+        # delete the temporary folder
+        shutil.rmtree(temp_directory)
+        return None
 
     def resetPlot(self, switch_to_plot:bool=False, animated:bool=False) -> None:
         '''
