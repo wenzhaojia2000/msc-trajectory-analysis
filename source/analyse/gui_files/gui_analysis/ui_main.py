@@ -194,7 +194,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         # make sure user has ffmpeg installed
         try:
-            subprocess.run(['ffmpeg', '-version'])
+            subprocess.run(['ffmpeg', '-version'], check=False)
         except FileNotFoundError:
             self.showError('Please install ffmpeg to call this function.')
             return None
@@ -227,7 +227,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # run ffmpeg to generate video https://stackoverflow.com/questions/24961127
         args = ['ffmpeg', '-y', '-framerate', '30', '-pattern_type', 'glob', '-i',
                 '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', str(savename)]
-        subprocess.run(args, cwd=temp_directory)
+        subprocess.run(args, cwd=temp_directory, check=True)
         # delete the temporary folder
         shutil.rmtree(temp_directory)
         return None

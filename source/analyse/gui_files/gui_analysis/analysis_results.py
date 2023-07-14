@@ -87,8 +87,8 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
             self.autocol_iexp.setEnabled(False)
         else:
             self.autocol_iexp.setEnabled(True)
-            
-    def rdauto(self, plot_error:bool=False) -> None:
+
+    def rdauto(self) -> None:
         '''
         Reads the auto file, which is expected to be in the format, where each
         cell is a float,

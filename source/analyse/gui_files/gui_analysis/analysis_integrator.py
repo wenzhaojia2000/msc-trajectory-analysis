@@ -20,7 +20,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         '''
         super().__init__(owner=owner, push_name='analint_push',
                          box_name='analint_layout')
-    
+
     def findObjects(self, push_name, box_name) -> None:
         '''
         Obtains UI elements as instance variables, and possibly some of their

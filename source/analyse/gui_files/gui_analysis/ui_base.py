@@ -75,7 +75,7 @@ class AnalysisTab(AnalysisBase):
     float_regex = re.compile(
         r'([+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|\.\d+|[+-]?inf|nan)'
     )
-    
+
     def __init__(self, owner:AnalysisMainInterface, push_name:str, box_name:str,
                  *args, **kwargs) -> None:
         '''
@@ -113,7 +113,7 @@ class AnalysisTab(AnalysisBase):
         Action to perform when the tab's push button is pushed.
         '''
         raise NotImplementedError
-        
+
     @staticmethod
     def freezeContinue(func:Callable) -> Callable:
         '''
@@ -228,4 +228,3 @@ class AnalysisTab(AnalysisBase):
             else:
                 print('[readFloats] No floats found in iterable')
         self.owner.data = np.array(data)
-        return None

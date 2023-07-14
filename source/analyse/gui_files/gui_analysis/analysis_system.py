@@ -80,17 +80,17 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         x.12    t.1    y1.12    y2.12
         ...     ...    ...      ...
         x.1n    t.1    y1.1n    y2.1n
-                                         <- empty line
+
         x.21    t.2    y1.21    y2.21
         ...     ...    ...      ...
         x.2n    t.2    y1.2n    y2.2n
-        ...                              <- empty lines
+        ...
         x.mn    t.m    y1.mn    y2.mn
-                                         <- empty line(s) at end of file
 
         where x is position, t is time, and y1, y2 are the real and imag parts
-        of the spf (?). Any lines starting with "set" or "plot" are ignored.
-        Time intervals t.1 ... t.m are expected to increase linearly upwards.
+        of the spf. Any lines starting with "set" or "plot" are ignored.
+        Empty lines between time intervals are not required. Time intervals
+        t.1 ... t.m are expected to increase linearly upwards.
 
         Plots the density over position with a scroll bar to scroll through
         time.
@@ -155,4 +155,3 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                            self.owner.data[slider_pos][:, 2])
                 im.setData(self.owner.data[slider_pos][:, 0],
                            self.owner.data[slider_pos][:, 3])
-        return None
