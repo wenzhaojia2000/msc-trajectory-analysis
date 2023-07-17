@@ -173,8 +173,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>356</width>
-           <height>348</height>
+           <width>248</width>
+           <height>236</height>
           </rect>
          </property>
          <attribute name="label">
@@ -195,6 +195,9 @@
             </item>
             <item>
              <widget class="QRadioButton" name="analint_2">
+              <property name="statusTip">
+               <string>Reads ./timing and plots a bar chart.</string>
+              </property>
               <property name="text">
                <string>Look at timing file</string>
               </property>
@@ -202,6 +205,9 @@
             </item>
             <item>
              <widget class="QRadioButton" name="analint_3">
+              <property name="statusTip">
+               <string>Executes rdupdate and plots the step size.</string>
+              </property>
               <property name="text">
                <string>Plot update file step size</string>
               </property>
@@ -209,6 +215,9 @@
             </item>
             <item>
              <widget class="QRadioButton" name="analint_4">
+              <property name="statusTip">
+               <string>Executes rdupdate and plots the error.</string>
+              </property>
               <property name="text">
                <string>Plot update file errors</string>
               </property>
@@ -296,7 +305,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>335</width>
+           <width>330</width>
            <height>383</height>
           </rect>
          </property>
@@ -308,6 +317,9 @@
            <layout class="QVBoxLayout" name="analres_layout" stretch="0,0,0">
             <item>
              <widget class="QRadioButton" name="analres_1">
+              <property name="statusTip">
+               <string>Executes rdauto and plots the autocorrelation function.</string>
+              </property>
               <property name="text">
                <string>Plot autocorrelation function</string>
               </property>
@@ -318,6 +330,9 @@
             </item>
             <item>
              <widget class="QRadioButton" name="analres_2">
+              <property name="statusTip">
+               <string>Executes autospec and plots the spectrum.</string>
+              </property>
               <property name="text">
                <string>Plot spectrum from autocorrelation function</string>
               </property>
@@ -561,8 +576,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>356</width>
-           <height>348</height>
+           <width>276</width>
+           <height>266</height>
           </rect>
          </property>
          <attribute name="label">
@@ -573,6 +588,9 @@
            <layout class="QVBoxLayout" name="analsys_layout" stretch="0,0,0,0">
             <item>
              <widget class="QRadioButton" name="analsys_1">
+              <property name="statusTip">
+               <string>Executes showd1d and plots an animated density evolution.</string>
+              </property>
               <property name="text">
                <string>Plot 1D density evolution</string>
               </property>
@@ -663,7 +681,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="compcal_tab">
+        <widget class="QWidget" name="analdat_tab">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -673,7 +691,7 @@
           </rect>
          </property>
          <attribute name="label">
-          <string>Compare Calculations</string>
+          <string>Analyse Direct Dynamics</string>
          </attribute>
         </widget>
        </widget>
@@ -742,6 +760,7 @@
      <string>File</string>
     </property>
     <addaction name="menu_dir"/>
+    <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menu_options">
     <property name="title">
@@ -761,7 +780,13 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="menu_dir">
    <property name="text">
-    <string>&amp;Open directory</string>
+    <string>Open directory</string>
+   </property>
+   <property name="statusTip">
+    <string>Opens a directory with quantics files.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="keep_files_checkbox">
@@ -770,6 +795,20 @@
    </property>
    <property name="text">
     <string>Keep intermediate files</string>
+   </property>
+   <property name="statusTip">
+    <string>Keep any files generated from quantics programs.</string>
+   </property>
+  </action>
+  <action name="action_exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="statusTip">
+    <string>Exits the program.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>

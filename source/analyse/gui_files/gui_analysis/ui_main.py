@@ -58,6 +58,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.graph = self.findChild(QtWidgets.QWidget, 'output_plot')
         self.slider = self.findChild(QtWidgets.QSlider, 'output_slider')
         self.timeout_menu = self.findChild(QtWidgets.QMenu, 'timeout_menu')
+        self.exit = self.findChild(QtWidgets.QAction, 'action_exit')
         self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
         self.keep_files = self.findChild(QtWidgets.QAction, 'keep_files_checkbox')
 
@@ -75,6 +76,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.dir_edit.editingFinished.connect(self.directoryChanged)
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
         self.menu_dir.triggered.connect(self.chooseDirectory)
+        self.exit.triggered.connect(lambda x: self.close())
 
         # add a timeout spinbox to the timeout menu
         self.timeout_spinbox = QtWidgets.QDoubleSpinBox(self)
