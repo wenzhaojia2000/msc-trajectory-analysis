@@ -4,7 +4,6 @@
 '''
 
 from pathlib import Path
-# import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab

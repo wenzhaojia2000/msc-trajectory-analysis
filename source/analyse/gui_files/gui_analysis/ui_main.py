@@ -16,6 +16,7 @@ from .analysis_convergence import AnalysisConvergence
 from .analysis_integrator import AnalysisIntegrator
 from .analysis_results import AnalysisResults
 from .analysis_system import AnalysisSystem
+from .analysis_directdynamics import AnalysisDirectDynamics
 
 class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
     '''
@@ -42,6 +43,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.integrator = AnalysisIntegrator(self)
         self.results =  AnalysisResults(self)
         self.system = AnalysisSystem(self)
+        self.directdynamics = AnalysisDirectDynamics(self)
         # the title of the graph if title is set to 'automatic'. set through
         # default_title argument of self.changePlotTitle
         self.default_title = ""

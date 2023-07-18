@@ -173,8 +173,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>248</width>
-           <height>236</height>
+           <width>356</width>
+           <height>348</height>
           </rect>
          </property>
          <attribute name="label">
@@ -305,7 +305,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>330</width>
+           <width>335</width>
            <height>383</height>
           </rect>
          </property>
@@ -576,8 +576,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>276</width>
-           <height>266</height>
+           <width>356</width>
+           <height>348</height>
           </rect>
          </property>
          <attribute name="label">
@@ -681,7 +681,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analdat_tab">
+        <widget class="QWidget" name="analdd_tab">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -693,6 +693,52 @@
          <attribute name="label">
           <string>Analyse Direct Dynamics</string>
          </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item>
+           <layout class="QVBoxLayout" name="analdd_layout">
+            <item>
+             <widget class="QRadioButton" name="analdd_1">
+              <property name="statusTip">
+               <string>Reads ./log and plots the number of direct dynamics calculations per timestep.</string>
+              </property>
+              <property name="text">
+               <string>Plot calculation rate in log</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="analdd_2">
+              <property name="text">
+               <string>Check database</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="analdd_vspacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>259</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="analdd_push">
+            <property name="text">
+             <string>Continue</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>
