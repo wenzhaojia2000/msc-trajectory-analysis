@@ -144,7 +144,9 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         Plots the spectrum of the autocorrelation function.
         '''
         # map of autocol_unit indices to command line argument (labels are different)
-        autocol_unit_map = {0: "ev", 1: "au", 2: "nmwl", 3: "cm-1", 4: "kcal/mol"}
+        autocol_unit_map = {0: 'ev', 1: 'au', 2: 'nmwl', 3: 'cm-1', 4: 'kcal/mol',
+                            5: 'kj/mol', 6: 'invev', 7: 'kelvin', 8: 'debye',
+                            9: 'mev', 10: 'mh', 11: 'aj'}
         # additional arguments for autocorrelation options
         autocol_options = [
             str(self.autocol_emin.value()),

@@ -173,8 +173,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>248</width>
-           <height>236</height>
+           <width>356</width>
+           <height>348</height>
           </rect>
          </property>
          <attribute name="label">
@@ -305,7 +305,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>330</width>
+           <width>335</width>
            <height>383</height>
           </rect>
          </property>
@@ -470,6 +470,41 @@
                  <string>kcal mol⁻¹</string>
                 </property>
                </item>
+               <item>
+                <property name="text">
+                 <string>kJ mol⁻¹</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>eV⁻¹</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>K</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Debye</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>meV</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>mHa</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>aJ</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item row="4" column="0">
@@ -576,8 +611,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>276</width>
-           <height>266</height>
+           <width>356</width>
+           <height>348</height>
           </rect>
          </property>
          <attribute name="label">
@@ -686,8 +721,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>235</width>
-           <height>113</height>
+           <width>356</width>
+           <height>348</height>
           </rect>
          </property>
          <attribute name="label">
