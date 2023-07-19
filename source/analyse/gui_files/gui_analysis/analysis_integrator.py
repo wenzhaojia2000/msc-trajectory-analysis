@@ -50,15 +50,19 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
-        match radio_name:
-            case 'analint_1': # analyse step size
-                self.runCmd('rdsteps')
-            case 'analint_2': # look at timing file
-                self.rdtiming()
-            case 'analint_3': # plot update file step size
-                self.rdupdate(plot_error=False)
-            case 'analint_4': # plot update file errors
-                self.rdupdate(plot_error=True)
+        try:
+            match radio_name:
+                case 'analint_1': # analyse step size
+                    self.runCmd('rdsteps')
+                case 'analint_2': # look at timing file
+                    self.rdtiming()
+                case 'analint_3': # plot update file step size
+                    self.rdupdate(plot_error=False)
+                case 'analint_4': # plot update file errors
+                    self.rdupdate(plot_error=True)
+        except Exception as e:
+            self.owner.showError(f'Error ({e.__class__.__name__})'
+                                 f'\n\n{e}')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
@@ -95,16 +99,14 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         '''
         filepath = Path(self.owner.dir_edit.text())/'timing'
         if filepath.is_file() is False:
-            self.owner.showError('FileNotFound: Cannot find timing file in directory')
-            return None
+            raise FileNotFoundError('Cannot find timing file in directory')
         with open(filepath, mode='r', encoding='utf-8') as f:
             text = f.read()
         # split after 'Clock' and before 'Total' (see docstring), so we have
         # three strings, with the middle being the data
         splits = re.split(r'(?<=Clock)\n|\n(?=Total)', text, flags=re.IGNORECASE)
         if len(splits) != 3:
-            self.owner.showError('ValueError: Invalid timing file')
-            return None
+            raise ValueError('Invalid timing file')
         pre, text, post = splits
 
         arr = []
@@ -121,8 +123,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
                 arr.append(tuple(name + list(map(float, floats)) + [line]))
         if len(arr) == 0:
             # nothing found?
-            self.owner.showError('ValueError: Invalid timing file')
-            return None
+            raise ValueError('Invalid timing file')
 
         # sort by column chosen by user
         if self.timing_sort.currentIndex() == 0:
@@ -159,7 +160,6 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         for i, label in enumerate(names):
             ticks.append((positions[i], label))
         self.owner.graph.getAxis('left').setTicks([ticks])
-        return None
 
     def rdupdate(self, plot_error:bool=False) -> None:
         '''
@@ -177,8 +177,6 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         chosen by the self.update_plot combobox.
         '''
         output = self.runCmd('rdupdate')
-        if output is None:
-            return None
         # assemble data matrix
         self.readFloats(output.split('\n'), 4)
 

@@ -27,16 +27,20 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
-        match radio_name:
-            case 'analconv_1': # check orthonormality of spfs in psi file
-                self.runCmd('ortho')
-            case 'analconv_2': # check orthonormality of spfs in restart file
-                self.runCmd('ortho', '-r')
-            case 'analconv_3': # plot populations of natural orbitals
-                self.runCmd('rdcheck', 'natpop', '1', '1')
-            case 'analconv_4': # plot populations of grid edges
-                self.runCmd('rdgpop', '0')
-            case 'analconv_5': # plot time-evolution of norm of wavefunction
-                self.runCmd('norm')
-            case 'analconv_6': # norm of wavefunction on restart file
-                self.runCmd('norm', '-r')
+        try:
+            match radio_name:
+                case 'analconv_1': # check orthonormality of spfs in psi file
+                    self.runCmd('ortho')
+                case 'analconv_2': # check orthonormality of spfs in restart file
+                    self.runCmd('ortho', '-r')
+                case 'analconv_3': # plot populations of natural orbitals
+                    self.runCmd('rdcheck', 'natpop', '1', '1')
+                case 'analconv_4': # plot populations of grid edges
+                    self.runCmd('rdgpop', '0')
+                case 'analconv_5': # plot time-evolution of norm of wavefunction
+                    self.runCmd('norm')
+                case 'analconv_6': # norm of wavefunction on restart file
+                    self.runCmd('norm', '-r')
+        except Exception as e:
+            self.owner.showError(f'Error ({e.__class__.__name__})'
+                                 f'\n\n{e}')

@@ -202,10 +202,6 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         except FileNotFoundError:
             self.showError('Please install ffmpeg to call this function.')
             return None
-        except subprocess.SubprocessError as e:
-            self.owner.showError(f'Error ({e.__class__.__name__}): {e}'
-                                 f'\n\n{e.stdout}')
-            return None
         # obtain a savename for the file
         savename, _ = QtWidgets.QFileDialog.getSaveFileName(self,
             "Save File", self.dir_edit.text() + '/Untitled.mp4',
@@ -231,7 +227,13 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # run ffmpeg to generate video https://stackoverflow.com/questions/24961127
         args = ['ffmpeg', '-y', '-framerate', '30', '-pattern_type', 'glob', '-i',
                 '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', str(savename)]
-        subprocess.run(args, cwd=temp_directory, check=True)
+        try:
+            subprocess.run(args, cwd=temp_directory, check=True)
+        except subprocess.CalledProcessError as e:
+            self.owner.showError(f'ffmpeg error ({e.__class__.__name__}): {e}'
+                                 f'At the moment of this error, the console '
+                                 f'output was:\n\n{e.stdout}')
+            return None
         # delete the temporary folder
         shutil.rmtree(temp_directory)
         return None

@@ -57,13 +57,17 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
-        match radio_name:
-            case 'analres_1': # plot autocorrelation function
-                self.rdauto()
-            case 'analres_2': # plot spectrum from autocorrelation function
-                self.autospec()
-            case 'analres_3': # plot eigenvalues from matrix diagonalisation
-                self.runCmd('rdeigval')
+        try:
+            match radio_name:
+                case 'analres_1': # plot autocorrelation function
+                    self.rdauto()
+                case 'analres_2': # plot spectrum from autocorrelation function
+                    self.autospec()
+                case 'analres_3': # plot eigenvalues from matrix diagonalisation
+                    self.runCmd('rdeigval')
+        except Exception as e:
+            self.owner.showError(f'Error ({e.__class__.__name__})'
+                                 f'\n\n{e}')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
@@ -107,8 +111,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         '''
         filepath = Path(self.owner.dir_edit.text())/'auto'
         if filepath.is_file() is False:
-            self.owner.showError('FileNotFound: Cannot find auto file in directory')
-            return None
+            raise FileNotFoundError('Cannot find auto file in directory')
         # reset text
         self.owner.text.setText("")
         # assemble data matrix
@@ -125,7 +128,6 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
                               name='Imag. autocorrelation', pen='b')
         self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
                               name='Abs. autocorrelation', pen='g')
-        return None
 
     def autospec(self):
         '''
@@ -158,11 +160,9 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         # choose prefactor
         match self.autocol_prefac.currentIndex():
             case 0:
-                output = self.runCmd('autospec', '-FT', *autocol_options)
+                self.runCmd('autospec', '-FT', *autocol_options)
             case 1:
-                output = self.runCmd('autospec', '-EP', *autocol_options)
-        if output is None:
-            return None
+                self.runCmd('autospec', '-EP', *autocol_options)
 
         filepath = Path(self.owner.dir_edit.text())/'spectrum.pl'
         # assemble data matrix
@@ -180,4 +180,3 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         self.owner.graph.plot(self.owner.data[:, 0],
                               self.owner.data[:, self.autocol_func.currentIndex()%3+1],
                               name='Autocorrelation spectrum', pen='r')
-        return None

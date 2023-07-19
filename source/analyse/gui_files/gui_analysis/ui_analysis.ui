@@ -318,7 +318,7 @@
             <item>
              <widget class="QRadioButton" name="analres_1">
               <property name="statusTip">
-               <string>Executes rdauto and plots the autocorrelation function.</string>
+               <string>Reads ./auto and plots the autocorrelation function.</string>
               </property>
               <property name="text">
                <string>Plot autocorrelation function</string>
@@ -702,7 +702,7 @@
                <string>Reads ./log and plots the number of direct dynamics calculations per timestep.</string>
               </property>
               <property name="text">
-               <string>Plot calculation rate in log</string>
+               <string>Plot DD calculation rate from log</string>
               </property>
               <property name="checked">
                <bool>true</bool>

@@ -48,15 +48,19 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         # get objectName() of checked radio button (there should only be 1)
         radio_name = [radio.objectName() for radio in self.radio
                       if radio.isChecked()][0]
-        match radio_name:
-            case 'analsys_1': # plot 1d density evolution
-                self.showd1d()
-            case 'analsys_2': # plot 2d density evolution
-                self.runCmd('showsys')
-            case 'analsys_3': # plot diabatic state population
-                self.runCmd('plstate')
-            case 'analsys_4': # plot potential energy surface
-                self.runCmd('showsys', '-pes', input='1')
+        try:
+            match radio_name:
+                case 'analsys_1': # plot 1d density evolution
+                    self.showd1d()
+                case 'analsys_2': # plot 2d density evolution
+                    self.runCmd('showsys')
+                case 'analsys_3': # plot diabatic state population
+                    self.runCmd('plstate')
+                case 'analsys_4': # plot potential energy surface
+                    self.runCmd('showsys', '-pes', input='1')
+        except Exception as e:
+            self.owner.showError(f'Error ({e.__class__.__name__})'
+                                 f'\n\n{e}')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
@@ -98,9 +102,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             'f' + str(self.dof.value()),
             's' + str(self.state.value())
         ]
-        output = self.runCmd('showd1d', '-T', '-w', *den1d_options)
-        if output is None:
-            return None
+        self.runCmd('showd1d', '-T', '-w', *den1d_options)
 
         # find filename of command output
         if self.state.value() == 1:
@@ -136,7 +138,6 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                               name='Re(phi)', pen='r')
         self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 3],
                               name='Im(phi)', pen='b')
-        return None
 
     @QtCore.pyqtSlot()
     def showd1dChangePlot(self) -> None:

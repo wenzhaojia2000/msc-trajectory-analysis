@@ -112,7 +112,6 @@ class AnalysisTab(AnalysisBase):
         '''
         Action to perform when the tab's push button is pushed.
         '''
-        raise NotImplementedError
 
     @staticmethod
     def freezeContinue(func:Callable) -> Callable:
@@ -140,9 +139,8 @@ class AnalysisTab(AnalysisBase):
 
     def runCmd(self, *args, input:str=None) -> str:
         '''
-        This function will run the shell command sent to it and either returns
-        and shows the result in the main window's output's text tab or displays
-        an error message (in which case None is returned).
+        Execute the shell command sent by args. Returns and shows the result in
+        the main window's output's text tab.
 
         args should be a series of strings with commas representing spaces, eg.
         'ls', '-A', '/home/'. The keyword input is the a string to feed to
@@ -156,20 +154,21 @@ class AnalysisTab(AnalysisBase):
                                check=True)
             self.owner.text.setText(p.stdout)
             return p.stdout
-        except subprocess.SubprocessError as e:
-            self.owner.showError(f'Error ({e.__class__.__name__}): {e}'
-                                 f'\n\n{e.stdout}')
-            return None
-        except FileNotFoundError:
-            self.owner.showError('Error (FileNotFoundError)'
-                                 '\n\nThis error is likely caused by a quantics '
-                                 'program not being installed or being in an '
-                                 'invalid directory.')
-            return None
-        except Exception as e:
-            self.owner.showError(f'Error ({e.__class__.__name__})'
-                                 f'\n\n{e}')
-            return None
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
+            # something went wrong executing the function. add the console
+            # stdout to the end of the error string, then raise error again.
+            if e.stdout:
+                msg = (f'{e} At the moment of this error, the console output '
+                       f'was:\n\n{e.stdout}')
+            # TimeoutExpired and CalledProcessError do not have an attribute
+            # for message, instead generating the message by overloading __str__.
+            # workaround by just raising the base error type
+            raise subprocess.SubprocessError(msg) from None
+        except FileNotFoundError as e:
+            # custom message
+            e.strerror = 'The program cannot be found'
+            e.filename = args[0]
+            raise
 
     def readFloats(self, iterable:list, floats_per_line:int=None,
                    ignore_regex:re.Pattern|str=None, check:bool=False,
@@ -183,10 +182,10 @@ class AnalysisTab(AnalysisBase):
         ...    ...    ...    ...   ...
         am.1   am.2   am.3   ...   am.n
 
-        and returns floats found in it in an numpy array. Each cell should be
-        in a numeric form that can be converted into a float like 0.123 or
-        1.234E-10, etc., and cells are seperated with any number of spaces (or
-        tabs).
+        and stores floats found in it in an numpy array self.owner.data. Each
+        cell should be in a numeric form that can be converted into a float
+        like 0.123 or 1.234E-10, etc., and cells are seperated with any number
+        of spaces (or tabs).
 
         iterable must be an iterable: if it is a string, use string.split('\n')
         before using this function.
@@ -201,7 +200,7 @@ class AnalysisTab(AnalysisBase):
         floats.
 
         If write_text is True, writes the file or iterable into the 'Text'
-        output tab.
+        output tab self.owner.text.
         '''
         data = []
         if write_text:
