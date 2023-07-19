@@ -140,7 +140,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         elif Path(self.dir_edit.text()).is_dir() is False:
             self.dir_edit.undo()
             QtWidgets.QMessageBox.critical(self, 'Error',
-                'ValueError: Directory does not exist or is invalid')
+                'NotADirectoryError: Directory does not exist or is invalid')
         # if path is valid, resolve it (change to absolute path without ./
         # or ../, etc)
         elif Path(self.dir_edit.text()).is_dir():

@@ -1,5 +1,5 @@
 # conda environment file
-# to active, use `conda env update -f environment.yml`
+# to activate, use `conda env update -f environment.yml`
 
 name: quantics_gui
 dependencies:

@@ -7,9 +7,12 @@ import sys
 from gui_analysis import ui_main
 
 if __name__ == '__main__':
-    app = ui_main.QtWidgets.QApplication(sys.argv)
+    if sys.version_info < (3, 10):
+        raise OSError('This program requires python >= 3.10. If you are running '
+                      'conda, check the environment.yml file in this folder.')
 
-    # create and show the form
+    app = ui_main.QtWidgets.QApplication(sys.argv)
+    # create and show the window
     window = ui_main.AnalysisMain()
     window.show()
     # run the main Qt loop
