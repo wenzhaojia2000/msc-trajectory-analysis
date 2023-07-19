@@ -11,7 +11,6 @@ from PyQt5 import QtWidgets, QtCore
 from pyqtgraph.exporters import ImageExporter
 
 from .ui_base import AnalysisMainInterface
-from .ui_error import ErrorWindow
 from .analysis_convergence import AnalysisConvergence
 from .analysis_integrator import AnalysisIntegrator
 from .analysis_results import AnalysisResults
@@ -46,7 +45,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.directdynamics = AnalysisDirectDynamics(self)
         # the title of the graph if title is set to 'automatic'. set through
         # default_title argument of self.changePlotTitle
-        self.default_title = ""
+        self.default_title = ''
 
     def findObjects(self) -> None:
         '''
@@ -128,13 +127,6 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.legend_checkbox.setChecked(True)
         self.legend_checkbox.triggered.connect(self.toggleLegend)
 
-    def showError(self, msg:str) -> None:
-        '''
-        Creates a popup window showing an error message.
-        '''
-        self.error_window = ErrorWindow(msg)
-        self.error_window.show()
-
     @QtCore.pyqtSlot()
     def directoryChanged(self) -> None:
         '''
@@ -146,8 +138,9 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # if the path is invalid, change to last acceptable path and open
         # error popup
         elif Path(self.dir_edit.text()).is_dir() is False:
-            self.showError('Directory does not exist or is invalid')
             self.dir_edit.undo()
+            QtWidgets.QMessageBox.critical(self, 'Error',
+                'ValueError: Directory does not exist or is invalid')
         # if path is valid, resolve it (change to absolute path without ./
         # or ../, etc)
         elif Path(self.dir_edit.text()).is_dir():
@@ -167,7 +160,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             self.dir_edit.setText(dirname)
 
     @QtCore.pyqtSlot()
-    def changePlotTitle(self, default_title:str=None) -> None:
+    def changePlotTitle(self) -> None:
         '''
         Changes the title of the graph, by setting it to the default title if
         custom title is set to Automatic, or whatever the user wrote otherwise.
@@ -200,7 +193,8 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         try:
             subprocess.run(['ffmpeg', '-version'], check=False)
         except FileNotFoundError:
-            self.showError('Please install ffmpeg to call this function.')
+            QtWidgets.QMessageBox.critical(self, 'Error',
+                'FileNotFoundError: Please install ffmpeg to call this function.')
             return None
         # obtain a savename for the file
         savename, _ = QtWidgets.QFileDialog.getSaveFileName(self,
@@ -230,9 +224,9 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         try:
             subprocess.run(args, cwd=temp_directory, check=True)
         except subprocess.CalledProcessError as e:
-            self.owner.showError(f'ffmpeg error ({e.__class__.__name__}): {e}'
-                                 f'At the moment of this error, the console '
-                                 f'output was:\n\n{e.stdout}')
+            QtWidgets.QMessageBox.critical(self, 'Error',
+                f'{e.__class__.__name__}: {e} At the moment of this error, the '
+                f'console output was:\n\n{e.stdout}')
             return None
         # delete the temporary folder
         shutil.rmtree(temp_directory)

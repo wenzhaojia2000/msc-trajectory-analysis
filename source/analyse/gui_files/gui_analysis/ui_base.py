@@ -205,7 +205,7 @@ class AnalysisTab(AnalysisBase):
         data = []
         if write_text:
             # clear text view if write_text is true
-            self.owner.text.setText("")
+            self.owner.text.setText('')
         for line in iterable:
             # write line to text view if write_text is true
             if write_text:

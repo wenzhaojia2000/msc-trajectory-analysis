@@ -61,8 +61,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
                 case 'analint_4': # plot update file errors
                     self.rdupdate(plot_error=True)
         except Exception as e:
-            self.owner.showError(f'Error ({e.__class__.__name__})'
-                                 f'\n\n{e}')
+            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
@@ -194,4 +193,3 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
                                      bottom='Time (fs)', left='Step size (fs)')
             self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
                                   name='Step size', pen='r')
-        return None

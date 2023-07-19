@@ -37,8 +37,7 @@ class AnalysisDirectDynamics(QtWidgets.QWidget, AnalysisTab):
                 case 'analdd_2': # check database
                     self.runCmd('checkdb')
         except Exception as e:
-            self.owner.showError(f'Error ({e.__class__.__name__})'
-                                 f'\n\n{e}')
+            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     def calcrate(self) -> None:
         '''

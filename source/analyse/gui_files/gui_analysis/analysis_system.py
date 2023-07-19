@@ -59,8 +59,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                 case 'analsys_4': # plot potential energy surface
                     self.runCmd('showsys', '-pes', input='1')
         except Exception as e:
-            self.owner.showError(f'Error ({e.__class__.__name__})'
-                                 f'\n\n{e}')
+            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:

@@ -42,5 +42,4 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
                 case 'analconv_6': # norm of wavefunction on restart file
                     self.runCmd('norm', '-r')
         except Exception as e:
-            self.owner.showError(f'Error ({e.__class__.__name__})'
-                                 f'\n\n{e}')
+            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')

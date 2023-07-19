@@ -66,8 +66,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
                 case 'analres_3': # plot eigenvalues from matrix diagonalisation
                     self.runCmd('rdeigval')
         except Exception as e:
-            self.owner.showError(f'Error ({e.__class__.__name__})'
-                                 f'\n\n{e}')
+            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
