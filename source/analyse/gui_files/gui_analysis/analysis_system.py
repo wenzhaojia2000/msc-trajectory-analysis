@@ -118,6 +118,14 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             # delete intermediate file
             filepath.unlink()
 
+        # add contents of showd1d.log to text view
+        filepath = Path(self.owner.dir_edit.text())/'showd1d.log'
+        if filepath.is_file():
+            with open(filepath, mode='r', encoding='utf-8') as f:
+                self.owner.text.append(f'{"-"*80}\n{f.read()}')
+            if self.owner.keep_files.isChecked() is False:
+                filepath.unlink()
+
         # adjust slider properties, connect to showd1dChangePlot slot
         self.owner.slider.setMaximum(len(self.owner.data)-1)
         self.owner.slider.setSliderPosition(0)

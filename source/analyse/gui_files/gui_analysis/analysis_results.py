@@ -112,7 +112,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find auto file in directory')
         # reset text
-        self.owner.text.setText("")
+        self.owner.text.setText('')
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 4, write_text=True, check=True)
