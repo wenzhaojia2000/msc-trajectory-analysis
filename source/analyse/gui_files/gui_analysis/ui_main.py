@@ -210,6 +210,8 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         temp_directory = Path(savename).parent/'frames'
         temp_directory.mkdir(parents=True, exist_ok=True)
 
+        # change cursor to wait cursor
+        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         # export image for each frame, into the temporary directory
         exporter = ImageExporter(self.graph.plotItem)
         for i in range(self.slider.minimum(), self.slider.maximum()+1):
@@ -217,6 +219,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             exporter.export(str(temp_directory/f'{i:05}.png'))
             # force pyqt to update slider immediately, so user can see progress
             self.slider.repaint()
+        QtWidgets.QApplication.restoreOverrideCursor()
 
         # run ffmpeg to generate video https://stackoverflow.com/questions/24961127
         args = ['ffmpeg', '-y', '-framerate', '30', '-pattern_type', 'glob', '-i',

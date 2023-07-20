@@ -106,12 +106,18 @@ class AnalysisTab(AnalysisBase):
         Freezes the tab's push button given until func is executed. Can be used
         as a decorator using @AnalysisTab.freezeContinue or as a function using
         AnalysisTab.freezeContinue(func)(self, *args, **kwargs).
+        
+        Note: If func raises an exception, continue will not be restored. You
+        should ensure func does not crash by eg. wrapping it in a try-except
+        block.
         '''
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             '''
             Modification of the original function func.
             '''
+            # set cursor to wait cursor
+            QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
             self.push.setEnabled(False)
             self.push.setText("Busy")
             # force pyqt to update button immediately (otherwise pyqt leaves
@@ -119,6 +125,7 @@ class AnalysisTab(AnalysisBase):
             self.push.repaint()
             value = func(self, *args, **kwargs)
             # func executed, now can unfreeze
+            QtWidgets.QApplication.restoreOverrideCursor()
             self.push.setEnabled(True)
             self.push.setText("Continue")
             return value
