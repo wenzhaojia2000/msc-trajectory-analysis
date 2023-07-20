@@ -102,7 +102,7 @@
             <item>
              <widget class="QRadioButton" name="analconv_1">
               <property name="text">
-               <string>Check orthonormality of SPFs in Psi file</string>
+               <string>Check orthonormality of SPFs</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -111,36 +111,39 @@
             </item>
             <item>
              <widget class="QRadioButton" name="analconv_2">
-              <property name="text">
-               <string>Check orthonormality of SPFs in Restart file</string>
+              <property name="statusTip">
+               <string>Executes rdgpop and plots grid populations.</string>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="analconv_3">
-              <property name="text">
-               <string>Plot populations of natural orbitals</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="analconv_4">
               <property name="text">
                <string>Plot populations of grid edges</string>
               </property>
              </widget>
             </item>
             <item>
+             <widget class="QRadioButton" name="analconv_3">
+              <property name="text">
+               <string>Plot populations of states</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="analconv_4">
+              <property name="text">
+               <string>Plot populations of natural orbitals</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QRadioButton" name="analconv_5">
               <property name="text">
-               <string>Plot time-evolution of norm of wavefunction</string>
+               <string>Plot coordinate expectation values</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QRadioButton" name="analconv_6">
               <property name="text">
-               <string>Norm of wavefunction on restart file</string>
+               <string>Plot time-evolution of norm of wavefunction</string>
               </property>
              </widget>
             </item>
@@ -158,6 +161,43 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="gpop_box">
+            <property name="title">
+             <string>Grid population options</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <widget class="QLabel" name="gpop_nz_label">
+               <property name="text">
+                <string>Number of grid points</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="gpop_nz">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="gpop_dof_label">
+               <property name="text">
+                <string>Number of DOFs</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="gpop_dof">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="analconv_push">
@@ -783,7 +823,7 @@
          <enum>QTabWidget::South</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="output_text_tab">
          <attribute name="title">
@@ -909,7 +949,6 @@
   <tabstop>analconv_2</tabstop>
   <tabstop>analconv_3</tabstop>
   <tabstop>analconv_4</tabstop>
-  <tabstop>analconv_5</tabstop>
   <tabstop>analconv_6</tabstop>
   <tabstop>analconv_push</tabstop>
   <tabstop>analint_1</tabstop>

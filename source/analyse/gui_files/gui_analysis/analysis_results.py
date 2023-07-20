@@ -130,7 +130,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
 
     def autospec(self):
         '''
-        Reads the command output of using autospec, which is expected to be in
+        Reads the file output of using autospec, which is expected to be in
         the format, where each cell is a float,
 
         E.1    g0.1    g1.1    g2.1
