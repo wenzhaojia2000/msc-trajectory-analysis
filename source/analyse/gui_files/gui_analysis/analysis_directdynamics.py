@@ -62,9 +62,9 @@ class AnalysisDirectDynamics(QtWidgets.QWidget, AnalysisTab):
             for line in f:
                 self.owner.text.append(line[:-1])
                 # find a line with time[fs] in it and get time 
-                if re.search(r'time\[fs\] *', line):
+                if re.search(r'time\[fs\]', line):
                     try:
-                        time = float(re.search(self.float_regex, line)[0])
+                        time = float(re.search(r'[+-]?\d+(?:\.\d*)?', line)[0])
                         times.append(time)
                         n_calcs.append(0)
                     except:

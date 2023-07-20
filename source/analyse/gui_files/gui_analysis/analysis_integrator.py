@@ -89,9 +89,8 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         Total ...
         [any other information]
 
-        name should be a string *with no spaces*, as cells should be seperated
-        by spaces. The other cells should be in a numeric form that can be
-        converted into a float like 0.123 or 1.234E-10, etc.
+        name should be a string, and other cells should be in a numeric form
+        that can be converted into a float like 0.123 or 1.234E-10, etc.
 
         Plots a bar graph of the column selected by the user, and also outputs
         the timing file sorted by the selected column in the text tab.
@@ -111,15 +110,16 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         arr = []
         for line in text.split('\n'):
             # should find one name and five floats per line (name, a, b, c, d,
-            # e). need to use findall instead of search/match to return just
-            # the part in the brackets
-            name = re.findall(r'^ *(\S+)', line)
-            floats = re.findall(self.float_regex, line)
-            if len(name) == 1 and len(floats) == 5:
-                # regex returns strings, need to convert into float. the last
-                # entry is the line itself, which is already formatted in a
-                # nice way. this saves manually formatting the data
-                arr.append(tuple(name + list(map(float, floats)) + [line]))
+            # e). after splitting by whitespace, floats should take up the last
+            # 5 entries, and the name take up the rest
+            row = re.findall(r'\S+', line)
+            if len(row) >= 5:
+                name = ' '.join(row[:-5])
+                floats = row[-5:]
+                # floats are still strings, need to convert. the last entry is
+                # the line itself, which is already formatted in a nice way.
+                # this saves manually formatting the data
+                arr.append(tuple([name] + list(map(float, floats)) + [line]))
         if len(arr) == 0:
             # nothing found?
             raise ValueError('Invalid timing file')
@@ -139,17 +139,16 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         self.owner.resetPlot()
 
         # start plotting
-        self.owner.changePlotTitle('Subroutine timings')
-        self.owner.graph.setLabel('left', '')
+        self.owner.setPlotLabels(title='Subroutine timings', left='')
         # this is a horizontal bar chart so everything is spun 90 deg. can't
         # do a normal vertical one as pyqtgraph can't rotate tick names (yet)
         if self.timing_sort.currentIndex() == 0:
             # plot cpu if 'name' is selected (names don't have values)
             values = [row[3] for row in self.owner.data]
-            self.owner.graph.setLabel('bottom', 'CPU', color='k')
+            self.owner.setPlotLabels(bottom='CPU')
         else:
             values = [row[self.timing_sort.currentIndex()] for row in self.owner.data]
-            self.owner.graph.setLabel('bottom', self.timing_sort.currentText(), color='k')
+            self.owner.setPlotLabels(bottom=self.timing_sort.currentText())
         names = [row[0] for row in self.owner.data]
         positions = list(range(1, len(values)+1))
         bar = BarGraphItem(x0=0, y=positions, height=0.6, width=values)

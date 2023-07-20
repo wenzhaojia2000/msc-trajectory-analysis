@@ -62,19 +62,6 @@ class AnalysisTab(AnalysisBase):
     - One QBoxLayout instance, containing at least one radio button
     - One QPushButton instance (confirming radio button selection)
     '''
-    # overcomplicated regex to match floats. class variable which can be used
-    # in derived class methods.
-    # [+-]?                   optionally a + or - at the beginning
-    # \d+(?:\.\d*)?           a string of digits, optionally with decimal
-    #                         point and possibly more digits
-    # (?:[eE][+-]?\d+)?       optionally an exponential (e+N, e-N) at the
-    #                         end
-    # \.\d+                   catches floats that start with decimal like
-    #                         .25
-    # [+-]?inf|nan            catches weird values like +-inf and nan
-    float_regex = re.compile(
-        r'([+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|\.\d+|[+-]?inf|nan)'
-    )
 
     def __init__(self, owner:AnalysisMainInterface, push_name:str, box_name:str,
                  *args, **kwargs) -> None:
@@ -215,11 +202,15 @@ class AnalysisTab(AnalysisBase):
                 continue
             # should find this number of floats per line, if not, ignore
             # that line
-            matches = re.findall(self.float_regex, line)
-            if floats_per_line and len(matches) != floats_per_line:
-                continue
-            # regex returns strings, need to convert into float
-            data.append(list(map(float, matches)))
+            matches = re.findall(r'\S+', line)
+            try:
+                # regex returns strings, need to convert into float
+                floats = list(map(float, matches))
+            except ValueError:
+                pass
+            else:
+                if floats_per_line and len(matches) == floats_per_line:
+                    data.append(floats)
         if len(data) == 0:
             # nothing found
             if check:
