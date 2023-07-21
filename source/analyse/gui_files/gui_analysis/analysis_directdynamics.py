@@ -9,16 +9,16 @@ import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
 
-class AnalysisDirectDynamics(QtWidgets.QWidget, AnalysisTab):
+class AnalysisDirectDynamics(AnalysisTab):
     '''
     Defines functionality for the "Analyse Direct Dynamics" tab of the analysis
     GUI.
     '''
-    def __init__(self, owner:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface) -> None:
         '''
         Initiation method.
         '''
-        super().__init__(owner=owner, push_name='analdd_push',
+        super().__init__(parent=parent, push_name='analdd_push',
                          box_name='analdd_layout')
 
     @QtCore.pyqtSlot()
@@ -38,8 +38,8 @@ class AnalysisDirectDynamics(QtWidgets.QWidget, AnalysisTab):
                     self.runCmd('checkdb')
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
-            self.owner.tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
+            self.parent().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
     def calcrate(self) -> None:
         '''
@@ -54,15 +54,15 @@ class AnalysisDirectDynamics(QtWidgets.QWidget, AnalysisTab):
         
         and plots the number of calculations per timestep against time.
         '''
-        filepath = Path(self.owner.dir_edit.text())/'log'
+        filepath = Path(self.parent().dir_edit.text())/'log'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find log file in directory')
         times = []
         n_calcs = []
-        self.owner.text.setText("")
+        self.parent().text.setText("")
         with open(filepath, mode='r', encoding='utf-8') as f:
             for line in f:
-                self.owner.text.append(line[:-1])
+                self.parent().text.append(line[:-1])
                 # find a line with time[fs] in it and get time 
                 if re.search(r'time\[fs\]', line):
                     try:
@@ -81,11 +81,11 @@ class AnalysisDirectDynamics(QtWidgets.QWidget, AnalysisTab):
         if len(times) == 0:
             # nothing found?
             raise ValueError('Invalid log file')
-        self.owner.data = np.array([times, n_calcs])
+        self.parent().data = np.array([times, n_calcs])
 
         # start plotting, depending on options
-        self.owner.resetPlot(True)
-        self.owner.setPlotLabels(title='Calculations per time step',
-                                 bottom='Time (fs)', left='QC calculations')
-        self.owner.graph.plot(self.owner.data[0, :], self.owner.data[1, :],
-                              name='QC calculations', pen='r')
+        self.parent().resetPlot(True)
+        self.parent().setPlotLabels(title='Calculations per time step',
+                                    bottom='Time (fs)', left='QC calculations')
+        self.parent().graph.plot(self.parent().data[0, :], self.parent().data[1, :],
+                                 name='QC calculations', pen='r')

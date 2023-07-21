@@ -9,16 +9,16 @@ from PyQt5 import QtWidgets, QtCore
 from pyqtgraph import BarGraphItem
 from .ui_base import AnalysisMainInterface, AnalysisTab
 
-class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
+class AnalysisIntegrator(AnalysisTab):
     '''
     Defines functionality for the "Analyse Integrator" tab of the analysis
     GUI.
     '''
-    def __init__(self, owner:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface) -> None:
         '''
         Initiation method.
         '''
-        super().__init__(owner=owner, push_name='analint_push',
+        super().__init__(parent=parent, push_name='analint_push',
                          box_name='analint_layout')
 
     def findObjects(self, push_name, box_name) -> None:
@@ -27,8 +27,8 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
-        self.timing_box = self.owner.findChild(QtWidgets.QGroupBox, 'timing_box')
-        self.timing_sort = self.owner.findChild(QtWidgets.QComboBox, 'timing_combobox')
+        self.timing_box = self.parent().findChild(QtWidgets.QGroupBox, 'timing_box')
+        self.timing_sort = self.parent().findChild(QtWidgets.QComboBox, 'timing_combobox')
         # box is hidden initially
         self.timing_box.hide()
 
@@ -62,8 +62,8 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
                     self.rdupdate(plot_error=True)
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
-            self.owner.tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
+            self.parent().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
@@ -97,7 +97,7 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         Plots a bar graph of the column selected by the user, and also outputs
         the timing file sorted by the selected column in the text tab.
         '''
-        filepath = Path(self.owner.dir_edit.text())/'timing'
+        filepath = Path(self.parent().dir_edit.text())/'timing'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find timing file in directory')
         with open(filepath, mode='r', encoding='utf-8') as f:
@@ -133,33 +133,33 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         else:
             # sort by number (largest first)
             arr.sort(key=lambda x: -x[self.timing_sort.currentIndex()])
-        self.owner.data = arr
+        self.parent().data = arr
 
         # display sorted text
-        text = "\n".join([line[-1] for line in self.owner.data])
-        self.owner.text.setText(f'{pre}\n{text}\n\n{post}')
-        self.owner.resetPlot()
+        text = "\n".join([line[-1] for line in self.parent().data])
+        self.parent().text.setText(f'{pre}\n{text}\n\n{post}')
+        self.parent().resetPlot()
 
         # start plotting
-        self.owner.setPlotLabels(title='Subroutine timings', left='')
+        self.parent().setPlotLabels(title='Subroutine timings', left='')
         # this is a horizontal bar chart so everything is spun 90 deg. can't
         # do a normal vertical one as pyqtgraph can't rotate tick names (yet)
         if self.timing_sort.currentIndex() == 0:
             # plot cpu if 'name' is selected (names don't have values)
-            values = [row[3] for row in self.owner.data]
-            self.owner.setPlotLabels(bottom='CPU')
+            values = [row[3] for row in self.parent().data]
+            self.parent().setPlotLabels(bottom='CPU')
         else:
-            values = [row[self.timing_sort.currentIndex()] for row in self.owner.data]
-            self.owner.setPlotLabels(bottom=self.timing_sort.currentText())
-        names = [row[0] for row in self.owner.data]
+            values = [row[self.timing_sort.currentIndex()] for row in self.parent().data]
+            self.parent().setPlotLabels(bottom=self.timing_sort.currentText())
+        names = [row[0] for row in self.parent().data]
         positions = list(range(1, len(values)+1))
         bar = BarGraphItem(x0=0, y=positions, height=0.6, width=values)
-        self.owner.graph.addItem(bar)
+        self.parent().graph.addItem(bar)
         # sort out bar chart ticks https://stackoverflow.com/questions/72002352
         ticks = []
         for i, label in enumerate(names):
             ticks.append((positions[i], label))
-        self.owner.graph.getAxis('left').setTicks([ticks])
+        self.parent().graph.getAxis('left').setTicks([ticks])
 
     def rdupdate(self, plot_error:bool=False) -> None:
         '''
@@ -181,16 +181,16 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
         self.readFloats(output.split('\n'), 4)
 
         # start plotting, depending on options
-        self.owner.resetPlot(True)
+        self.parent().resetPlot(True)
         if plot_error:
-            self.owner.setPlotLabels(title='Update file errors',
-                                     bottom='Time (fs)', left='Error')
-            self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
-                                  name='Error of A-vector', pen='r')
-            self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
-                                  name='Error of SPFs', pen='b')
+            self.parent().setPlotLabels(title='Update file errors',
+                                        bottom='Time (fs)', left='Error')
+            self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 2],
+                                     name='Error of A-vector', pen='r')
+            self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 3],
+                                     name='Error of SPFs', pen='b')
         else:
-            self.owner.setPlotLabels(title='Update file step size',
-                                     bottom='Time (fs)', left='Step size (fs)')
-            self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
-                                  name='Step size', pen='r')
+            self.parent().setPlotLabels(title='Update file step size',
+                                        bottom='Time (fs)', left='Step size (fs)')
+            self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 1],
+                                     name='Step size', pen='r')

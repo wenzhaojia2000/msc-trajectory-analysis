@@ -14,11 +14,12 @@ from PyQt5 import QtWidgets, QtCore, uic
 
 class AnalysisMeta(type(QtCore.QObject), ABCMeta):
     '''
-    Allows the AnalysisBase class to extend from Qt's metaclass so multiple
-    inheritance from a Qt object doesn't cause metaclass conflict.
+    Allows the AnalysisBase class to extend from ABC's metaclass so multiple
+    inheritance from a Qt object and an abstract class doesn't cause metaclass
+    conflict.
     '''
 
-class AnalysisBase(ABC, metaclass=AnalysisMeta):
+class AnalysisBase(QtCore.QObject, metaclass=AnalysisMeta):
     '''
     Abstract class of an analysis GUI, of some kind.
     '''
@@ -37,7 +38,7 @@ class AnalysisBase(ABC, metaclass=AnalysisMeta):
         Connects UI elements so they do stuff when interacted with.
         '''
 
-class AnalysisMainInterface(AnalysisBase):
+class AnalysisMainInterface(AnalysisBase, ABC):
     '''
     Abstract class of the analysis main window.
     '''
@@ -46,7 +47,7 @@ class AnalysisMainInterface(AnalysisBase):
         Initiation method. Requires a .ui file generated from Qt designer for
         the base-level UI.
         '''
-        super().__init__()
+        super().__init__(*args, **kwargs)
         uic.loadUi(ui_file, self)
         # following requires implementation of the abstract methods
         self.findObjects()
@@ -63,15 +64,14 @@ class AnalysisTab(AnalysisBase):
     - One QPushButton instance (confirming radio button selection)
     '''
 
-    def __init__(self, owner:AnalysisMainInterface, push_name:str, box_name:str,
+    def __init__(self, parent:AnalysisMainInterface, push_name:str, box_name:str,
                  *args, **kwargs) -> None:
         '''
         Initiation method. As a tab is part of the main program, requires the
-        owner AnalysisMain instance as an argument, as well as the object
+        parent AnalysisMain instance as an argument, as well as the object
         name of its QPushButton and QBoxLayout instances.
         '''
-        super().__init__()
-        self.owner = owner
+        super().__init__(parent, *args, **kwargs)
         self.findObjects(push_name, box_name)
         self.connectObjects()
 
@@ -81,8 +81,8 @@ class AnalysisTab(AnalysisBase):
         derived class can add further implementation to this method by using
         `super().findObjects(push_name, box_name)`.
         '''
-        self.push = self.owner.findChild(QtWidgets.QPushButton, push_name)
-        self.box = self.owner.findChild(QtWidgets.QBoxLayout, box_name)
+        self.push = self.parent().findChild(QtWidgets.QPushButton, push_name)
+        self.box = self.parent().findChild(QtWidgets.QBoxLayout, box_name)
         self.radio = [self.box.itemAt(i).widget() for i in range(self.box.count())]
 
     def connectObjects(self):
@@ -142,11 +142,11 @@ class AnalysisTab(AnalysisBase):
         '''
         try:
             p = subprocess.run(args, universal_newlines=True, input=input,
-                               cwd=self.owner.dir_edit.text(),
-                               timeout=float(self.owner.timeout_spinbox.value()),
+                               cwd=self.parent().dir_edit.text(),
+                               timeout=float(self.parent().timeout_spinbox.value()),
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                check=True)
-            self.owner.text.setText(p.stdout)
+            self.parent().text.setText(p.stdout)
             return p.stdout
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
             # something went wrong executing the function. add the console
@@ -155,8 +155,8 @@ class AnalysisTab(AnalysisBase):
                 msg = (f'{e} At the moment of this error, the console output '
                        f'was:\n\n{e.stdout}')
             # TimeoutExpired and CalledProcessError do not have an attribute
-            # for message, instead generating the message by overloading __str__.
-            # workaround by just raising the base error type
+            # for message, instead generating the message by overloading
+            # __str__. workaround by just raising the base error type
             raise subprocess.SubprocessError(msg) from None
         except FileNotFoundError as e:
             # custom message
@@ -175,10 +175,10 @@ class AnalysisTab(AnalysisBase):
         ...    ...    ...    ...   ...
         am.1   am.2   am.3   ...   am.n
 
-        and stores floats found in it in an numpy array self.owner.data. Each
-        cell should be in a numeric form that can be converted into a float
-        like 0.123 or 1.234E-10, etc., and cells are seperated with any number
-        of spaces (or tabs).
+        and stores floats found in it in an numpy array self.parent().data.
+        Each cell should be in a numeric form that can be converted into a
+        float like 0.123 or 1.234E-10, etc., and cells are seperated with any
+        number of spaces (or tabs).
 
         iterable must be an iterable: if it is a string, use string.split('\n')
         before using this function.
@@ -190,16 +190,16 @@ class AnalysisTab(AnalysisBase):
         regex.
 
         If write_text is True, writes the file or iterable into the 'Text'
-        output tab self.owner.text.
+        output tab self.parent().text.
         '''
         data = []
         if write_text:
             # clear text view if write_text is true
-            self.owner.text.setText('')
+            self.parent().text.setText('')
         for line in iterable:
             # write line to text view if write_text is true
             if write_text:
-                self.owner.text.append(line[:-1])
+                self.parent().text.append(line[:-1])
             # ignore finding floats on this line if matches regex
             if ignore_regex and re.search(ignore_regex, line):
                 continue
@@ -219,4 +219,4 @@ class AnalysisTab(AnalysisBase):
             # nothing found
             raise ValueError('No floats found in iterable. Check console '
                              'output to see what went wrong?')
-        self.owner.data = np.array(data)
+        self.parent().data = np.array(data)

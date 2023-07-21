@@ -8,16 +8,16 @@ import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
 
-class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
+class AnalysisSystem(AnalysisTab):
     '''
     Defines functionality for the "Analyse System Evolution" tab of the
     analysis GUI.
     '''
-    def __init__(self, owner:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface) -> None:
         '''
         Initiation method.
         '''
-        super().__init__(owner=owner, push_name='analsys_push',
+        super().__init__(parent=parent, push_name='analsys_push',
                          box_name='analsys_layout')
 
     def findObjects(self, push_name, box_name) -> None:
@@ -26,9 +26,9 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
-        self.den1d_box = self.owner.findChild(QtWidgets.QGroupBox, 'den1d_box')
-        self.dof = self.owner.findChild(QtWidgets.QSpinBox, 'dof_spinbox')
-        self.state = self.owner.findChild(QtWidgets.QSpinBox, 'state_spinbox')
+        self.den1d_box = self.parent().findChild(QtWidgets.QGroupBox, 'den1d_box')
+        self.dof = self.parent().findChild(QtWidgets.QSpinBox, 'dof_spinbox')
+        self.state = self.parent().findChild(QtWidgets.QSpinBox, 'state_spinbox')
 
     def connectObjects(self) -> None:
         '''
@@ -60,8 +60,8 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                     self.runCmd('showsys', '-pes', input='1')
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
-            self.owner.tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
+            self.parent().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
@@ -107,46 +107,46 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
 
         # find filename of command output
         if self.state.value() == 1:
-            filepath = Path(self.owner.dir_edit.text())/f'den1d_{den1d_options[0]}'
+            filepath = Path(self.parent().dir_edit.text())/f'den1d_{den1d_options[0]}'
         else:
-            filepath = Path(self.owner.dir_edit.text())/f'den1d_{"_".join(den1d_options)}'
+            filepath = Path(self.parent().dir_edit.text())/f'den1d_{"_".join(den1d_options)}'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 4, ignore_regex=r'^plot|^set')
             # split the matrix into chunks depending on its time column
-            n_interval = np.unique(self.owner.data[:, 1]).size
-            self.owner.data = np.split(self.owner.data, n_interval)
-        if self.owner.keep_files.isChecked() is False:
+            n_interval = np.unique(self.parent().data[:, 1]).size
+            self.parent().data = np.split(self.parent().data, n_interval)
+        if self.parent().keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
 
         # add contents of showd1d.log to text view
-        filepath = Path(self.owner.dir_edit.text())/'showd1d.log'
+        filepath = Path(self.parent().dir_edit.text())/'showd1d.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
-                self.owner.text.append(f'{"-"*80}\n{f.read()}')
-            if self.owner.keep_files.isChecked() is False:
+                self.parent().text.append(f'{"-"*80}\n{f.read()}')
+            if self.parent().keep_files.isChecked() is False:
                 filepath.unlink()
 
         # adjust slider properties, connect to showd1dChangePlot slot
-        self.owner.slider.setMaximum(len(self.owner.data)-1)
-        self.owner.slider.setSliderPosition(0)
+        self.parent().slider.setMaximum(len(self.parent().data)-1)
+        self.parent().slider.setSliderPosition(0)
         try:
-            self.owner.slider.valueChanged.disconnect()
+            self.parent().slider.valueChanged.disconnect()
         except TypeError:
             # happens if slider has no connections
             pass
         finally:
-            self.owner.slider.valueChanged.connect(self.showd1dChangePlot)
+            self.parent().slider.valueChanged.connect(self.showd1dChangePlot)
         # start plotting
-        self.owner.resetPlot(True, animated=True)
-        self.owner.setPlotLabels(title='1D density evolution',
-                                 bottom='rd (au)', left='V (ev)',
-                                 top=f't={self.owner.data[0][0][1]}')
-        self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 2],
-                              name='Re(phi)', pen='r')
-        self.owner.graph.plot(self.owner.data[0][:, 0], self.owner.data[0][:, 3],
-                              name='Im(phi)', pen='b')
+        self.parent().resetPlot(True, animated=True)
+        self.parent().setPlotLabels(title='1D density evolution',
+                                    bottom='rd (au)', left='V (ev)',
+                                    top=f't={self.parent().data[0][0][1]}')
+        self.parent().graph.plot(self.parent().data[0][:, 0], self.parent().data[0][:, 2],
+                                 name='Re(phi)', pen='r')
+        self.parent().graph.plot(self.parent().data[0][:, 0], self.parent().data[0][:, 3],
+                                 name='Im(phi)', pen='b')
 
     @QtCore.pyqtSlot()
     def showd1dChangePlot(self) -> None:
@@ -154,13 +154,15 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
         Allows the user to move the slider to control time when using the
         showd1d analysis.
         '''
-        data_items = self.owner.graph.listDataItems()
-        slider_pos = int(self.owner.slider.value())
-        if self.owner.data and len(data_items) == 2:
+        data_items = self.parent().graph.listDataItems()
+        slider_pos = int(self.parent().slider.value())
+        if self.parent().data and len(data_items) == 2:
             re, im = data_items
             if re.name() == 'Re(phi)' and im.name() == 'Im(phi)':
-                self.owner.setPlotLabels(top=f't={self.owner.data[slider_pos][0][1]} fs')
-                re.setData(self.owner.data[slider_pos][:, 0],
-                           self.owner.data[slider_pos][:, 2])
-                im.setData(self.owner.data[slider_pos][:, 0],
-                           self.owner.data[slider_pos][:, 3])
+                self.parent().setPlotLabels(
+                    top=f't={self.parent().data[slider_pos][0][1]} fs'
+                )
+                re.setData(self.parent().data[slider_pos][:, 0],
+                           self.parent().data[slider_pos][:, 2])
+                im.setData(self.parent().data[slider_pos][:, 0],
+                           self.parent().data[slider_pos][:, 3])

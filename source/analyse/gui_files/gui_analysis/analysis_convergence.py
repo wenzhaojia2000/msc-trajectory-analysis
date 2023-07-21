@@ -7,16 +7,16 @@ from pathlib import Path
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
 
-class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
+class AnalysisConvergence(AnalysisTab):
     '''
     Defines functionality for the "Analyse Convergence" tab of the analysis
     GUI.
     '''
-    def __init__(self, owner:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface) -> None:
         '''
         Initiation method.
         '''
-        super().__init__(owner=owner, push_name='analconv_push',
+        super().__init__(parent=parent, push_name='analconv_push',
                          box_name='analconv_layout')
 
     def findObjects(self, push_name, box_name) -> None:
@@ -26,9 +26,9 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box "autocorrelation options"
-        self.gpop_box = self.owner.findChild(QtWidgets.QGroupBox, 'gpop_box')
-        self.gpop_nz = self.owner.findChild(QtWidgets.QSpinBox, 'gpop_nz')
-        self.gpop_dof = self.owner.findChild(QtWidgets.QSpinBox, 'gpop_dof')
+        self.gpop_box = self.parent().findChild(QtWidgets.QGroupBox, 'gpop_box')
+        self.gpop_nz = self.parent().findChild(QtWidgets.QSpinBox, 'gpop_nz')
+        self.gpop_dof = self.parent().findChild(QtWidgets.QSpinBox, 'gpop_dof')
         # box is hidden initially
         self.gpop_box.hide()
 
@@ -78,8 +78,8 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
                     self.runCmd('norm')
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
-            self.owner.tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
+            self.parent().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
     def rdgpop(self) -> None:
         '''
@@ -104,25 +104,25 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
         ]
         self.runCmd('rdgpop', '-w', *gpop_options)
 
-        filepath = Path(self.owner.dir_edit.text())/'gpop.pl'
+        filepath = Path(self.parent().dir_edit.text())/'gpop.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 5, r'^#')
-        if self.owner.keep_files.isChecked() is False:
+        if self.parent().keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
 
         # start plotting
-        self.owner.resetPlot(True)
-        self.owner.setPlotLabels(title='Grid edge population',
-                                 bottom='Time (fs)', left='Population')
-        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 1],
-                              name='Grid (begin)', pen='r')
-        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 2],
-                              name='Grid (end)',
-                              pen={'color': 'r', 'style': QtCore.Qt.DashLine})
-        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 3],
-                              name='Basis (begin)', pen='b')
-        self.owner.graph.plot(self.owner.data[:, 0], self.owner.data[:, 4],
-                              name='Basis (end)',
-                              pen={'color': 'b', 'style': QtCore.Qt.DashLine})
+        self.parent().resetPlot(True)
+        self.parent().setPlotLabels(title='Grid edge population',
+                                    bottom='Time (fs)', left='Population')
+        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 1],
+                                 name='Grid (begin)', pen='r')
+        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 2],
+                                 name='Grid (end)',
+                                 pen={'color': 'r', 'style': QtCore.Qt.DashLine})
+        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 3],
+                                 name='Basis (begin)', pen='b')
+        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 4],
+                                 name='Basis (end)',
+                                 pen={'color': 'b', 'style': QtCore.Qt.DashLine})

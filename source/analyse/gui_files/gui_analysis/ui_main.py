@@ -201,7 +201,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             "Save File", self.dir_edit.text() + '/Untitled.mp4',
             "Video (*.mp4);;All files (*)"
         )
-        if savename == "":
+        if savename == '':
             # user cancels operation
             return None
         # add .mp4 suffix to savename if not already
