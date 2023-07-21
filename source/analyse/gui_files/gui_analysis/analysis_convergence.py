@@ -77,6 +77,8 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
                 case 'analconv_6': # plot time-evolution of norm of wavefunction
                     self.runCmd('norm')
         except Exception as e:
+            # switch to text tab to see if there are any other explanatory errors
+            self.owner.tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     def rdgpop(self) -> None:
@@ -105,7 +107,7 @@ class AnalysisConvergence(QtWidgets.QWidget, AnalysisTab):
         filepath = Path(self.owner.dir_edit.text())/'gpop.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f, 5, r'^#', check=True)
+            self.readFloats(f, 5, r'^#')
         if self.owner.keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()

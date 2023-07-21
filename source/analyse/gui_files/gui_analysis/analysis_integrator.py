@@ -61,6 +61,8 @@ class AnalysisIntegrator(QtWidgets.QWidget, AnalysisTab):
                 case 'analint_4': # plot update file errors
                     self.rdupdate(plot_error=True)
         except Exception as e:
+            # switch to text tab to see if there are any other explanatory errors
+            self.owner.tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()

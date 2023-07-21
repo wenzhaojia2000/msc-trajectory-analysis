@@ -59,6 +59,8 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
                 case 'analsys_4': # plot potential energy surface
                     self.runCmd('showsys', '-pes', input='1')
         except Exception as e:
+            # switch to text tab to see if there are any other explanatory errors
+            self.owner.tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
@@ -110,7 +112,7 @@ class AnalysisSystem(QtWidgets.QWidget, AnalysisTab):
             filepath = Path(self.owner.dir_edit.text())/f'den1d_{"_".join(den1d_options)}'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f, 4, ignore_regex=r'^plot|^set', check=True)
+            self.readFloats(f, 4, ignore_regex=r'^plot|^set')
             # split the matrix into chunks depending on its time column
             n_interval = np.unique(self.owner.data[:, 1]).size
             self.owner.data = np.split(self.owner.data, n_interval)

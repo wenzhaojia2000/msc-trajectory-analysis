@@ -165,8 +165,7 @@ class AnalysisTab(AnalysisBase):
             raise
 
     def readFloats(self, iterable:list, floats_per_line:int=None,
-                   ignore_regex:re.Pattern|str=None, check:bool=False,
-                   write_text:bool=False) -> None:
+                   ignore_regex:re.Pattern|str=None, write_text:bool=False) -> None:
         '''
         Function that reads a file or list of strings that is formatted in a
         'grid', ie. in the form
@@ -189,9 +188,6 @@ class AnalysisTab(AnalysisBase):
 
         If ignore_regex is set, the function ignores lines that match the
         regex.
-
-        If check is True, raises an exception if the function cannot find any
-        floats.
 
         If write_text is True, writes the file or iterable into the 'Text'
         output tab self.owner.text.
@@ -216,12 +212,11 @@ class AnalysisTab(AnalysisBase):
             except ValueError:
                 pass
             else:
-                if floats_per_line and len(matches) == floats_per_line:
+                if (floats_per_line and len(matches) == floats_per_line)\
+                or floats_per_line is None:
                     data.append(floats)
         if len(data) == 0:
             # nothing found
-            if check:
-                raise ValueError('No floats found in iterable')
-            else:
-                print('[readFloats] No floats found in iterable')
+            raise ValueError('No floats found in iterable. Check console '
+                             'output to see what went wrong?')
         self.owner.data = np.array(data)

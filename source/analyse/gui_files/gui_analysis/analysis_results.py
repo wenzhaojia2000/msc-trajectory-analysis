@@ -66,6 +66,8 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
                 case 'analres_3': # plot eigenvalues from matrix diagonalisation
                     self.runCmd('rdeigval')
         except Exception as e:
+            # switch to text tab to see if there are any other explanatory errors
+            self.owner.tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
@@ -115,7 +117,10 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         self.owner.text.setText('')
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f, 4, write_text=True, check=True)
+            try:
+                self.readFloats(f, 4, write_text=True)
+            except ValueError:
+                raise ValueError('Invalid auto file') from None
 
         # start plotting
         self.owner.resetPlot(True)
@@ -168,7 +173,7 @@ class AnalysisResults(QtWidgets.QWidget, AnalysisTab):
         filepath = Path(self.owner.dir_edit.text())/'spectrum.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f, 4, r'^#', check=True)
+            self.readFloats(f, 4, r'^#')
         if self.owner.keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()

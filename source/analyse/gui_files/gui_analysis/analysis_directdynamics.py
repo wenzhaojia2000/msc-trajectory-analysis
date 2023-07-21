@@ -37,6 +37,8 @@ class AnalysisDirectDynamics(QtWidgets.QWidget, AnalysisTab):
                 case 'analdd_2': # check database
                     self.runCmd('checkdb')
         except Exception as e:
+            # switch to text tab to see if there are any other explanatory errors
+            self.owner.tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self, 'Error', f'{type(e).__name__}: {e}')
 
     def calcrate(self) -> None:
