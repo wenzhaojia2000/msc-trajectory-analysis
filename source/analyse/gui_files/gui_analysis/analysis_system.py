@@ -26,9 +26,10 @@ class AnalysisSystem(AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
+        # group box '1d density options'
         self.den1d_box = self.parent().findChild(QtWidgets.QGroupBox, 'den1d_box')
-        self.dof = self.parent().findChild(QtWidgets.QSpinBox, 'dof_spinbox')
-        self.state = self.parent().findChild(QtWidgets.QSpinBox, 'state_spinbox')
+        self.den1d_dof = self.parent().findChild(QtWidgets.QSpinBox, 'den1d_dof')
+        self.den1d_state = self.parent().findChild(QtWidgets.QSpinBox, 'den1d_state')
 
     def connectObjects(self) -> None:
         '''
@@ -100,13 +101,13 @@ class AnalysisSystem(AnalysisTab):
         time.
         '''
         den1d_options = [
-            'f' + str(self.dof.value()),
-            's' + str(self.state.value())
+            'f' + str(self.den1d_dof.value()),
+            's' + str(self.den1d_state.value())
         ]
         self.runCmd('showd1d', '-T', '-w', *den1d_options)
 
         # find filename of command output
-        if self.state.value() == 1:
+        if self.den1d_state.value() == 1:
             filepath = Path(self.parent().dir_edit.text())/f'den1d_{den1d_options[0]}'
         else:
             filepath = Path(self.parent().dir_edit.text())/f'den1d_{"_".join(den1d_options)}'

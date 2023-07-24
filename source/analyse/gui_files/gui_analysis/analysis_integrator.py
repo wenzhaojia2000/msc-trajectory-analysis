@@ -27,8 +27,9 @@ class AnalysisIntegrator(AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
+        # group box 'timing file options'
         self.timing_box = self.parent().findChild(QtWidgets.QGroupBox, 'timing_box')
-        self.timing_sort = self.parent().findChild(QtWidgets.QComboBox, 'timing_combobox')
+        self.timing_sort = self.parent().findChild(QtWidgets.QComboBox, 'timing_sort')
         # box is hidden initially
         self.timing_box.hide()
 

@@ -25,15 +25,15 @@ class AnalysisResults(AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
-        # group box "autocorrelation options"
-        self.autocol_box = self.parent().findChild(QtWidgets.QGroupBox, 'autocorrelation_box')
-        self.autocol_prefac = self.parent().findChild(QtWidgets.QComboBox, 'prefac_combobox')
-        self.autocol_emin = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'emin_spinbox')
-        self.autocol_emax = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'emax_spinbox')
-        self.autocol_unit = self.parent().findChild(QtWidgets.QComboBox, 'unit_combobox')
-        self.autocol_tau = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'tau_spinbox')
-        self.autocol_iexp = self.parent().findChild(QtWidgets.QSpinBox, 'iexp_spinbox')
-        self.autocol_func = self.parent().findChild(QtWidgets.QComboBox, 'filfunc_combobox')
+        # group box 'autocorrelation options'
+        self.autocol_box = self.parent().findChild(QtWidgets.QGroupBox, 'autocol_box')
+        self.autocol_prefac = self.parent().findChild(QtWidgets.QComboBox, 'autocol_prefac')
+        self.autocol_emin = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'autocol_emin')
+        self.autocol_emax = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'autocol_emax')
+        self.autocol_unit = self.parent().findChild(QtWidgets.QComboBox, 'autocol_unit')
+        self.autocol_tau = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'autocol_tau')
+        self.autocol_iexp = self.parent().findChild(QtWidgets.QSpinBox, 'autocol_iexp')
+        self.autocol_func = self.parent().findChild(QtWidgets.QComboBox, 'autocol_filfunc')
         # box is hidden initially
         self.autocol_box.hide()
 
@@ -46,7 +46,7 @@ class AnalysisResults(AnalysisTab):
         for radio in self.radio:
             radio.clicked.connect(self.optionSelected)
         # in autocorrelation box, allow damping order to change if tau nonzero
-        self.autocol_tau.valueChanged.connect(self.autocolDampingChanged)
+        self.autocol_tau.valueChanged.connect(self.autocolOptionChanged)
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -83,15 +83,12 @@ class AnalysisResults(AnalysisTab):
                 box.hide()
 
     @QtCore.pyqtSlot()
-    def autocolDampingChanged(self) -> None:
+    def autocolOptionChanged(self) -> None:
         '''
         Allows the user to change the damping order if the damping time is set
         to non-zero (ie. damping is enabled)
         '''
-        if self.autocol_tau.value() == 0.0:
-            self.autocol_iexp.setEnabled(False)
-        else:
-            self.autocol_iexp.setEnabled(True)
+        self.autocol_iexp.setEnabled(bool(self.autocol_tau.value()))
 
     def rdauto(self) -> None:
         '''

@@ -14,8 +14,8 @@
    <string>Analyse</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_5">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_5">
+    <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,50,0">
       <property name="leftMargin">
        <number>10</number>
@@ -173,6 +173,9 @@
                <property name="text">
                 <string>Number of grid points</string>
                </property>
+               <property name="buddy">
+                <cstring>gpop_nz</cstring>
+               </property>
               </widget>
              </item>
              <item row="0" column="1">
@@ -186,6 +189,9 @@
               <widget class="QLabel" name="gpop_dof_label">
                <property name="text">
                 <string>Number of DOFs</string>
+               </property>
+               <property name="buddy">
+                <cstring>gpop_dof</cstring>
                </property>
               </widget>
              </item>
@@ -285,14 +291,17 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_6">
              <item row="0" column="0">
-              <widget class="QLabel" name="timing_label">
+              <widget class="QLabel" name="timing_sort_label">
                <property name="text">
                 <string>Plot/Sort by</string>
+               </property>
+               <property name="buddy">
+                <cstring>timing_sort</cstring>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="timing_combobox">
+              <widget class="QComboBox" name="timing_sort">
                <property name="currentIndex">
                 <number>3</number>
                </property>
@@ -401,20 +410,23 @@
            </spacer>
           </item>
           <item>
-           <widget class="QGroupBox" name="autocorrelation_box">
+           <widget class="QGroupBox" name="autocol_box">
             <property name="title">
              <string>Autocorrelation options</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
              <item row="0" column="0">
-              <widget class="QLabel" name="prefac_label">
+              <widget class="QLabel" name="autocol_prefac_label">
                <property name="text">
                 <string>Prefactor</string>
+               </property>
+               <property name="buddy">
+                <cstring>autocol_prefac</cstring>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="prefac_combobox">
+              <widget class="QComboBox" name="autocol_prefac">
                <item>
                 <property name="text">
                  <string>None (Fourier Transform)</string>
@@ -428,7 +440,7 @@
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="emin_label">
+              <widget class="QLabel" name="autocol_emin_label">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;min&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -436,12 +448,12 @@
                 <enum>Qt::AutoText</enum>
                </property>
                <property name="buddy">
-                <cstring>emin_spinbox</cstring>
+                <cstring>autocol_emin</cstring>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="emin_spinbox">
+              <widget class="QDoubleSpinBox" name="autocol_emin">
                <property name="minimum">
                 <double>-inf</double>
                </property>
@@ -451,17 +463,17 @@
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="emax_label">
+              <widget class="QLabel" name="autocol_emax_label">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;max&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="buddy">
-                <cstring>emax_spinbox</cstring>
+                <cstring>autocol_emax</cstring>
                </property>
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="emax_spinbox">
+              <widget class="QDoubleSpinBox" name="autocol_emax">
                <property name="minimum">
                 <double>-inf</double>
                </property>
@@ -471,17 +483,17 @@
               </widget>
              </item>
              <item row="3" column="0">
-              <widget class="QLabel" name="unit_label">
+              <widget class="QLabel" name="autocol_unit_label">
                <property name="text">
                 <string>Energy unit</string>
                </property>
                <property name="buddy">
-                <cstring>unit_combobox</cstring>
+                <cstring>autocol_unit</cstring>
                </property>
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QComboBox" name="unit_combobox">
+              <widget class="QComboBox" name="autocol_unit">
                <property name="currentText">
                 <string>eV</string>
                </property>
@@ -548,17 +560,17 @@
               </widget>
              </item>
              <item row="4" column="0">
-              <widget class="QLabel" name="tau_label">
+              <widget class="QLabel" name="autocol_tau_label">
                <property name="text">
                 <string>Damping time (τ)</string>
                </property>
                <property name="buddy">
-                <cstring>tau_spinbox</cstring>
+                <cstring>autocol_tau</cstring>
                </property>
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="tau_spinbox">
+              <widget class="QDoubleSpinBox" name="autocol_tau">
                <property name="specialValueText">
                 <string>No damping</string>
                </property>
@@ -571,17 +583,17 @@
               </widget>
              </item>
              <item row="5" column="0">
-              <widget class="QLabel" name="iexp_label">
+              <widget class="QLabel" name="autocol_iexp_label">
                <property name="text">
                 <string>Damping order</string>
                </property>
                <property name="buddy">
-                <cstring>iexp_spinbox</cstring>
+                <cstring>autocol_iexp</cstring>
                </property>
               </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QSpinBox" name="iexp_spinbox">
+              <widget class="QSpinBox" name="autocol_iexp">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -594,14 +606,17 @@
               </widget>
              </item>
              <item row="6" column="0">
-              <widget class="QLabel" name="filfunc_label">
+              <widget class="QLabel" name="autocol_filfunc_label">
                <property name="text">
                 <string>Filter function</string>
+               </property>
+               <property name="buddy">
+                <cstring>autocol_filfunc</cstring>
                </property>
               </widget>
              </item>
              <item row="6" column="1">
-              <widget class="QComboBox" name="filfunc_combobox">
+              <widget class="QComboBox" name="autocol_filfunc">
                <item>
                 <property name="text">
                  <string>g0</string>
@@ -715,32 +730,38 @@
             <property name="title">
              <string>1D density options</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_5">
-             <item row="0" column="0" rowspan="2">
-              <widget class="QLabel" name="dof_label">
+            <layout class="QGridLayout" name="gridLayout_7">
+             <item row="0" column="0">
+              <widget class="QLabel" name="den1d_dof_label">
                <property name="text">
                 <string>Degree of freedom</string>
+               </property>
+               <property name="buddy">
+                <cstring>den1d_dof</cstring>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QSpinBox" name="dof_spinbox">
+              <widget class="QSpinBox" name="den1d_dof">
                <property name="minimum">
                 <number>1</number>
                </property>
               </widget>
              </item>
-             <item row="1" column="1" rowspan="2">
-              <widget class="QSpinBox" name="state_spinbox">
-               <property name="specialValueText">
-                <string>Sum over states</string>
+             <item row="1" column="0">
+              <widget class="QLabel" name="den1d_state_label">
+               <property name="text">
+                <string>State</string>
+               </property>
+               <property name="buddy">
+                <cstring>den1d_state</cstring>
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="state_label">
-               <property name="text">
-                <string>State</string>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="den1d_state">
+               <property name="specialValueText">
+                <string>Sum over states</string>
                </property>
               </widget>
              </item>
@@ -793,6 +814,9 @@
             </item>
             <item>
              <widget class="QRadioButton" name="analdd_3">
+              <property name="statusTip">
+               <string>Executes checkdb.</string>
+              </property>
               <property name="text">
                <string>Check or clean database</string>
               </property>
@@ -856,6 +880,9 @@
               <widget class="QLabel" name="clean_mindb_label">
                <property name="text">
                 <string>Duplicate removal tolerance</string>
+               </property>
+               <property name="buddy">
+                <cstring>clean_mindb</cstring>
                </property>
               </widget>
              </item>
@@ -1048,11 +1075,11 @@
   <tabstop>analres_1</tabstop>
   <tabstop>analres_2</tabstop>
   <tabstop>analres_3</tabstop>
-  <tabstop>emin_spinbox</tabstop>
-  <tabstop>emax_spinbox</tabstop>
-  <tabstop>unit_combobox</tabstop>
-  <tabstop>tau_spinbox</tabstop>
-  <tabstop>iexp_spinbox</tabstop>
+  <tabstop>autocol_emin</tabstop>
+  <tabstop>autocol_emax</tabstop>
+  <tabstop>autocol_unit</tabstop>
+  <tabstop>autocol_tau</tabstop>
+  <tabstop>autocol_iexp</tabstop>
   <tabstop>analres_push</tabstop>
   <tabstop>analsys_1</tabstop>
   <tabstop>analsys_2</tabstop>

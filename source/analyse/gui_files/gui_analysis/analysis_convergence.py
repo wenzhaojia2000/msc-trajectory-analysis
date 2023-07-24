@@ -25,7 +25,7 @@ class AnalysisConvergence(AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
-        # group box "autocorrelation options"
+        # group box 'grid population options'
         self.gpop_box = self.parent().findChild(QtWidgets.QGroupBox, 'gpop_box')
         self.gpop_nz = self.parent().findChild(QtWidgets.QSpinBox, 'gpop_nz')
         self.gpop_dof = self.parent().findChild(QtWidgets.QSpinBox, 'gpop_dof')

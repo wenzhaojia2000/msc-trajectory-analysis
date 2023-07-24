@@ -27,7 +27,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
-        # group box "clean database options"
+        # group box 'clean database options'
         self.clean_box = self.parent().findChild(QtWidgets.QGroupBox, 'clean_box')
         self.clean_testint = self.parent().findChild(QtWidgets.QCheckBox, 'clean_testint')
         self.clean_rmdup = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rmdup')
@@ -46,8 +46,8 @@ class AnalysisDirectDynamics(AnalysisTab):
         for radio in self.radio:
             radio.clicked.connect(self.optionSelected)
         # in clean database box, show certain options only when checked
-        self.clean_rmdup.stateChanged.connect(self.cleanOptionChecked)
-        self.clean_rmfail.stateChanged.connect(self.cleanOptionChecked)
+        self.clean_rmdup.stateChanged.connect(self.cleanOptionChanged)
+        self.clean_rmfail.stateChanged.connect(self.cleanOptionChanged)
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
@@ -62,7 +62,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                 box.hide()
 
     @QtCore.pyqtSlot()
-    def cleanOptionChecked(self) -> None:
+    def cleanOptionChanged(self) -> None:
         '''
         Allows the user to change the duplicate removal tolerance if the remove
         duplicate box is checked, and the remove interpolated points checkbox
