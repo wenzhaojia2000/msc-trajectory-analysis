@@ -116,7 +116,7 @@ class AnalysisDirectDynamics(AnalysisTab):
             raise FileNotFoundError('Cannot find log file in directory')
         times = []
         n_calcs = []
-        self.parent().text.setText("")
+        self.parent().text.setPlainText('')
         with open(filepath, mode='r', encoding='utf-8') as f:
             for line in f:
                 self.parent().text.append(line[:-1])

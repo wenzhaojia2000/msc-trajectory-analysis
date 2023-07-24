@@ -111,7 +111,7 @@ class AnalysisResults(AnalysisTab):
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find auto file in directory')
         # reset text
-        self.parent().text.setText('')
+        self.parent().text.setPlainText('')
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             try:

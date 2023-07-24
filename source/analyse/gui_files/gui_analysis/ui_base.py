@@ -146,7 +146,7 @@ class AnalysisTab(AnalysisBase):
                                timeout=float(self.parent().timeout_spinbox.value()),
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                check=True)
-            self.parent().text.setText(p.stdout)
+            self.parent().text.setPlainText(p.stdout)
             return p.stdout
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
             # something went wrong executing the function. add the console
@@ -195,7 +195,7 @@ class AnalysisTab(AnalysisBase):
         data = []
         if write_text:
             # clear text view if write_text is true
-            self.parent().text.setText('')
+            self.parent().text.setPlainText('')
         for line in iterable:
             # write line to text view if write_text is true
             if write_text:

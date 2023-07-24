@@ -55,7 +55,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
         self.dir_edit_dialog = self.findChild(QtWidgets.QToolButton, 'dir_edit_dialog')
         self.tab_widget = self.findChild(QtWidgets.QTabWidget, 'tab_widget')
-        self.text = self.findChild(QtWidgets.QTextEdit, 'output_text')
+        self.text = self.findChild(QtWidgets.QPlainTextEdit, 'output_text')
         self.graph = self.findChild(QtWidgets.QWidget, 'output_plot')
         self.slider = self.findChild(QtWidgets.QSlider, 'output_slider')
         self.timeout_menu = self.findChild(QtWidgets.QMenu, 'timeout_menu')

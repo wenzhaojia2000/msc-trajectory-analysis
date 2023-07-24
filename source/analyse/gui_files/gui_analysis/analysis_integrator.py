@@ -138,7 +138,7 @@ class AnalysisIntegrator(AnalysisTab):
 
         # display sorted text
         text = "\n".join([line[-1] for line in self.parent().data])
-        self.parent().text.setText(f'{pre}\n{text}\n\n{post}')
+        self.parent().text.setPlainText(f'{pre}\n{text}\n\n{post}')
         self.parent().resetPlot()
 
         # start plotting
