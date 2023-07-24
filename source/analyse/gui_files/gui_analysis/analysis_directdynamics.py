@@ -21,6 +21,59 @@ class AnalysisDirectDynamics(AnalysisTab):
         super().__init__(parent=parent, push_name='analdd_push',
                          box_name='analdd_layout')
 
+    def findObjects(self, push_name, box_name) -> None:
+        '''
+        Obtains UI elements as instance variables, and possibly some of their
+        properties.
+        '''
+        super().findObjects(push_name, box_name)
+        # group box "clean database options"
+        self.clean_box = self.parent().findChild(QtWidgets.QGroupBox, 'clean_box')
+        self.clean_testint = self.parent().findChild(QtWidgets.QCheckBox, 'clean_testint')
+        self.clean_rmdup = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rmdup')
+        self.clean_mindb = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'clean_mindb')
+        self.clean_rmfail = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rmfail')
+        self.clean_rminterp = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rminterp')
+        # box is hidden initially
+        self.clean_box.hide()
+
+    def connectObjects(self) -> None:
+        '''
+        Connects UI elements so they do stuff when interacted with.
+        '''
+        super().connectObjects()
+        # show the update options box when certain result is selected
+        for radio in self.radio:
+            radio.clicked.connect(self.optionSelected)
+        # in clean database box, show certain options only when checked
+        self.clean_rmdup.stateChanged.connect(self.cleanOptionChecked)
+        self.clean_rmfail.stateChanged.connect(self.cleanOptionChecked)
+
+    @QtCore.pyqtSlot()
+    def optionSelected(self) -> None:
+        '''
+        Shows per-analysis options if a valid option is checked.
+        '''
+        options = {2: self.clean_box}
+        for radio, box in options.items():
+            if self.radio[radio].isChecked():
+                box.show()
+            else:
+                box.hide()
+
+    @QtCore.pyqtSlot()
+    def cleanOptionChecked(self) -> None:
+        '''
+        Allows the user to change the duplicate removal tolerance if the remove
+        duplicate box is checked, and the remove interpolated points checkbox
+        if the remove failed points box is checked.
+        '''
+        self.clean_mindb.setEnabled(self.clean_rmdup.isChecked())
+        self.clean_rminterp.setEnabled(self.clean_rmfail.isChecked())
+        # uncheck box when disabled
+        if self.clean_rminterp.isEnabled() is False:
+            self.clean_rminterp.setChecked(False)
+
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
     def continuePushed(self) -> None:
@@ -35,7 +88,11 @@ class AnalysisDirectDynamics(AnalysisTab):
                 case 'analdd_1': # plot calculation rate in log
                     self.calcrate()
                 case 'analdd_2': # check database
-                    self.runCmd('checkdb')
+                    raise NotImplementedError('Not implemented yet')
+                case 'analdd_3':
+                    self.checkdb()
+                case 'analdd_4':
+                    raise NotImplementedError('Not implemented yet')
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
             self.parent().tab_widget.setCurrentIndex(0)
@@ -89,3 +146,22 @@ class AnalysisDirectDynamics(AnalysisTab):
                                     bottom='Time (fs)', left='QC calculations')
         self.parent().graph.plot(self.parent().data[0, :], self.parent().data[1, :],
                                  name='QC calculations', pen='r')
+
+    def checkdb(self) -> None:
+        '''
+        Executes the checkdb command with options depending on which options
+        the user has chosen.
+        '''
+        clean_options = []
+        if self.clean_testint.isChecked():
+            clean_options.append('-rd')
+        if self.clean_rmdup.isChecked():
+            clean_options.append('-d')
+            clean_options.append('-mindb ' + str(self.clean_mindb.value()))
+        if self.clean_rminterp.isChecked():
+            clean_options.append('-sc')
+        elif self.clean_rmfail.isChecked():
+            clean_options.append('-c')
+        # switch to text view to see output
+        self.parent().tab_widget.setCurrentIndex(0)
+        self.runCmd('checkdb', *clean_options)
