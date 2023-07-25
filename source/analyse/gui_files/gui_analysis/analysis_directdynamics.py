@@ -5,6 +5,7 @@
 
 from pathlib import Path
 import re
+import sqlite3
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
@@ -34,8 +35,13 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.clean_mindb = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'clean_mindb')
         self.clean_rmfail = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rmfail')
         self.clean_rminterp = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rminterp')
-        # box is hidden initially
+        # group box 'query'
+        self.sql_box = self.parent().findChild(QtWidgets.QGroupBox, 'sql_box')
+        self.sql_allowwrite = self.parent().findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
+        self.sql_query = self.parent().findChild(QtWidgets.QPlainTextEdit, 'sql_query')
+        # boxes are hidden initially
         self.clean_box.hide()
+        self.sql_box.hide()
 
     def connectObjects(self) -> None:
         '''
@@ -48,13 +54,15 @@ class AnalysisDirectDynamics(AnalysisTab):
         # in clean database box, show certain options only when checked
         self.clean_rmdup.stateChanged.connect(self.cleanOptionChanged)
         self.clean_rmfail.stateChanged.connect(self.cleanOptionChanged)
+        # have the sql query box grow in size instead of adding a scroll bar
+        self.sql_query.textChanged.connect(self.sqlChanged)
 
     @QtCore.pyqtSlot()
     def optionSelected(self) -> None:
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        options = {2: self.clean_box}
+        options = {2: self.clean_box, 3: self.sql_box}
         for radio, box in options.items():
             if self.radio[radio].isChecked():
                 box.show()
@@ -75,6 +83,17 @@ class AnalysisDirectDynamics(AnalysisTab):
             self.clean_rminterp.setChecked(False)
 
     @QtCore.pyqtSlot()
+    def sqlChanged(self):
+        '''
+        Sets the height of the SQL query text edit high enough to show all the
+        query without a scroll bar. This is definitely a hack so please replace
+        this if there is a better way to do it.
+        '''
+        # hand-picked arbitary constants that magically work
+        adj_height = 8 + 15 * self.sql_query.document().size().height()
+        self.sql_query.setMinimumHeight(int(adj_height))
+
+    @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
     def continuePushed(self) -> None:
         '''
@@ -92,7 +111,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                 case 'analdd_3':
                     self.checkdb()
                 case 'analdd_4':
-                    raise NotImplementedError('Not implemented yet')
+                    self.querydb()
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
             self.parent().tab_widget.setCurrentIndex(0)
@@ -116,7 +135,7 @@ class AnalysisDirectDynamics(AnalysisTab):
             raise FileNotFoundError('Cannot find log file in directory')
         times = []
         n_calcs = []
-        self.parent().text.setPlainText('')
+        self.parent().text.clear()
         with open(filepath, mode='r', encoding='utf-8') as f:
             for line in f:
                 self.parent().text.append(line[:-1])
@@ -157,7 +176,7 @@ class AnalysisDirectDynamics(AnalysisTab):
             clean_options.append('-rd')
         if self.clean_rmdup.isChecked():
             clean_options.append('-d')
-            clean_options.append('-mindb ' + str(self.clean_mindb.value()))
+            clean_options.extend(['-mindb', str(self.clean_mindb.value())])
         if self.clean_rminterp.isChecked():
             clean_options.append('-sc')
         elif self.clean_rmfail.isChecked():
@@ -165,3 +184,44 @@ class AnalysisDirectDynamics(AnalysisTab):
         # switch to text view to see output
         self.parent().tab_widget.setCurrentIndex(0)
         self.runCmd('checkdb', *clean_options)
+
+    def querydb(self) -> None:
+        '''
+        '''
+        query = self.sql_query.toPlainText()
+        filepath = Path(self.parent().dir_edit.text())/'database.sql'
+        if self.sql_allowwrite.isChecked():
+            mode = 'rw'
+        else:
+            mode = 'ro'
+        con = sqlite3.connect(f'file:{filepath}?mode={mode}', uri=True,
+                              timeout=float(self.parent().timeout_spinbox.value()))
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        res = cur.execute(query).fetchall()
+        con.close()
+
+        # format result
+        self.parent().tab_widget.setCurrentIndex(0)
+        self.parent().text.clear()
+        self.parent().text.appendPlainText(f'Executing:\n{query}')
+        if len(res) > 0:
+            # print header, wrapped by hyphens
+            header = ['{:>16} '.format(col[0]) for col in cur.description]
+            header_str = ''.join(header)
+            self.parent().text.appendPlainText(
+                f'{"-"*len(header_str)}\n{header_str}\n{"-"*len(header_str)}'
+            )
+            # print out results in a nicely formatted table
+            for row in res:
+                out = ''
+                for cell in row:
+                    if isinstance(cell, float):
+                        # scientific format with 9 dp
+                        out += '{: .9e} '.format(cell)
+                    else:
+                        # align right with width 16
+                        out += '{:>16} '.format(cell)
+                self.parent().text.appendPlainText(out)
+        else:
+            self.parent().text.appendPlainText('\nNo rows returned')

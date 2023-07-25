@@ -781,9 +781,9 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-19</y>
+           <y>-116</y>
            <width>335</width>
-           <height>367</height>
+           <height>464</height>
           </rect>
          </property>
          <attribute name="label">
@@ -916,6 +916,52 @@
                </property>
                <property name="text">
                 <string>Remove interpolated points</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="sql_box">
+            <property name="title">
+             <string>Query</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QCheckBox" name="sql_allowwrite">
+               <property name="text">
+                <string>Allow write queries</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPlainTextEdit" name="sql_query">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>23</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Courier</family>
+                </font>
+               </property>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
                </property>
               </widget>
              </item>
