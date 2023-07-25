@@ -187,6 +187,8 @@ class AnalysisDirectDynamics(AnalysisTab):
 
     def querydb(self) -> None:
         '''
+        Executes a user-written SQL query on database.sql. Returns the result
+        with nice formatting.
         '''
         query = self.sql_query.toPlainText()
         filepath = Path(self.parent().dir_edit.text())/'database.sql'

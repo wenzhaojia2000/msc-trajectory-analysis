@@ -52,15 +52,18 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         Finds objects from the loaded .ui file and set them as instance
         variables and sets some of their properties.
         '''
+        # ui items
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
         self.dir_edit_dialog = self.findChild(QtWidgets.QToolButton, 'dir_edit_dialog')
         self.tab_widget = self.findChild(QtWidgets.QTabWidget, 'tab_widget')
         self.text = self.findChild(QtWidgets.QPlainTextEdit, 'output_text')
         self.graph = self.findChild(QtWidgets.QWidget, 'output_plot')
         self.slider = self.findChild(QtWidgets.QSlider, 'output_slider')
+        # menu items
         self.timeout_menu = self.findChild(QtWidgets.QMenu, 'timeout_menu')
         self.exit = self.findChild(QtWidgets.QAction, 'action_exit')
         self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
+        self.line_wrap = self.findChild(QtWidgets.QAction, 'line_wrap')
         self.keep_files = self.findChild(QtWidgets.QAction, 'keep_files_checkbox')
 
         # set icon of the dir_edit_dialog
@@ -78,6 +81,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
         self.menu_dir.triggered.connect(self.chooseDirectory)
         self.exit.triggered.connect(lambda x: self.close())
+        self.line_wrap.triggered.connect(self.changeLineWrap)
 
         # add a timeout spinbox to the timeout menu
         self.timeout_spinbox = QtWidgets.QDoubleSpinBox(self)
@@ -158,6 +162,16 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         )
         if dirname:
             self.dir_edit.setText(dirname)
+
+    @QtCore.pyqtSlot()
+    def changeLineWrap(self) -> None:
+        '''
+        Changes the line wrapping in the text view.
+        '''
+        if self.line_wrap.isChecked():
+            self.text.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
+        else:
+            self.text.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
 
     @QtCore.pyqtSlot()
     def changePlotTitle(self) -> None:

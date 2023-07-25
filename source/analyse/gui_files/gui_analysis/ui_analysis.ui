@@ -963,6 +963,9 @@
                <property name="sizeAdjustPolicy">
                 <enum>QAbstractScrollArea::AdjustToContents</enum>
                </property>
+               <property name="tabStopWidth">
+                <number>20</number>
+               </property>
               </widget>
              </item>
             </layout>
@@ -1002,8 +1005,14 @@
             <property name="undoRedoEnabled">
              <bool>false</bool>
             </property>
+            <property name="lineWrapMode">
+             <enum>QPlainTextEdit::NoWrap</enum>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
+            </property>
+            <property name="tabStopWidth">
+             <number>20</number>
             </property>
            </widget>
           </item>
@@ -1058,6 +1067,7 @@
      </property>
     </widget>
     <addaction name="timeout_menu"/>
+    <addaction name="line_wrap"/>
     <addaction name="keep_files_checkbox"/>
    </widget>
    <addaction name="menu_file"/>
@@ -1095,6 +1105,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="line_wrap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Line wrap</string>
+   </property>
+   <property name="statusTip">
+    <string>In text view, break long lines into multiple lines.</string>
    </property>
   </action>
  </widget>
