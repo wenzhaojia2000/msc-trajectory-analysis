@@ -195,11 +195,11 @@ class AnalysisTab(AnalysisBase):
         data = []
         if write_text:
             # clear text view if write_text is true
-            self.parent().text.setPlainText('')
+            self.parent().text.clear()
         for line in iterable:
             # write line to text view if write_text is true
             if write_text:
-                self.parent().text.append(line[:-1])
+                self.parent().text.appendPlainText(line[:-1])
             # ignore finding floats on this line if matches regex
             if ignore_regex and re.search(ignore_regex, line):
                 continue

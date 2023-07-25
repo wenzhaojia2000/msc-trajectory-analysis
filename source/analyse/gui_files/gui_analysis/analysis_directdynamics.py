@@ -138,7 +138,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.parent().text.clear()
         with open(filepath, mode='r', encoding='utf-8') as f:
             for line in f:
-                self.parent().text.append(line[:-1])
+                self.parent().text.appendPlainText(line[:-1])
                 # find a line with time[fs] in it and get time 
                 if re.search(r'time\[fs\]', line):
                     try:
@@ -198,7 +198,6 @@ class AnalysisDirectDynamics(AnalysisTab):
             mode = 'ro'
         con = sqlite3.connect(f'file:{filepath}?mode={mode}', uri=True,
                               timeout=float(self.parent().timeout_spinbox.value()))
-        con.row_factory = sqlite3.Row
         cur = con.cursor()
         res = cur.execute(query).fetchall()
         con.close()
@@ -218,12 +217,15 @@ class AnalysisDirectDynamics(AnalysisTab):
             for row in res:
                 out = ''
                 for cell in row:
-                    if isinstance(cell, float):
-                        # scientific format with 9 dp
-                        out += '{: .9e} '.format(cell)
+                    if isinstance(cell, float) and np.isfinite(cell):
+                        # scientific format with 9 dp (8 dp if |exponent| > 100)
+                        if abs(cell) >= 1e+100 or 0 < abs(cell) <= 1e-100:
+                            out += '{: .8e} '.format(cell)
+                        else:
+                            out += '{: .9e} '.format(cell)
                     else:
-                        # align right with width 16
-                        out += '{:>16} '.format(cell)
+                        # align right with width 16 (str() allows None to be formatted)
+                        out += '{:>16} '.format(str(cell))
                 self.parent().text.appendPlainText(out)
         else:
             self.parent().text.appendPlainText('\nNo rows returned')

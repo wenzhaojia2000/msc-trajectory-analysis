@@ -125,7 +125,7 @@ class AnalysisSystem(AnalysisTab):
         filepath = Path(self.parent().dir_edit.text())/'showd1d.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
-                self.parent().text.append(f'{"-"*80}\n{f.read()}')
+                self.parent().text.appendPlainText(f'{"-"*80}\n{f.read()}')
             if self.parent().keep_files.isChecked() is False:
                 filepath.unlink()
 
