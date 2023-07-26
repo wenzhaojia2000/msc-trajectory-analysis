@@ -227,9 +227,8 @@ class AnalysisTab(AnalysisBase):
         Function that writes a table (list of lists or tuples) into a formatted
         table written into self.parent().text.
 
-        The function isn't able to format items which are not strings, floats,
-        integers, or None very nicely. Strings should also be less than 16
-        characters long.
+        The width of each column is 16 characters, so ensure strings and
+        integers are less than this width (floats are automatically formatted).
 
         header is a list of column names which is shown above the table. pre
         and post are strings that are printed before and after the table,

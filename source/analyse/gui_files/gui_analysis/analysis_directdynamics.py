@@ -30,12 +30,17 @@ class AnalysisDirectDynamics(AnalysisTab):
         super().findObjects(push_name, box_name)
         # group box 'pes/apes options'
         self.findpes_box = self.parent().findChild(QtWidgets.QGroupBox, 'findpes_box')
+        self.findpes_type = self.parent().findChild(QtWidgets.QComboBox, 'findpes_type')
         self.findpes_task = [
             self.parent().findChild(QtWidgets.QRadioButton, 'findpes_int'),
             self.parent().findChild(QtWidgets.QRadioButton, 'findpes_mat')
         ]
         self.findpes_int_box = self.parent().findChild(QtWidgets.QFrame, 'findpes_int_box')
         self.findpes_mat_box = self.parent().findChild(QtWidgets.QFrame, 'findpes_mat_box')
+        self.findpes_emin = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'findpes_emin')
+        self.findpes_emax = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'findpes_emax')
+        self.findpes_state = self.parent().findChild(QtWidgets.QSpinBox, 'findpes_state')
+        self.findpes_tol = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'findpes_tol')
         # group box 'clean database options'
         self.clean_box = self.parent().findChild(QtWidgets.QGroupBox, 'clean_box')
         self.clean_testint = self.parent().findChild(QtWidgets.QCheckBox, 'clean_testint')
@@ -136,7 +141,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                     # self.gwptraj()
                     raise NotImplementedError('Not implemented yet')
                 case 'analdd_3': # inspect PES/APES in database
-                    raise NotImplementedError('Not implemented yet')
+                    self.findpes()
                 case 'analdd_4': # check or clean database
                     self.checkdb()
                 case 'analdd_5': # query database
@@ -229,6 +234,67 @@ class AnalysisDirectDynamics(AnalysisTab):
     #         self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, col],
     #                                  name=col, pen=colours[col%7])
 
+    def findpes(self) -> None:
+        '''
+        '''
+        filepath = Path(self.parent().dir_edit.text())/'database.sql'
+        con = sqlite3.connect(f'file:{filepath}?mode=ro', uri=True,
+                              timeout=float(self.parent().timeout_spinbox.value()))
+        cur = con.cursor()
+        # the number of electronic states
+        nroot = cur.execute('SELECT Nroot FROM refdb;').fetchone()[0]
+        # the table to select entries
+        table = {0: 'pes', 1: 'apes'}[self.findpes_type.currentIndex()]
+        # generate the query. it will be a sequence of strings joined together
+        # with UNION, as a query is generated for each electronic state.
+        # nb: the method here uses f strings which is generally unsafe as it
+        # is vulnerable to sql injection. however, the user has access to the
+        # entire database anyway, so this is not an issue.
+        query = []
+        if self.findpes_task[0].isChecked():
+            # task is find energies between interval
+            emin = self.findpes_emin.value()
+            emax = self.findpes_emax.value()
+            description = (f'Finding database entries in {table} where '
+                           f'energies between {emin} and {emax}')
+            for s in range(1, nroot+1):
+                if table == 'pes':
+                    query.append(f'SELECT {s} AS "state", * FROM pes WHERE '
+                                 f'eng_{s}_{s} BETWEEN {emin} AND {emax}')
+                else:
+                    query.append(f'SELECT {s} AS "state", * FROM apes WHERE '
+                                 f'eng_{s} BETWEEN {emin} AND {emax}')
+        else:
+            # task is find matching energies
+            state = self.findpes_state.value()
+            tol = self.findpes_tol.value()
+            description = (f'Finding database entries in {table} where '
+                           f'energies match state {state} (abs. tol. {tol})')
+            for s in range(1, nroot+1):
+                if s == state:
+                    continue
+                elif table == 'pes':
+                    query.append(f'SELECT {state} AS "state1", {s} AS "state2", '
+                                 f'* FROM pes WHERE ABS(eng_{s}_{s} - eng_'
+                                 f'{state}_{state}) <= {tol}')
+                else:
+                    query.append(f'SELECT {state} AS "state1", {s} AS "state2", '
+                                 f'* FROM apes WHERE ABS(eng_{s} - eng_{state}) '
+                                 f'<= {tol}')
+
+        query = '\nUNION\n'.join(query)
+        res = cur.execute(query).fetchall()
+        con.close()
+
+        # format result
+        self.parent().tab_widget.setCurrentIndex(0)
+        if res:
+            post=f'Query was:\n{query}'
+        else:
+            post=f'No rows returned\n\nQuery was:\n{query}'
+        self.writeTable(res, header=[col[0] for col in cur.description],
+                        pre=description, post=post)
+
     def checkdb(self) -> None:
         '''
         Executes the checkdb command with options depending on which options
@@ -260,7 +326,8 @@ class AnalysisDirectDynamics(AnalysisTab):
         else:
             mode = 'ro'
         con = sqlite3.connect(f'file:{filepath}?mode={mode}', uri=True,
-                              timeout=float(self.parent().timeout_spinbox.value()))
+                              timeout=float(self.parent().timeout_spinbox.value()),
+                              isolation_level=None)
         cur = con.cursor()
         res = cur.execute(query).fetchall()
         con.close()
@@ -268,8 +335,8 @@ class AnalysisDirectDynamics(AnalysisTab):
         # format result
         self.parent().tab_widget.setCurrentIndex(0)
         if res:
-            post='No rows returned'
-        else:
             post=None
+        else:
+            post='No rows returned'
         self.writeTable(res, header=[col[0] for col in cur.description],
                         pre=f'Executing:\n{query}\n', post=post)

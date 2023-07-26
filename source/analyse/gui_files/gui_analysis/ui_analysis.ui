@@ -784,7 +784,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-430</y>
+           <y>-225</y>
            <width>335</width>
            <height>778</height>
           </rect>
@@ -976,7 +976,7 @@
                 <item row="1" column="1">
                  <widget class="QDoubleSpinBox" name="findpes_tol">
                   <property name="decimals">
-                   <number>3</number>
+                   <number>4</number>
                   </property>
                   <property name="maximum">
                    <double>10.000000000000000</double>
@@ -985,7 +985,7 @@
                    <double>0.001000000000000</double>
                   </property>
                   <property name="value">
-                   <double>0.010000000000000</double>
+                   <double>0.001000000000000</double>
                   </property>
                  </widget>
                 </item>
