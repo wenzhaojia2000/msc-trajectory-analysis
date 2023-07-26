@@ -28,6 +28,14 @@ class AnalysisDirectDynamics(AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
+        # group box 'pes/apes options'
+        self.findpes_box = self.parent().findChild(QtWidgets.QGroupBox, 'findpes_box')
+        self.findpes_task = [
+            self.parent().findChild(QtWidgets.QRadioButton, 'findpes_int'),
+            self.parent().findChild(QtWidgets.QRadioButton, 'findpes_mat')
+        ]
+        self.findpes_int_box = self.parent().findChild(QtWidgets.QFrame, 'findpes_int_box')
+        self.findpes_mat_box = self.parent().findChild(QtWidgets.QFrame, 'findpes_mat_box')
         # group box 'clean database options'
         self.clean_box = self.parent().findChild(QtWidgets.QGroupBox, 'clean_box')
         self.clean_testint = self.parent().findChild(QtWidgets.QCheckBox, 'clean_testint')
@@ -40,6 +48,8 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.sql_allowwrite = self.parent().findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
         self.sql_query = self.parent().findChild(QtWidgets.QPlainTextEdit, 'sql_query')
         # boxes are hidden initially
+        self.findpes_box.hide()
+        self.findpes_mat_box.hide()
         self.clean_box.hide()
         self.sql_box.hide()
 
@@ -51,6 +61,9 @@ class AnalysisDirectDynamics(AnalysisTab):
         # show the update options box when certain result is selected
         for radio in self.radio:
             radio.clicked.connect(self.optionSelected)
+        # in pes/apes box, show certain options only when checked
+        for radio in self.findpes_task:
+            radio.clicked.connect(self.findpesOptionChanged)
         # in clean database box, show certain options only when checked
         self.clean_rmdup.stateChanged.connect(self.cleanOptionChanged)
         self.clean_rmfail.stateChanged.connect(self.cleanOptionChanged)
@@ -62,9 +75,22 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        options = {2: self.clean_box, 3: self.sql_box}
+        options = {2: self.findpes_box, 3: self.clean_box, 4: self.sql_box}
         for radio, box in options.items():
             if self.radio[radio].isChecked():
+                box.show()
+            else:
+                box.hide()
+
+    @QtCore.pyqtSlot()
+    def findpesOptionChanged(self) -> None:
+        '''
+        Allows the user to change task-specific options depending on whether
+        the interval task or the match task is selected
+        '''
+        options = {0: self.findpes_int_box, 1: self.findpes_mat_box}
+        for radio, box in options.items():
+            if self.findpes_task[radio].isChecked():
                 box.show()
             else:
                 box.hide()
@@ -104,13 +130,16 @@ class AnalysisDirectDynamics(AnalysisTab):
                       if radio.isChecked()][0]
         try:
             match radio_name:
-                case 'analdd_1': # plot calculation rate in log
+                case 'analdd_1': # plot dd calculation rate in log
                     self.calcrate()
-                case 'analdd_2': # check database
+                case 'analdd_2': # plot wavepacket basis function trajectories
+                    # self.gwptraj()
                     raise NotImplementedError('Not implemented yet')
-                case 'analdd_3':
+                case 'analdd_3': # inspect PES/APES in database
+                    raise NotImplementedError('Not implemented yet')
+                case 'analdd_4': # check or clean database
                     self.checkdb()
-                case 'analdd_4':
+                case 'analdd_5': # query database
                     self.querydb()
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
@@ -166,6 +195,40 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.parent().graph.plot(self.parent().data[0, :], self.parent().data[1, :],
                                  name='QC calculations', pen='r')
 
+    # def gwptraj(self) -> None:
+    #     '''
+    #     The trajectory file that this function reads has way more than is
+    #     displayed when using the interactive cmd function (in eth_sql_5/
+    #     there are 900 columns while only 30 are displayed at one time in the
+    #     command line gnuplot).
+    #     '''
+    #     self.runCmd('gwptraj', '-trj')
+    #     filepath = Path(self.parent().dir_edit.text())/'trajectory'
+    #     # assemble data matrix
+    #     with open(filepath, mode='r', encoding='utf-8') as f:
+    #         self.readFloats(f, None)
+    #     if self.parent().keep_files.isChecked() is False:
+    #         # delete intermediate file
+    #         filepath.unlink()
+
+    #     # add contents of showd1d.log to text view
+    #     filepath = Path(self.parent().dir_edit.text())/'gwptraj.log'
+    #     if filepath.is_file():
+    #         with open(filepath, mode='r', encoding='utf-8') as f:
+    #             self.parent().text.appendPlainText(f'{"-"*80}\n{f.read()}')
+    #         if self.parent().keep_files.isChecked() is False:
+    #             filepath.unlink()
+
+    #     # start plotting
+    #     colours = ['r','g','b','c','m','y','k']
+    #     self.parent().resetPlot(True)
+    #     self.parent().setPlotLabels(title='GWP function centre coordinates',
+    #                                 bottom='Time (fs)', left='Trajectory (au)')
+    #     # plot line for each column
+    #     for col in range(self.parent().data.shape[1]):
+    #         self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, col],
+    #                                  name=col, pen=colours[col%7])
+
     def checkdb(self) -> None:
         '''
         Executes the checkdb command with options depending on which options
@@ -204,28 +267,9 @@ class AnalysisDirectDynamics(AnalysisTab):
 
         # format result
         self.parent().tab_widget.setCurrentIndex(0)
-        self.parent().text.clear()
-        self.parent().text.appendPlainText(f'Executing:\n{query}')
-        if len(res) > 0:
-            # print header, wrapped by hyphens
-            header = ['{:>16} '.format(col[0]) for col in cur.description]
-            header_str = ''.join(header)
-            self.parent().text.appendPlainText(
-                f'{"-"*len(header_str)}\n{header_str}\n{"-"*len(header_str)}'
-            )
-            # print out results in a nicely formatted table
-            for row in res:
-                out = ''
-                for cell in row:
-                    if isinstance(cell, float) and np.isfinite(cell):
-                        # scientific format with 9 dp (8 dp if |exponent| > 100)
-                        if abs(cell) >= 1e+100 or 0 < abs(cell) <= 1e-100:
-                            out += '{: .8e} '.format(cell)
-                        else:
-                            out += '{: .9e} '.format(cell)
-                    else:
-                        # align right with width 16 (str() allows None to be formatted)
-                        out += '{:>16} '.format(str(cell))
-                self.parent().text.appendPlainText(out)
+        if res:
+            post='No rows returned'
         else:
-            self.parent().text.appendPlainText('\nNo rows returned')
+            post=None
+        self.writeTable(res, header=[col[0] for col in cur.description],
+                        pre=f'Executing:\n{query}\n', post=post)
