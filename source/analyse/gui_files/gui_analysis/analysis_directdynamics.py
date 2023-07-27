@@ -236,8 +236,13 @@ class AnalysisDirectDynamics(AnalysisTab):
 
     def findpes(self) -> None:
         '''
+        Find database entries in the pes/apes + geo table where energies are
+        within a certain user-defined interval or where energies between two
+        states match within a tolerance.
         '''
         filepath = Path(self.parent().dir_edit.text())/'database.sql'
+        if filepath.is_file() is False:
+            raise FileNotFoundError('Cannot find database.sql file in directory')
         con = sqlite3.connect(f'file:{filepath}?mode=ro', uri=True,
                               timeout=float(self.parent().timeout_spinbox.value()))
         cur = con.cursor()
@@ -259,30 +264,34 @@ class AnalysisDirectDynamics(AnalysisTab):
                            f'energies between {emin} and {emax}')
             for s in range(1, nroot+1):
                 if table == 'pes':
-                    query.append(f'SELECT {s} AS "state", * FROM pes WHERE '
-                                 f'eng_{s}_{s} BETWEEN {emin} AND {emax}')
+                    query.append(f'SELECT {s} AS "state", * FROM pes LEFT JOIN '
+                                 f'geo USING(id) WHERE eng_{s}_{s} BETWEEN '
+                                 f'{emin} AND {emax}')
                 else:
-                    query.append(f'SELECT {s} AS "state", * FROM apes WHERE '
-                                 f'eng_{s} BETWEEN {emin} AND {emax}')
+                    query.append(f'SELECT {s} AS "state", * FROM apes LEFT JOIN '
+                                 f'geo USING(id) WHERE eng_{s} BETWEEN {emin} '
+                                 f'AND {emax}')
         else:
             # task is find matching energies
-            state = self.findpes_state.value()
+            s1 = self.findpes_state.value()
             tol = self.findpes_tol.value()
+            if s1 > nroot:
+                raise ValueError(f'State {s1} cannot be greater than number of'
+                                 f'states {nroot}')
             description = (f'Finding database entries in {table} where '
-                           f'energies match state {state} (abs. tol. {tol})')
-            for s in range(1, nroot+1):
-                if s == state:
+                           f'energies match state {s1} (abs. tol. {tol})')
+            for s2 in range(1, nroot+1):
+                if s2 == s1:
                     continue
                 elif table == 'pes':
-                    query.append(f'SELECT {state} AS "state1", {s} AS "state2", '
-                                 f'* FROM pes WHERE ABS(eng_{s}_{s} - eng_'
-                                 f'{state}_{state}) <= {tol}')
+                    query.append(f'SELECT {s1} AS "state1", {s2} AS "state2", * '
+                                 f'FROM pes LEFT JOIN geo USING(id) WHERE '
+                                 f'ABS(eng_{s2}_{s2} - eng_{s1}_{s1}) <= {tol}')
                 else:
-                    query.append(f'SELECT {state} AS "state1", {s} AS "state2", '
-                                 f'* FROM apes WHERE ABS(eng_{s} - eng_{state}) '
-                                 f'<= {tol}')
-
-        query = '\nUNION\n'.join(query)
+                    query.append(f'SELECT {s1} AS "state1", {s2} AS "state2", * '
+                                 f'FROM apes LEFT JOIN geo USING(id) WHERE '
+                                 f'ABS(eng_{s2} - eng_{s1}) <= {tol}')
+        query = '\nUNION\n'.join(query) + ';'
         res = cur.execute(query).fetchall()
         con.close()
 
@@ -321,6 +330,8 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         query = self.sql_query.toPlainText()
         filepath = Path(self.parent().dir_edit.text())/'database.sql'
+        if filepath.is_file() is False:
+            raise FileNotFoundError('Cannot find database.sql file in directory')
         if self.sql_allowwrite.isChecked():
             mode = 'rw'
         else:
