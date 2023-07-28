@@ -219,8 +219,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>248</width>
-           <height>236</height>
+           <width>356</width>
+           <height>348</height>
           </rect>
          </property>
          <attribute name="label">
@@ -354,7 +354,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>330</width>
+           <width>335</width>
            <height>383</height>
           </rect>
          </property>
@@ -789,7 +789,7 @@
            <x>0</x>
            <y>0</y>
            <width>335</width>
-           <height>778</height>
+           <height>877</height>
           </rect>
          </property>
          <attribute name="label">
@@ -865,6 +865,50 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="gwptraj_box">
+            <property name="title">
+             <string>GWP Trajectory Options</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_11">
+             <item row="0" column="0">
+              <widget class="QLabel" name="gwptraj_task_label">
+               <property name="text">
+                <string>Task</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1" rowspan="2">
+              <widget class="QComboBox" name="gwptraj_task">
+               <item>
+                <property name="text">
+                 <string>Plot GWP Center</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Plot GWP Momentum</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="0" rowspan="2">
+              <widget class="QLabel" name="gwptraj_mode_label">
+               <property name="text">
+                <string>Mode</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="gwptraj_mode">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QGroupBox" name="findpes_box">

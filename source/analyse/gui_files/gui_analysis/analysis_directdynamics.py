@@ -28,6 +28,10 @@ class AnalysisDirectDynamics(AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
+        # group box 'gwp trajectory options'
+        self.gwptraj_box = self.parent().findChild(QtWidgets.QGroupBox, 'gwptraj_box')
+        self.gwptraj_task = self.parent().findChild(QtWidgets.QComboBox, 'gwptraj_task')
+        self.gwptraj_mode = self.parent().findChild(QtWidgets.QSpinBox, 'gwptraj_mode')
         # group box 'pes/apes options'
         self.findpes_box = self.parent().findChild(QtWidgets.QGroupBox, 'findpes_box')
         self.findpes_type = self.parent().findChild(QtWidgets.QComboBox, 'findpes_type')
@@ -53,6 +57,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.sql_allowwrite = self.parent().findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
         self.sql_query = self.parent().findChild(QtWidgets.QPlainTextEdit, 'sql_query')
         # boxes are hidden initially
+        self.gwptraj_box.hide()
         self.findpes_box.hide()
         self.findpes_mat_box.hide()
         self.clean_box.hide()
@@ -80,7 +85,8 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        options = {2: self.findpes_box, 3: self.clean_box, 4: self.sql_box}
+        options = {1: self.gwptraj_box, 2: self.findpes_box, 3: self.clean_box,
+                   4: self.sql_box}
         for radio, box in options.items():
             if self.radio[radio].isChecked():
                 box.show()
@@ -138,8 +144,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                 case 'analdd_1': # plot dd calculation rate in log
                     self.calcrate()
                 case 'analdd_2': # plot wavepacket basis function trajectories
-                    # self.gwptraj()
-                    raise NotImplementedError('Not implemented yet')
+                    self.gwptraj()
                 case 'analdd_3': # inspect PES/APES in database
                     self.findpes()
                 case 'analdd_4': # check or clean database
@@ -200,39 +205,70 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.parent().graph.plot(self.parent().data[0, :], self.parent().data[1, :],
                                  name='QC calculations', pen='r')
 
-    # def gwptraj(self) -> None:
-    #     '''
-    #     The trajectory file that this function reads has way more than is
-    #     displayed when using the interactive cmd function (in eth_sql_5/
-    #     there are 900 columns while only 30 are displayed at one time in the
-    #     command line gnuplot).
-    #     '''
-    #     self.runCmd('gwptraj', '-trj')
-    #     filepath = Path(self.parent().dir_edit.text())/'trajectory'
-    #     # assemble data matrix
-    #     with open(filepath, mode='r', encoding='utf-8') as f:
-    #         self.readFloats(f, None)
-    #     if self.parent().keep_files.isChecked() is False:
-    #         # delete intermediate file
-    #         filepath.unlink()
+    def gwptraj(self) -> None:
+        '''
+        Reads the file output of using gwptraj -trj, which is expected to be
+        in the format, where each cell is a float,
 
-    #     # add contents of showd1d.log to text view
-    #     filepath = Path(self.parent().dir_edit.text())/'gwptraj.log'
-    #     if filepath.is_file():
-    #         with open(filepath, mode='r', encoding='utf-8') as f:
-    #             self.parent().text.appendPlainText(f'{"-"*80}\n{f.read()}')
-    #         if self.parent().keep_files.isChecked() is False:
-    #             filepath.unlink()
+        t.1    A1.1   A2.1   ...   An.1   B1.1   ...   Bn.1   ... repeat for momenta
+        t.2    A1.2   A2.2   ...   An.2   B1.2   ...   Bn.2   ... repeat for momenta
+        ...    ...    ...    ...   ...    ...    ...   ...    ... repeat for momenta
+        t.m    A1.m   A2.m   ...   An.m   B1.m   ...   Bn.m   ... repeat for momenta
+        
+        where t is time, ABCDE... are gaussian wavepackets (GWPs), and 1...n
+        are the modes. The columns are then repeated for momenta instead of
+        GWP center coordinates.
 
-    #     # start plotting
-    #     colours = ['r','g','b','c','m','y','k']
-    #     self.parent().resetPlot(True)
-    #     self.parent().setPlotLabels(title='GWP function centre coordinates',
-    #                                 bottom='Time (fs)', left='Trajectory (au)')
-    #     # plot line for each column
-    #     for col in range(self.parent().data.shape[1]):
-    #         self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, col],
-    #                                  name=col, pen=colours[col%7])
+        Plots the GWPs' center or momentum for a given mode. No legend is
+        output.
+        '''
+        # -trj outputs a trajectory file only
+        self.runCmd('gwptraj', '-trj')
+        filepath = Path(self.parent().dir_edit.text())/'trajectory'
+        # assemble data matrix
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            self.readFloats(f, None)
+        if self.parent().keep_files.isChecked() is False:
+            # delete intermediate file
+            filepath.unlink()
+
+        # add contents of showd1d.log to text view
+        filepath = Path(self.parent().dir_edit.text())/'gwptraj.log'
+        if filepath.is_file():
+            with open(filepath, mode='r', encoding='utf-8') as f:
+                self.parent().text.appendPlainText(f'{"-"*80}\n{f.read()}')
+            if self.parent().keep_files.isChecked() is False:
+                filepath.unlink()
+
+        mode = self.gwptraj_mode.value()
+        # the number of columns is 2*number of gaussians*number of modes. the
+        # 2 is from the momenta being written after the gwp centers
+        ncol = self.parent().data.shape[1]
+        ngwp = 30 # hardcode for now, but it's in input
+        nmode = ncol//(2*ngwp)
+        if mode > nmode:
+            raise ValueError(f'Mode {mode} is larger than number of modes {nmode}')
+        # start plotting
+        colours = ['r','g','b','c','m','y','k']
+        self.parent().resetPlot(True)        
+        if self.gwptraj_task.currentIndex() == 0:
+            # task is plot centre coordinates, which make up the first half of
+            # the columns in trajectory file
+            offset = mode
+            self.parent().setPlotLabels(title='GWP function centre coordinates',
+                                        bottom='Time (fs)', left='GWP Center (au)')
+        else:
+            # task is plot momentum, which make up the second half of the
+            # columns in trajectory file
+            offset = ncol//2 + mode
+            self.parent().setPlotLabels(title='GWP function momentum',
+                                        bottom='Time (fs)', left='GWP Momentum (au)')
+        # plot line for each gaussian. columns are written for each gaussian
+        # with ascending mode. to pick the gaussians for one mode we skip
+        # nmode columns each time until we get to ngwp lines
+        for col in range(offset, offset+ngwp*nmode, nmode):
+            self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, col],
+                                     pen=colours[col%7])
 
     def findpes(self) -> None:
         '''
