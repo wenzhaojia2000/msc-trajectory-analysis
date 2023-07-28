@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 '''
 @author: 19081417
+
+Consists of the single class that provide the functionality for the main
+window, except the tabs which provide the analysis functionality.
 '''
 
 from pathlib import Path
 import shutil
 import subprocess
 
+import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from pyqtgraph.exporters import ImageExporter
 
@@ -20,6 +24,9 @@ from .analysis_directdynamics import AnalysisDirectDynamics
 class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
     '''
     UI of the main program.
+
+    Also consists of convenience functions for plotting to the UI's graph and
+    for writing to the UI's text screen.
     '''
     def __init__(self) -> None:
         '''
@@ -288,3 +295,53 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
                 if isinstance(value, str):
                     value = (value,)
                 self.graph.setLabel(key, *value, color='k')
+
+    def writeTable(self, table:list, header:list=None, pre:str=None,
+                   post:str=None) -> None:
+        '''
+        Function that writes a table (list of lists or tuples) into a formatted
+        table written into self.text.
+
+        The width of each column is 16 characters, so ensure strings and
+        integers are less than this width (floats are automatically formatted).
+
+        header is a list of column names which is shown above the table. pre
+        and post are strings that are printed before and after the table,
+        respectively.
+        '''
+        # obtain border length, the number of hyphens to section off
+        if len(table) > 0:
+            border_len = len(table[0])*17
+        elif header:
+            border_len = len(header)*17
+        else:
+            border_len = 0
+
+        self.text.clear()
+        if pre:
+            self.text.appendPlainText(pre)
+        self.text.appendPlainText('-'*border_len)
+        # print header, wrapped by hyphens
+        if header:
+            header = ''.join(['{:>16} '.format(col) for col in header])
+            self.text.appendPlainText(header)
+            self.text.appendPlainText('='*border_len)
+        # print out results
+        for row in table:
+            out = ''
+            for cell in row:
+                if isinstance(cell, float) and np.isfinite(cell):
+                    # scientific format with 9 dp (8 dp if |exponent| > 100)
+                    if abs(cell) >= 1e+100 or 0 < abs(cell) <= 1e-100:
+                        out += '{: .8e} '.format(cell)
+                    else:
+                        out += '{: .9e} '.format(cell)
+                else:
+                    # align right with width 16 (str() allows None to be formatted)
+                    out += '{:>16} '.format(str(cell))
+            self.text.appendPlainText(out)
+        # show bottom border only if there is at least one result
+        if len(table) > 0:
+            self.text.appendPlainText('-'*border_len)
+        if post:
+            self.text.appendPlainText(post)

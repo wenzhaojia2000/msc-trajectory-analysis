@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
 @author: 19081417
+
+Consists of the single class that provides functionality for the 'Analyse
+Integrator' tab of the analysis GUI. A class instance of this should be
+included in the main UI class.
 '''
 
 from pathlib import Path

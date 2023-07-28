@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
 @author: 19081417
+
+Consists of the single class that provides functionality for the 'Analyse
+Direct Dynamics' tab of the analysis GUI. A class instance of this should be
+included in the main UI class.
 '''
 
 from pathlib import Path
@@ -12,7 +16,7 @@ from .ui_base import AnalysisMainInterface, AnalysisTab
 
 class AnalysisDirectDynamics(AnalysisTab):
     '''
-    Defines functionality for the "Analyse Direct Dynamics" tab of the analysis
+    Defines functionality for the 'Analyse Direct Dynamics' tab of the analysis
     GUI.
     '''
     def __init__(self, parent:AnalysisMainInterface) -> None:
@@ -57,11 +61,8 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.sql_allowwrite = self.parent().findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
         self.sql_query = self.parent().findChild(QtWidgets.QPlainTextEdit, 'sql_query')
         # boxes are hidden initially
-        self.gwptraj_box.hide()
-        self.findpes_box.hide()
-        self.findpes_mat_box.hide()
-        self.clean_box.hide()
-        self.sql_box.hide()
+        self.optionSelected()
+        self.findpesOptionChanged()
 
     def connectObjects(self) -> None:
         '''
@@ -337,8 +338,8 @@ class AnalysisDirectDynamics(AnalysisTab):
             post=f'Query was:\n{query}'
         else:
             post=f'No rows returned\n\nQuery was:\n{query}'
-        self.writeTable(res, header=[col[0] for col in cur.description],
-                        pre=description, post=post)
+        self.parent().writeTable(res, header=[col[0] for col in cur.description],
+                                 pre=description, post=post)
 
     def checkdb(self) -> None:
         '''
@@ -385,5 +386,5 @@ class AnalysisDirectDynamics(AnalysisTab):
             post=None
         else:
             post='No rows returned'
-        self.writeTable(res, header=[col[0] for col in cur.description],
-                        pre=f'Executing:\n{query}\n', post=post)
+        self.parent().writeTable(res, header=[col[0] for col in cur.description],
+                                 pre=f'Executing:\n{query}\n', post=post)

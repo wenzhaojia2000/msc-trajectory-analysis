@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 @author: 19081417
+
+Consists of superclasses which the main UI and UI tabs extend from.
 '''
 
 from abc import ABC, ABCMeta, abstractmethod
@@ -62,6 +64,9 @@ class AnalysisTab(AnalysisBase):
     
     - One QBoxLayout instance, containing at least one radio button
     - One QPushButton instance (confirming radio button selection)
+    
+    Also consists of convenience functions which may aid with writing analysis
+    functions.
     '''
 
     def __init__(self, parent:AnalysisMainInterface, push_name:str, box_name:str,
@@ -220,53 +225,3 @@ class AnalysisTab(AnalysisBase):
             raise ValueError('No floats found in iterable. Check console '
                              'output to see what went wrong?')
         self.parent().data = np.array(data)
-
-    def writeTable(self, table:list, header:list=None, pre:str=None,
-                   post:str=None) -> None:
-        '''
-        Function that writes a table (list of lists or tuples) into a formatted
-        table written into self.parent().text.
-
-        The width of each column is 16 characters, so ensure strings and
-        integers are less than this width (floats are automatically formatted).
-
-        header is a list of column names which is shown above the table. pre
-        and post are strings that are printed before and after the table,
-        respectively.
-        '''
-        # obtain border length, the number of hyphens to section off
-        if len(table) > 0:
-            border_len = len(table[0])*17
-        elif header:
-            border_len = len(header)*17
-        else:
-            border_len = 0
-
-        self.parent().text.clear()
-        if pre:
-            self.parent().text.appendPlainText(pre)
-        self.parent().text.appendPlainText('-'*border_len)
-        # print header, wrapped by hyphens
-        if header:
-            header = ''.join(['{:>16} '.format(col) for col in header])
-            self.parent().text.appendPlainText(header)
-            self.parent().text.appendPlainText('='*border_len)
-        # print out results
-        for row in table:
-            out = ''
-            for cell in row:
-                if isinstance(cell, float) and np.isfinite(cell):
-                    # scientific format with 9 dp (8 dp if |exponent| > 100)
-                    if abs(cell) >= 1e+100 or 0 < abs(cell) <= 1e-100:
-                        out += '{: .8e} '.format(cell)
-                    else:
-                        out += '{: .9e} '.format(cell)
-                else:
-                    # align right with width 16 (str() allows None to be formatted)
-                    out += '{:>16} '.format(str(cell))
-            self.parent().text.appendPlainText(out)
-        # show bottom border only if there is at least one result
-        if len(table) > 0:
-            self.parent().text.appendPlainText('-'*border_len)
-        if post:
-            self.parent().text.appendPlainText(post)
