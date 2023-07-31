@@ -240,17 +240,34 @@ class AnalysisDirectDynamics(AnalysisTab):
                 self.parent().text.appendPlainText(f'{"-"*80}\n{f.read()}')
             if self.parent().keep_files.isChecked() is False:
                 filepath.unlink()
+        
+        # find ngwp from input. if input not found ask user for value
+        try:
+            with open(Path(self.parent().dir_edit.text())/'input', mode='r',
+                      encoding='utf-8') as f:
+                txt = f.read()
+                # IndexError raised when ngwp not found
+                ngwp = int(re.findall(r'ngwp\s*?=\s*?(\d+)', txt)[0])
+        except (FileNotFoundError, IndexError):
+            ngwp, ok = QtWidgets.QInputDialog.getInt(
+                parent=self.parent(),
+                title='Input ngwp',
+                label='Cannot find input file or read ngwp from input file.'
+                'Please enter the number of GWPs present (this should be ngwp'
+                'value in input)',
+                minValue=1
+            )
+            if not ok:
+                raise ValueError('User cancelled operation') from None
 
         mode = self.gwptraj_mode.value()
         # the number of columns is 2*number of gaussians*number of modes. the
         # 2 is from the momenta being written after the gwp centers
         ncol = self.parent().data.shape[1]
-        ngwp = 30 # hardcode for now, but it's in input
         nmode = ncol//(2*ngwp)
         if mode > nmode:
             raise ValueError(f'Mode {mode} is larger than number of modes {nmode}')
         # start plotting
-        colours = ['r','g','b','c','m','y','k']
         self.parent().resetPlot(True)        
         if self.gwptraj_task.currentIndex() == 0:
             # task is plot centre coordinates, which make up the first half of
@@ -267,9 +284,9 @@ class AnalysisDirectDynamics(AnalysisTab):
         # plot line for each gaussian. columns are written for each gaussian
         # with ascending mode. to pick the gaussians for one mode we skip
         # nmode columns each time until we get to ngwp lines
-        for col in range(offset, offset+ngwp*nmode, nmode):
+        for i, col in enumerate(range(offset, offset+ngwp*nmode, nmode)):
             self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, col],
-                                     pen=colours[col%7])
+                                     pen=(i, ngwp))
 
     def findpes(self) -> None:
         '''
