@@ -296,24 +296,27 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
                     value = (value,)
                 self.graph.setLabel(key, *value, color='k')
 
-    def writeTable(self, table:list, header:list=None, pre:str=None,
-                   post:str=None) -> None:
+    def writeTable(self, table:list, header:list=None, colwidth:int=16, 
+                   pre:str=None, post:str=None) -> None:
         '''
         Function that writes a table (list of lists or tuples) into a formatted
         table written into self.text.
 
-        The width of each column is 16 characters, so ensure strings and
-        integers are less than this width (floats are automatically formatted).
+        Ensure strings and integers are less than the column width (floats are
+        automatically formatted to be fixed width). The default width is 16
+        with 1 space of padding.
 
         header is a list of column names which is shown above the table. pre
         and post are strings that are printed before and after the table,
         respectively.
         '''
+        if colwidth < 8:
+            raise ValueError('colwidth cannot be lower than 8')
         # obtain border length, the number of hyphens to section off
         if len(table) > 0:
-            border_len = len(table[0])*17
+            border_len = len(table[0]) * (colwidth + 1)
         elif header:
-            border_len = len(header)*17
+            border_len = len(header) * (colwidth + 1)
         else:
             border_len = 0
 
@@ -323,7 +326,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.text.appendPlainText('-'*border_len)
         # print header, wrapped by hyphens
         if header:
-            header = ''.join(['{:>16} '.format(col) for col in header])
+            header = ''.join([f'{{:>{colwidth}}} '.format(col) for col in header])
             self.text.appendPlainText(header)
             self.text.appendPlainText('='*border_len)
         # print out results
@@ -333,12 +336,12 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
                 if isinstance(cell, float) and np.isfinite(cell):
                     # scientific format with 9 dp (8 dp if |exponent| > 100)
                     if abs(cell) >= 1e+100 or 0 < abs(cell) <= 1e-100:
-                        out += '{: .8e} '.format(cell)
+                        out += f'{{: .{colwidth-8}e}} '.format(cell)
                     else:
-                        out += '{: .9e} '.format(cell)
+                        out += f'{{: .{colwidth-7}e}} '.format(cell)
                 else:
                     # align right with width 16 (str() allows None to be formatted)
-                    out += '{:>16} '.format(str(cell))
+                    out += f'{{:>{colwidth}}} '.format(str(cell))
             self.text.appendPlainText(out)
         # show bottom border only if there is at least one result
         if len(table) > 0:
