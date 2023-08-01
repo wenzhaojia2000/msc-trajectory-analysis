@@ -11,8 +11,9 @@ import shutil
 import subprocess
 
 import numpy as np
-from PyQt5 import QtWidgets, QtCore
-from pyqtgraph.exporters import ImageExporter
+import pyqtgraph as pg
+import pyqtgraph.exporters
+from PyQt5 import QtWidgets, QtCore, QtGui
 
 from .ui_base import AnalysisMainInterface
 from .analysis_convergence import AnalysisConvergence
@@ -53,6 +54,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # the title of the graph if title is set to 'automatic'. set through
         # default_title argument of self.changePlotTitle
         self.default_title = ''
+        self.data = None
 
     def findObjects(self) -> None:
         '''
@@ -104,7 +106,8 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         '''
         Sets the properties of self.graph, the pyqtgraph widget. Adds custom
         menus to the pyqtgraph context menu, which is opened when right-
-        clicking on the graph.
+        clicking on the graph. Sets the properties of the colour bar when a
+        contour plot is shown.
         '''
         self.graph.setBackground('w')
         self.graph.showGrid(x=True, y=True)
@@ -137,6 +140,18 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.legend_checkbox.setCheckable(True)
         self.legend_checkbox.setChecked(True)
         self.legend_checkbox.triggered.connect(self.toggleLegend)
+        # colourbar that is displayed for contour plots. it's supposed to
+        # be used for image plots only, but plotContours uses it. we pass an
+        # empty ImageItem to its image parameter instead. you can also change
+        # the colourmap here. to find different ones execute
+        #   pyqtgraph.examples.run()
+        # and select the Colors -> Color Maps option.
+        self.colourmap = pg.colormap.get('CET-R4')
+        self.colourbar = self.graph.getPlotItem().addColorBar(
+            pg.ImageItem(), colorMap=self.colourmap, interactive=False
+        )
+        # hide until a contour plot is plotted
+        self.colourbar.hide()
 
     @QtCore.pyqtSlot()
     def directoryChanged(self) -> None:
@@ -234,7 +249,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # change cursor to wait cursor
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         # export image for each frame, into the temporary directory
-        exporter = ImageExporter(self.graph.plotItem)
+        exporter = pg.exporters.ImageExporter(self.graph.plotItem)
         for i in range(self.slider.minimum(), self.slider.maximum()+1):
             self.slider.setSliderPosition(i)
             exporter.export(str(temp_directory/f'{i:05}.png'))
@@ -268,6 +283,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.graph.setLabels(top='', bottom='', left='')
         self.graph.getAxis('bottom').setTicks(None)
         self.graph.getAxis('left').setTicks(None)
+        self.colourbar.hide()
         self.toggleLegend()
         if animated:
             self.slider.show()
@@ -295,6 +311,29 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
                 if isinstance(value, str):
                     value = (value,)
                 self.graph.setLabel(key, *value, color='k')
+    
+    def plotContours(self, x:np.array, y:np.array, z:np.array, n_levels:int) -> None:
+        '''
+        Given numpy arrays x with shape (N,), y with shape (M,) and z with
+        shape (N, M), plots n_level contour lines with levels ranging from
+        min(z) to max(z). Shows a colourbar to the side.
+        '''
+        colours = self.colourmap.getLookupTable(nPts=n_levels, mode=pg.ColorMap.QCOLOR)
+        levels = np.linspace(z.min(), z.max(), n_levels)
+        # a single contour line is known as an isocurve in pyqtgraph. it does
+        # not accept x or y values, only the data (z). to display it properly
+        # we need to transform it using QtGui.QTransform first.
+        tr = QtGui.QTransform()
+        tr.translate(x.min(), y.min())
+        tr.scale((x.max() - x.min()) / np.shape(z)[0],
+                 (y.max() - y.min()) / np.shape(z)[1])
+        # create the isocurves, transforming each one
+        for i in range(n_levels):
+            c = pg.IsocurveItem(data=z, level=levels[i], pen=colours[i])
+            c.setTransform(tr)
+            self.graph.getPlotItem().addItem(c)
+        self.colourbar.setLevels((levels[0], levels[-1]))
+        self.colourbar.show()
 
     def writeTable(self, table:list, header:list=None, colwidth:int=16, 
                    pre:str=None, post:str=None) -> None:
