@@ -8,6 +8,7 @@ the main UI class.
 '''
 
 from pathlib import Path
+import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
@@ -33,6 +34,12 @@ class AnalysisSystem(AnalysisTab):
         self.den1d_box = self.parent().findChild(QtWidgets.QGroupBox, 'den1d_box')
         self.den1d_dof = self.parent().findChild(QtWidgets.QSpinBox, 'den1d_dof')
         self.den1d_state = self.parent().findChild(QtWidgets.QSpinBox, 'den1d_state')
+        # group box 'pes options'
+        self.showpes_box = self.parent().findChild(QtWidgets.QGroupBox, 'showpes_box')
+        self.showpes_type = self.parent().findChild(QtWidgets.QComboBox, 'showpes_type')
+        self.showpes_state = self.parent().findChild(QtWidgets.QSpinBox, 'showpes_state')
+        # hide box
+        self.showpes_box.hide()
 
     def connectObjects(self) -> None:
         '''
@@ -61,7 +68,7 @@ class AnalysisSystem(AnalysisTab):
                 case 'analsys_3': # plot diabatic state population
                     self.runCmd('plstate')
                 case 'analsys_4': # plot potential energy surface
-                    self.runCmd('showsys', '-pes', input='1')
+                    self.showpes()
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
             self.parent().tab_widget.setCurrentIndex(0)
@@ -72,7 +79,7 @@ class AnalysisSystem(AnalysisTab):
         '''
         Shows per-analysis options if a valid option is checked.
         '''
-        options = {0: self.den1d_box}
+        options = {0: self.den1d_box, 3: self.showpes_box}
         for radio, box in options.items():
             if self.radio[radio].isChecked():
                 box.show()
@@ -145,7 +152,8 @@ class AnalysisSystem(AnalysisTab):
         # start plotting
         self.parent().resetPlot(True, animated=True)
         self.parent().setPlotLabels(title='1D density evolution',
-                                    bottom='rd (au)', left='V (ev)',
+                                    bottom=f'DOF {den1d_options[0]} (au)',
+                                    left='Density',
                                     top=f't={self.parent().data[0][0][1]}')
         self.parent().graph.plot(self.parent().data[0][:, 0], self.parent().data[0][:, 2],
                                  name='Re(phi)', pen='r')
@@ -170,3 +178,81 @@ class AnalysisSystem(AnalysisTab):
                            self.parent().data[slider_pos][:, 2])
                 im.setData(self.parent().data[slider_pos][:, 0],
                            self.parent().data[slider_pos][:, 3])
+
+    def showpes(self):
+        '''
+        Reads the gnuplot file from the menu-driven output of showsys -pes.
+        The menu entries that are navigated by this function are:
+            10 (choose task)
+            20 (coordinate selection, using popup for the time being)
+            60 (choose state)
+        Data is read between the two EOD's at the start of the file, eg.
+        $Data1_1 << EOD
+             x.1   y.1   z.1.1
+             x.1   y.2   z.1.2
+             ...   ...   ...
+             x.1   y.n   z.1.n
+             x.2   y.1   z.2.1
+             ...   ...   ...
+             x.m   y.n   z.m.n
+        EOD
+        [the gnuplot commands after this are ignored]
+        The x, y, z coordinates are converted into a x, y vector and z matrix
+        to input into plotContours. x.1 < x.2 < ... x.m and same for y other-
+        wise it won't work.
+
+        At the moment, only works for contour graphs (where x AND y are
+        input into coordinate selection). Support for normal plots (only x)
+        will be added later.
+        '''
+        # if a plot file already exists, this won't work as we can't type
+        # the option to overwrite.
+        filepath = Path(self.parent().dir_edit.text())/'pes.gnuplot.pl'
+        filepath.unlink(missing_ok=True)
+
+        inp = ''
+        # choose task (10)
+        inp += {0: '10\n2\n', 1: '10\n1\n'}[self.showpes_type.currentIndex()]
+        # choose state (60), plot one state only (1)
+        inp += f'60\n1\n{self.showpes_state.value()}\n'
+        # choose coordinates (20)
+        # temporary popup to get information for now. will need to read input
+        # to get mode names and add gui radio buttons + spinbox for each mode
+        coords, ok = QtWidgets.QInputDialog.getMultiLineText(
+            self.parent(),
+            'Input coordinates',
+            'Write one mode on each line, with its name (not index!) then '
+            'either x, y, or value'
+        )
+        if not ok:
+            raise ValueError('User cancelled operation')
+        inp += f'20\n{coords}\n0\n'
+        # print plot (2), select ok to contour selection (1, 1), then save data
+        # (4) to gnuplot, then exit (0)
+        # fixme: if y is not selected, the contour options don't show up! this
+        # ends up showing the plot instead, which we don't want.
+        inp += '2\n1\n1\n4\npes.gnuplot.pl\n0'
+        # run the command
+        self.runCmd('showsys', '-pes', input=inp)
+
+        # assemble data matrix
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            txt = f.read()
+            # find data between two EODs. need dot to match new lines so add flag
+            data = re.findall(r'EOD(.*)EOD', txt, re.DOTALL)[0].split('\n')
+            # temporary 3 (for contour graph) as i fix findFloats for any number
+            # later
+            self.readFloats(data, 3)
+        if self.parent().keep_files.isChecked() is False:
+            # delete intermediate file
+            filepath.unlink()
+
+        # convert from list xyz coordinate data to grid data
+        x = np.unique(self.parent().data[:, 0])
+        y = np.unique(self.parent().data[:, 1])
+        z = np.array(self.parent().data[:, 2]).reshape(x.shape[0], y.shape[0])
+        # start plotting
+        self.parent().resetPlot(switch_to_plot=True)
+        self.parent().plotContours(x, y, z, 21)
+        self.parent().setPlotLabels(title=self.showpes_type.currentText(),
+                                    bottom='DOF x (au)', left='DOF y (au)')
