@@ -189,7 +189,8 @@ class AnalysisTab(AnalysisBase):
         before using this function.
 
         The function only adds a row to the final array if and only if there
-        are `floats_per_line` floats in the line. If None, matches any number.
+        are `floats_per_line` floats in the line. If None, matches any number
+        greater than zero.
 
         If ignore_regex is set, the function ignores lines that match the
         regex.
@@ -218,7 +219,7 @@ class AnalysisTab(AnalysisBase):
                 pass
             else:
                 if (floats_per_line and len(matches) == floats_per_line)\
-                or floats_per_line is None:
+                or (floats_per_line is None and len(matches) > 0):
                     data.append(floats)
         if len(data) == 0:
             # nothing found
