@@ -181,13 +181,12 @@ class AnalysisSystem(AnalysisTab):
 
     def showpes(self):
         '''
-        Reads the gnuplot file from the menu-driven output of showsys -pes.
+        Reads the xyz file from the menu-driven output of showsys -pes.
         The menu entries that are navigated by this function are:
             10 (choose task)
             20 (coordinate selection, using popup for the time being)
             60 (choose state)
-        Data is read between the two EOD's at the start of the file, eg.
-        $Data1_1 << EOD
+        The format of the xyz file should be
              x.1   y.1   z.1.1
              x.1   y.2   z.1.2
              ...   ...   ...
@@ -195,19 +194,15 @@ class AnalysisSystem(AnalysisTab):
              x.2   y.1   z.2.1
              ...   ...   ...
              x.m   y.n   z.m.n
-        EOD
-        [the gnuplot commands after this are ignored]
-        The x, y, z coordinates are converted into a x, y vector and z matrix
-        to input into plotContours. x.1 < x.2 < ... x.m and same for y other-
-        wise it won't work.
-
-        At the moment, only works for contour graphs (where x AND y are
-        input into coordinate selection). Support for normal plots (only x)
-        will be added later.
+        If only x is selected in coordinate selection then z does not appear
+        and the function plots a 1D plot. Otherwise, the x, y, z coordinates
+        are converted into a x, y vector and z matrix and a contour plot is
+        shown. x.1 < x.2 < ... x.m and for contour plots, the same for y,
+        otherwise it won't work.
         '''
         # if a plot file already exists, this won't work as we can't type
         # the option to overwrite.
-        filepath = Path(self.parent().dir_edit.text())/'pes.gnuplot.pl'
+        filepath = Path(self.parent().dir_edit.text())/'pes.xyz'
         filepath.unlink(missing_ok=True)
 
         inp = ''
@@ -227,32 +222,32 @@ class AnalysisSystem(AnalysisTab):
         if not ok:
             raise ValueError('User cancelled operation')
         inp += f'20\n{coords}\n0\n'
-        # print plot (2), select ok to contour selection (1, 1), then save data
-        # (4) to gnuplot, then exit (0)
-        # fixme: if y is not selected, the contour options don't show up! this
-        # ends up showing the plot instead, which we don't want.
-        inp += '2\n1\n1\n4\npes.gnuplot.pl\n0'
+        # save data to xyz file (5), enter name, then exit (0)
+        inp += '5\npes.xyz\n0'
         # run the command
         self.runCmd('showsys', '-pes', input=inp)
 
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            txt = f.read()
-            # find data between two EODs. need dot to match new lines so add flag
-            data = re.findall(r'EOD(.*)EOD', txt, re.DOTALL)[0].split('\n')
-            # temporary 3 (for contour graph) as i fix findFloats for any number
-            # later
-            self.readFloats(data, 3)
+            self.readFloats(f)
         if self.parent().keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
 
-        # convert from list xyz coordinate data to grid data
-        x = np.unique(self.parent().data[:, 0])
-        y = np.unique(self.parent().data[:, 1])
-        z = np.array(self.parent().data[:, 2]).reshape(x.shape[0], y.shape[0])
         # start plotting
         self.parent().resetPlot(switch_to_plot=True)
-        self.parent().plotContours(x, y, z, 21)
-        self.parent().setPlotLabels(title=self.showpes_type.currentText(),
-                                    bottom='DOF x (au)', left='DOF y (au)')
+        if self.parent().data.shape[1] == 3:
+            # contour plot
+            # convert from list xyz coordinate data to grid data
+            x = np.unique(self.parent().data[:, 0])
+            y = np.unique(self.parent().data[:, 1])
+            z = np.array(self.parent().data[:, 2]).reshape(x.shape[0], y.shape[0])
+            self.parent().setPlotLabels(title=self.showpes_type.currentText(),
+                                        bottom='DOF x (au)', left='DOF y (au)')
+            self.parent().plotContours(x, y, z, 21)
+        else:
+            # line plot
+            self.parent().setPlotLabels(title=self.showpes_type.currentText(),
+                                        bottom='DOF x (au)', left='PES')
+            self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 1],
+                                     name='PES', pen='r')
