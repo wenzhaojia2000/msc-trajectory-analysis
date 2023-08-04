@@ -24,7 +24,12 @@ class AnalysisDirectDynamics(AnalysisTab):
         Initiation method.
         '''
         super().__init__(parent=parent, push_name='analdd_push',
-                         box_name='analdd_layout')
+                         layout_name='analdd_layout', options={
+                             1: 'gwptraj_box', 2: 'findpes_box',
+                             3: 'clean_box', 4: 'sql_box'
+                        })
+        # one of the boxes inside findpes should be hidden
+        self.findpesOptionChanged()
 
     def findObjects(self, push_name, box_name) -> None:
         '''
@@ -33,11 +38,9 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box 'gwp trajectory options'
-        self.gwptraj_box = self.parent().findChild(QtWidgets.QGroupBox, 'gwptraj_box')
         self.gwptraj_task = self.parent().findChild(QtWidgets.QComboBox, 'gwptraj_task')
         self.gwptraj_mode = self.parent().findChild(QtWidgets.QSpinBox, 'gwptraj_mode')
         # group box 'pes/apes options'
-        self.findpes_box = self.parent().findChild(QtWidgets.QGroupBox, 'findpes_box')
         self.findpes_type = self.parent().findChild(QtWidgets.QComboBox, 'findpes_type')
         self.findpes_task = [
             self.parent().findChild(QtWidgets.QRadioButton, 'findpes_int'),
@@ -50,28 +53,20 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.findpes_state = self.parent().findChild(QtWidgets.QSpinBox, 'findpes_state')
         self.findpes_tol = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'findpes_tol')
         # group box 'clean database options'
-        self.clean_box = self.parent().findChild(QtWidgets.QGroupBox, 'clean_box')
         self.clean_testint = self.parent().findChild(QtWidgets.QCheckBox, 'clean_testint')
         self.clean_rmdup = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rmdup')
         self.clean_mindb = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'clean_mindb')
         self.clean_rmfail = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rmfail')
         self.clean_rminterp = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rminterp')
         # group box 'query'
-        self.sql_box = self.parent().findChild(QtWidgets.QGroupBox, 'sql_box')
         self.sql_allowwrite = self.parent().findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
         self.sql_query = self.parent().findChild(QtWidgets.QPlainTextEdit, 'sql_query')
-        # boxes are hidden initially
-        self.optionSelected()
-        self.findpesOptionChanged()
 
     def connectObjects(self) -> None:
         '''
         Connects UI elements so they do stuff when interacted with.
         '''
         super().connectObjects()
-        # show the update options box when certain result is selected
-        for radio in self.radio:
-            radio.clicked.connect(self.optionSelected)
         # in pes/apes box, show certain options only when checked
         for radio in self.findpes_task:
             radio.clicked.connect(self.findpesOptionChanged)
@@ -80,19 +75,6 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.clean_rmfail.stateChanged.connect(self.cleanOptionChanged)
         # have the sql query box grow in size instead of adding a scroll bar
         self.sql_query.textChanged.connect(self.sqlChanged)
-
-    @QtCore.pyqtSlot()
-    def optionSelected(self) -> None:
-        '''
-        Shows per-analysis options if a valid option is checked.
-        '''
-        options = {1: self.gwptraj_box, 2: self.findpes_box, 3: self.clean_box,
-                   4: self.sql_box}
-        for radio, box in options.items():
-            if self.radio[radio].isChecked():
-                box.show()
-            else:
-                box.hide()
 
     @QtCore.pyqtSlot()
     def findpesOptionChanged(self) -> None:

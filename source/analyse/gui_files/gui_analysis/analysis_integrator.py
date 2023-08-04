@@ -23,7 +23,9 @@ class AnalysisIntegrator(AnalysisTab):
         Initiation method.
         '''
         super().__init__(parent=parent, push_name='analint_push',
-                         box_name='analint_layout')
+                         layout_name='analint_layout', options={
+                             1: 'timing_box'
+                        })
 
     def findObjects(self, push_name, box_name) -> None:
         '''
@@ -32,19 +34,7 @@ class AnalysisIntegrator(AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box 'timing file options'
-        self.timing_box = self.parent().findChild(QtWidgets.QGroupBox, 'timing_box')
         self.timing_sort = self.parent().findChild(QtWidgets.QComboBox, 'timing_sort')
-        # box is hidden initially
-        self.timing_box.hide()
-
-    def connectObjects(self) -> None:
-        '''
-        Connects UI elements so they do stuff when interacted with.
-        '''
-        super().connectObjects()
-        # show the update options box when certain result is selected
-        for radio in self.radio:
-            radio.clicked.connect(self.optionSelected)
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -69,18 +59,6 @@ class AnalysisIntegrator(AnalysisTab):
             # switch to text tab to see if there are any other explanatory errors
             self.parent().tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
-
-    @QtCore.pyqtSlot()
-    def optionSelected(self) -> None:
-        '''
-        Shows per-analysis options if a valid option is checked.
-        '''
-        options = {1: self.timing_box}
-        for radio, box in options.items():
-            if self.radio[radio].isChecked():
-                box.show()
-            else:
-                box.hide()
 
     def rdtiming(self) -> None:
         '''

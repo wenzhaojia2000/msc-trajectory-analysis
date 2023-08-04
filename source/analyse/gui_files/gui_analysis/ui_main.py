@@ -54,7 +54,6 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # the title of the graph if title is set to 'automatic'. set through
         # default_title argument of self.changePlotTitle
         self.default_title = ''
-        self.data = None
 
     def findObjects(self) -> None:
         '''

@@ -21,7 +21,9 @@ class AnalysisConvergence(AnalysisTab):
         Initiation method.
         '''
         super().__init__(parent=parent, push_name='analconv_push',
-                         box_name='analconv_layout')
+                         layout_name='analconv_layout', options={
+                             1: 'gpop_box'
+                        })
 
     def findObjects(self, push_name, box_name) -> None:
         '''
@@ -30,32 +32,8 @@ class AnalysisConvergence(AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box 'grid population options'
-        self.gpop_box = self.parent().findChild(QtWidgets.QGroupBox, 'gpop_box')
         self.gpop_nz = self.parent().findChild(QtWidgets.QSpinBox, 'gpop_nz')
         self.gpop_dof = self.parent().findChild(QtWidgets.QSpinBox, 'gpop_dof')
-        # box is hidden initially
-        self.gpop_box.hide()
-
-    def connectObjects(self) -> None:
-        '''
-        Connects UI elements so they do stuff when interacted with.
-        '''
-        super().connectObjects()
-        # show the autocorrelation box when certain result in analyse results
-        for radio in self.radio:
-            radio.clicked.connect(self.optionSelected)
-
-    @QtCore.pyqtSlot()
-    def optionSelected(self) -> None:
-        '''
-        Shows per-analysis options if a valid option is checked.
-        '''
-        options = {1: self.gpop_box}
-        for radio, box in options.items():
-            if self.radio[radio].isChecked():
-                box.show()
-            else:
-                box.hide()
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue

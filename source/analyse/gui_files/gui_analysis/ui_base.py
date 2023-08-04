@@ -69,26 +69,45 @@ class AnalysisTab(AnalysisBase):
     functions.
     '''
 
-    def __init__(self, parent:AnalysisMainInterface, push_name:str, box_name:str,
-                 *args, **kwargs) -> None:
+    def __init__(self, parent:AnalysisMainInterface, push_name:str,
+                 layout_name:str, options:dict={}, *args, **kwargs) -> None:
         '''
         Initiation method. As a tab is part of the main program, requires the
         parent AnalysisMain instance as an argument, as well as the object
         name of its QPushButton and QBoxLayout instances.
+        
+        May optionally give an options dictionary, which allows the user to
+        select further options when a radio button is selected. The dictionary
+        has key: radio button index (int) and value: name of the QGroupBox to
+        show when that button is selected.
         '''
         super().__init__(parent, *args, **kwargs)
-        self.findObjects(push_name, box_name)
-        self.connectObjects()
+        # for speed, turn box names into the objects themselves
+        for index, box_name in options.items():
+            options[index] = self.parent().findChild(QtWidgets.QGroupBox, box_name)
+            if options[index] is None:
+                raise ValueError(f'QGroupBox with name {box_name} was not found')
+        self.options = options
 
-    def findObjects(self, push_name:str, box_name:str):
+        self.findObjects(push_name, layout_name)
+        self.connectObjects()
+        # should automatically hide the boxes that correspond to an option
+        # that isn't selected
+        self.optionSelected()
+
+    def findObjects(self, push_name:str, layout_name:str):
         '''
         A possibly incomplete implementation of the findObjects method. Any
         derived class can add further implementation to this method by using
         `super().findObjects(push_name, box_name)`.
         '''
         self.push = self.parent().findChild(QtWidgets.QPushButton, push_name)
-        self.box = self.parent().findChild(QtWidgets.QBoxLayout, box_name)
-        self.radio = [self.box.itemAt(i).widget() for i in range(self.box.count())]
+        if self.push is None:
+            raise ValueError(f'QPushButton with name {push_name} was not found')
+        layout = self.parent().findChild(QtWidgets.QBoxLayout, layout_name)
+        if layout is None:
+            raise ValueError(f'QBoxLayout with name {layout_name} was not found')
+        self.radio = [layout.itemAt(i).widget() for i in range(layout.count())]
 
     def connectObjects(self):
         '''
@@ -97,6 +116,22 @@ class AnalysisTab(AnalysisBase):
         `super().connectObjects()`.
         '''
         self.push.clicked.connect(self.continuePushed)
+        # show the update options box when certain result is selected
+        for radio in self.radio:
+            radio.clicked.connect(self.optionSelected)
+        
+    @QtCore.pyqtSlot()
+    def optionSelected(self) -> None:
+        '''
+        Shows per-analysis options in a QGroupBox if a valid option is checked,
+        with the options dictionary given in __init__. Can be overriden if
+        certain options are generated on-demand, using `super().optionSelected()`.
+        '''
+        for index, box in self.options.items():
+            if self.radio[index].isChecked():
+                box.show()
+            else:
+                box.hide()
 
     @abstractmethod
     @QtCore.pyqtSlot()

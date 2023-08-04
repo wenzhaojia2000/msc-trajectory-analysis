@@ -8,7 +8,6 @@ the main UI class.
 '''
 
 from pathlib import Path
-import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisMainInterface, AnalysisTab
@@ -22,7 +21,9 @@ class AnalysisSystem(AnalysisTab):
         Initiation method.
         '''
         super().__init__(parent=parent, push_name='analsys_push',
-                         box_name='analsys_layout')
+                         layout_name='analsys_layout', options={
+                             0: 'den1d_box', 3: 'showpes_box'
+                        })
 
     def findObjects(self, push_name, box_name) -> None:
         '''
@@ -31,24 +32,11 @@ class AnalysisSystem(AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box '1d density options'
-        self.den1d_box = self.parent().findChild(QtWidgets.QGroupBox, 'den1d_box')
         self.den1d_dof = self.parent().findChild(QtWidgets.QSpinBox, 'den1d_dof')
         self.den1d_state = self.parent().findChild(QtWidgets.QSpinBox, 'den1d_state')
         # group box 'pes options'
-        self.showpes_box = self.parent().findChild(QtWidgets.QGroupBox, 'showpes_box')
         self.showpes_type = self.parent().findChild(QtWidgets.QComboBox, 'showpes_type')
         self.showpes_state = self.parent().findChild(QtWidgets.QSpinBox, 'showpes_state')
-        # hide box
-        self.showpes_box.hide()
-
-    def connectObjects(self) -> None:
-        '''
-        Connects UI elements so they do stuff when interacted with.
-        '''
-        super().connectObjects()
-        # show the update options box when certain result is selected
-        for radio in self.radio:
-            radio.clicked.connect(self.optionSelected)
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -73,18 +61,6 @@ class AnalysisSystem(AnalysisTab):
             # switch to text tab to see if there are any other explanatory errors
             self.parent().tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
-
-    @QtCore.pyqtSlot()
-    def optionSelected(self) -> None:
-        '''
-        Shows per-analysis options if a valid option is checked.
-        '''
-        options = {0: self.den1d_box, 3: self.showpes_box}
-        for radio, box in options.items():
-            if self.radio[radio].isChecked():
-                box.show()
-            else:
-                box.hide()
 
     def showd1d(self) -> None:
         '''
@@ -205,12 +181,6 @@ class AnalysisSystem(AnalysisTab):
         filepath = Path(self.parent().dir_edit.text())/'pes.xyz'
         filepath.unlink(missing_ok=True)
 
-        inp = ''
-        # choose task (10)
-        inp += {0: '10\n2\n', 1: '10\n1\n'}[self.showpes_type.currentIndex()]
-        # choose state (60), plot one state only (1)
-        inp += f'60\n1\n{self.showpes_state.value()}\n'
-        # choose coordinates (20)
         # temporary popup to get information for now. will need to read input
         # to get mode names and add gui radio buttons + spinbox for each mode
         coords, ok = QtWidgets.QInputDialog.getMultiLineText(
@@ -221,6 +191,13 @@ class AnalysisSystem(AnalysisTab):
         )
         if not ok:
             raise ValueError('User cancelled operation')
+
+        inp = ''
+        # choose task (10)
+        inp += {0: '10\n2\n', 1: '10\n1\n'}[self.showpes_type.currentIndex()]
+        # choose state (60), plot one state only (1)
+        inp += f'60\n1\n{self.showpes_state.value()}\n'
+        # choose coordinates (20)
         inp += f'20\n{coords}\n0\n'
         # save data to xyz file (5), enter name, then exit (0)
         inp += '5\npes.xyz\n0'
