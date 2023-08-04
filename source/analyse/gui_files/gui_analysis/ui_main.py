@@ -29,7 +29,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
     Also consists of convenience functions for plotting to the UI's graph and
     for writing to the UI's text screen.
     '''
-    def __init__(self) -> None:
+    def __init__(self):
         '''
         The method that is called when a Ui instance is initiated.
         '''
@@ -55,7 +55,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # default_title argument of self.changePlotTitle
         self.default_title = ''
 
-    def findObjects(self) -> None:
+    def findObjects(self):
         '''
         Finds objects from the loaded .ui file and set them as instance
         variables and sets some of their properties.
@@ -81,7 +81,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # hide slider initially
         self.slider.hide()
 
-    def connectObjects(self) -> None:
+    def connectObjects(self):
         '''
         Connects objects so they do stuff when interacted with.
         '''
@@ -101,7 +101,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         timeout_action.setDefaultWidget(self.timeout_spinbox)
         self.timeout_menu.addAction(timeout_action)
 
-    def tweakGraph(self) -> None:
+    def tweakGraph(self):
         '''
         Sets the properties of self.graph, the pyqtgraph widget. Adds custom
         menus to the pyqtgraph context menu, which is opened when right-
@@ -153,7 +153,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.colourbar.hide()
 
     @QtCore.pyqtSlot()
-    def directoryChanged(self) -> None:
+    def directoryChanged(self):
         '''
         Action to perform when the user edits the directory textbox.
         '''
@@ -172,7 +172,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             self.dir_edit.setText(str(Path(self.dir_edit.text()).resolve()))
 
     @QtCore.pyqtSlot()
-    def chooseDirectory(self) -> None:
+    def chooseDirectory(self):
         '''
         Allows user to choose a directory using a menu when the directory
         button is clicked.
@@ -185,7 +185,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             self.dir_edit.setText(dirname)
 
     @QtCore.pyqtSlot()
-    def changeLineWrap(self) -> None:
+    def changeLineWrap(self):
         '''
         Changes the line wrapping in the text view.
         '''
@@ -195,7 +195,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             self.text.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
 
     @QtCore.pyqtSlot()
-    def changePlotTitle(self) -> None:
+    def changePlotTitle(self):
         '''
         Changes the title of the graph, by setting it to the default title if
         custom title is set to Automatic, or whatever the user wrote otherwise.
@@ -206,7 +206,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             self.graph.setTitle(self.title_edit.text(), color='k', bold=True)
 
     @QtCore.pyqtSlot()
-    def toggleLegend(self) -> None:
+    def toggleLegend(self):
         '''
         Toggles the plot legend on and off, depending on the status of the show
         legend checkbox.
@@ -219,7 +219,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
             legend.hide()
 
     @QtCore.pyqtSlot()
-    def saveVideo(self) -> None:
+    def saveVideo(self):
         '''
         Saves an .mp4 file of the current plot (which should be animated with
         slider control). Requires ffmpeg installed on the command line.
@@ -270,7 +270,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         shutil.rmtree(temp_directory)
         return None
 
-    def resetPlot(self, switch_to_plot:bool=False, animated:bool=False) -> None:
+    def resetPlot(self, switch_to_plot:bool=False, animated:bool=False):
         '''
         Resets the graph for replotting. Call this method before plotting
         something new. Use switch_to_plot to switch the tab menu so users can
@@ -293,7 +293,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         if switch_to_plot:
             self.tab_widget.setCurrentIndex(1)
 
-    def setPlotLabels(self, **kwargs) -> None:
+    def setPlotLabels(self, **kwargs):
         '''
         Sets the plot title using the title=... keyword and axis labels using
         left=..., right=..., top=...
@@ -311,7 +311,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
                     value = (value,)
                 self.graph.setLabel(key, *value, color='k')
     
-    def plotContours(self, x:np.array, y:np.array, z:np.array, n_levels:int) -> None:
+    def plotContours(self, x:np.array, y:np.array, z:np.array, n_levels:int):
         '''
         Given numpy arrays x with shape (N,), y with shape (M,) and z with
         shape (N, M), plots n_level contour lines with levels ranging from
@@ -335,7 +335,7 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         self.colourbar.show()
 
     def writeTable(self, table:list, header:list=None, colwidth:int=16, 
-                   pre:str=None, post:str=None) -> None:
+                   pre:str=None, post:str=None):
         '''
         Function that writes a table (list of lists or tuples) into a formatted
         table written into self.text.

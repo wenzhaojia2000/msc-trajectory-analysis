@@ -19,7 +19,7 @@ class AnalysisDirectDynamics(AnalysisTab):
     Defines functionality for the 'Analyse Direct Dynamics' tab of the analysis
     GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface):
         '''
         Initiation method.
         '''
@@ -31,7 +31,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         # one of the boxes inside findpes should be hidden
         self.findpesOptionChanged()
 
-    def findObjects(self, push_name, box_name) -> None:
+    def findObjects(self, push_name:str, box_name:str):
         '''
         Obtains UI elements as instance variables, and possibly some of their
         properties.
@@ -62,7 +62,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.sql_allowwrite = self.parent().findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
         self.sql_query = self.parent().findChild(QtWidgets.QPlainTextEdit, 'sql_query')
 
-    def connectObjects(self) -> None:
+    def connectObjects(self):
         '''
         Connects UI elements so they do stuff when interacted with.
         '''
@@ -77,7 +77,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.sql_query.textChanged.connect(self.sqlChanged)
 
     @QtCore.pyqtSlot()
-    def findpesOptionChanged(self) -> None:
+    def findpesOptionChanged(self):
         '''
         Allows the user to change task-specific options depending on whether
         the interval task or the match task is selected
@@ -90,7 +90,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                 box.hide()
 
     @QtCore.pyqtSlot()
-    def cleanOptionChanged(self) -> None:
+    def cleanOptionChanged(self):
         '''
         Allows the user to change the duplicate removal tolerance if the remove
         duplicate box is checked, and the remove interpolated points checkbox
@@ -115,7 +115,7 @@ class AnalysisDirectDynamics(AnalysisTab):
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
-    def continuePushed(self) -> None:
+    def continuePushed(self):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
@@ -139,7 +139,7 @@ class AnalysisDirectDynamics(AnalysisTab):
             self.parent().tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
-    def calcrate(self) -> None:
+    def calcrate(self):
         '''
         Reads the log and looks for lines of the following format
         
@@ -188,7 +188,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.parent().graph.plot(self.parent().data[0, :], self.parent().data[1, :],
                                  name='QC calculations', pen='r')
 
-    def gwptraj(self) -> None:
+    def gwptraj(self):
         '''
         Reads the file output of using gwptraj -trj, which is expected to be
         in the format, where each cell is a float,
@@ -270,7 +270,7 @@ class AnalysisDirectDynamics(AnalysisTab):
             self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, col],
                                      pen=(i, ngwp))
 
-    def findpes(self) -> None:
+    def findpes(self):
         '''
         Find database entries in the pes/apes + geo table where energies are
         within a certain user-defined interval or where energies between two
@@ -340,7 +340,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.parent().writeTable(res, header=[col[0] for col in cur.description],
                                  pre=description, post=post)
 
-    def checkdb(self) -> None:
+    def checkdb(self):
         '''
         Executes the checkdb command with options depending on which options
         the user has chosen.
@@ -359,7 +359,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.parent().tab_widget.setCurrentIndex(0)
         self.runCmd('checkdb', *clean_options)
 
-    def querydb(self) -> None:
+    def querydb(self):
         '''
         Executes a user-written SQL query on database.sql. Returns the result
         with nice formatting.

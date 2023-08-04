@@ -18,7 +18,7 @@ class AnalysisIntegrator(AnalysisTab):
     Defines functionality for the "Analyse Integrator" tab of the analysis
     GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface):
         '''
         Initiation method.
         '''
@@ -27,7 +27,7 @@ class AnalysisIntegrator(AnalysisTab):
                              1: 'timing_box'
                         })
 
-    def findObjects(self, push_name, box_name) -> None:
+    def findObjects(self, push_name:str, box_name:str):
         '''
         Obtains UI elements as instance variables, and possibly some of their
         properties.
@@ -38,7 +38,7 @@ class AnalysisIntegrator(AnalysisTab):
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
-    def continuePushed(self) -> None:
+    def continuePushed(self):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
@@ -60,7 +60,7 @@ class AnalysisIntegrator(AnalysisTab):
             self.parent().tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
-    def rdtiming(self) -> None:
+    def rdtiming(self):
         '''
         Reads the timing file, which is expected to be in the format
 
@@ -144,7 +144,7 @@ class AnalysisIntegrator(AnalysisTab):
             ticks.append((positions[i], label))
         self.parent().graph.getAxis('left').setTicks([ticks])
 
-    def rdupdate(self, plot_error:bool=False) -> None:
+    def rdupdate(self, plot_error:bool=False):
         '''
         Reads the command output of using rdupdate, which is expected to be in
         the format, where each cell is a float,

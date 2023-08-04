@@ -26,7 +26,7 @@ class AnalysisBase(QtCore.QObject, metaclass=AnalysisMeta):
     Abstract class of an analysis GUI, of some kind.
     '''
     @abstractmethod
-    def findObjects(self) -> None:
+    def findObjects(self):
         '''
         Obtains UI elements as instance variables, and possibly some of their
         properties.
@@ -35,7 +35,7 @@ class AnalysisBase(QtCore.QObject, metaclass=AnalysisMeta):
         # implemented so seperate raise NotImplementedError is redundant
 
     @abstractmethod
-    def connectObjects(self) -> None:
+    def connectObjects(self):
         '''
         Connects UI elements so they do stuff when interacted with.
         '''
@@ -44,7 +44,7 @@ class AnalysisMainInterface(AnalysisBase, ABC):
     '''
     Abstract class of the analysis main window.
     '''
-    def __init__(self, ui_file, *args, **kwargs) -> None:
+    def __init__(self, ui_file, *args, **kwargs):
         '''
         Initiation method. Requires a .ui file generated from Qt designer for
         the base-level UI.
@@ -61,16 +61,17 @@ class AnalysisMainInterface(AnalysisBase, ABC):
 class AnalysisTab(AnalysisBase):
     '''
     Abstract class of an analysis tab. The tab should have the following:
-    
+
     - One QBoxLayout instance, containing at least one radio button
+          (Recommend QVBoxLayout)
     - One QPushButton instance (confirming radio button selection)
-    
+
     Also consists of convenience functions which may aid with writing analysis
     functions.
     '''
 
     def __init__(self, parent:AnalysisMainInterface, push_name:str,
-                 layout_name:str, options:dict={}, *args, **kwargs) -> None:
+                 layout_name:str, options:dict={}, *args, **kwargs):
         '''
         Initiation method. As a tab is part of the main program, requires the
         parent AnalysisMain instance as an argument, as well as the object
@@ -121,7 +122,7 @@ class AnalysisTab(AnalysisBase):
             radio.clicked.connect(self.optionSelected)
         
     @QtCore.pyqtSlot()
-    def optionSelected(self) -> None:
+    def optionSelected(self):
         '''
         Shows per-analysis options in a QGroupBox if a valid option is checked,
         with the options dictionary given in __init__. Can be overriden if
@@ -135,7 +136,7 @@ class AnalysisTab(AnalysisBase):
 
     @abstractmethod
     @QtCore.pyqtSlot()
-    def continuePushed(self) -> None:
+    def continuePushed(self):
         '''
         Action to perform when the tab's push button is pushed.
         '''
@@ -205,7 +206,7 @@ class AnalysisTab(AnalysisBase):
             raise
 
     def readFloats(self, iterable:list, floats_per_line:int=None,
-                   ignore_regex:re.Pattern|str=None, write_text:bool=False) -> None:
+                   ignore_regex:re.Pattern|str=None, write_text:bool=False):
         '''
         Function that reads a file or list of strings that is formatted in a
         'grid', ie. in the form

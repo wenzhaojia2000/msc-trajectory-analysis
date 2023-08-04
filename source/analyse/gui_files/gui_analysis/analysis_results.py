@@ -16,7 +16,7 @@ class AnalysisResults(AnalysisTab):
     Defines functionality for the "Analyse Results" tab of the analysis
     GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface):
         '''
         Initiation method.
         '''
@@ -25,7 +25,7 @@ class AnalysisResults(AnalysisTab):
                              1: 'autocol_box'
                         })
 
-    def findObjects(self, push_name, box_name) -> None:
+    def findObjects(self, push_name:str, box_name:str):
         '''
         Obtains UI elements as instance variables, and possibly some of their
         properties.
@@ -40,7 +40,7 @@ class AnalysisResults(AnalysisTab):
         self.autocol_iexp = self.parent().findChild(QtWidgets.QSpinBox, 'autocol_iexp')
         self.autocol_func = self.parent().findChild(QtWidgets.QComboBox, 'autocol_filfunc')
 
-    def connectObjects(self) -> None:
+    def connectObjects(self):
         '''
         Connects UI elements so they do stuff when interacted with.
         '''
@@ -50,7 +50,7 @@ class AnalysisResults(AnalysisTab):
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
-    def continuePushed(self) -> None:
+    def continuePushed(self):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
@@ -71,14 +71,14 @@ class AnalysisResults(AnalysisTab):
             QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
-    def autocolOptionChanged(self) -> None:
+    def autocolOptionChanged(self):
         '''
         Allows the user to change the damping order if the damping time is set
         to non-zero (ie. damping is enabled)
         '''
         self.autocol_iexp.setEnabled(bool(self.autocol_tau.value()))
 
-    def rdauto(self) -> None:
+    def rdauto(self):
         '''
         Reads the auto file, which is expected to be in the format, where each
         cell is a float,

@@ -16,7 +16,7 @@ class AnalysisSystem(AnalysisTab):
     '''
     Defines functionality for the 'Analyse System' tab of the analysis GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface):
         '''
         Initiation method.
         '''
@@ -25,7 +25,7 @@ class AnalysisSystem(AnalysisTab):
                              0: 'den1d_box', 3: 'showpes_box'
                         })
 
-    def findObjects(self, push_name, box_name) -> None:
+    def findObjects(self, push_name:str, box_name:str):
         '''
         Obtains UI elements as instance variables, and possibly some of their
         properties.
@@ -40,7 +40,7 @@ class AnalysisSystem(AnalysisTab):
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
-    def continuePushed(self) -> None:
+    def continuePushed(self):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
@@ -62,7 +62,7 @@ class AnalysisSystem(AnalysisTab):
             self.parent().tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
-    def showd1d(self) -> None:
+    def showd1d(self):
         '''
         Reads the file output of using showd1d -T, which is expected to be
         in the format, where each cell is a float,
@@ -137,7 +137,7 @@ class AnalysisSystem(AnalysisTab):
                                  name='Im(phi)', pen='b')
 
     @QtCore.pyqtSlot()
-    def showd1dChangePlot(self) -> None:
+    def showd1dChangePlot(self):
         '''
         Allows the user to move the slider to control time when using the
         showd1d analysis.

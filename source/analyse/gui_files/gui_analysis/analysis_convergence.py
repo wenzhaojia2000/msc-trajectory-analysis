@@ -16,7 +16,7 @@ class AnalysisConvergence(AnalysisTab):
     Defines functionality for the "Analyse Convergence" tab of the analysis
     GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface) -> None:
+    def __init__(self, parent:AnalysisMainInterface):
         '''
         Initiation method.
         '''
@@ -25,7 +25,7 @@ class AnalysisConvergence(AnalysisTab):
                              1: 'gpop_box'
                         })
 
-    def findObjects(self, push_name, box_name) -> None:
+    def findObjects(self, push_name:str, box_name:str):
         '''
         Obtains UI elements as instance variables, and possibly some of their
         properties.
@@ -37,7 +37,7 @@ class AnalysisConvergence(AnalysisTab):
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
-    def continuePushed(self) -> None:
+    def continuePushed(self):
         '''
         Action to perform when the tab's 'Continue' button is pushed.
         '''
@@ -63,7 +63,7 @@ class AnalysisConvergence(AnalysisTab):
             self.parent().tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
 
-    def rdgpop(self) -> None:
+    def rdgpop(self):
         '''
         Reads the file output of using rdgpop, which is expected to be in
         the format, where each cell is a float,
