@@ -21,7 +21,7 @@ class AnalysisMeta(type(QtCore.QObject), ABCMeta):
     conflict.
     '''
 
-class AnalysisBase(QtCore.QObject, metaclass=AnalysisMeta):
+class AnalysisBase(ABC):
     '''
     Abstract class of an analysis GUI, of some kind.
     '''
@@ -40,7 +40,7 @@ class AnalysisBase(QtCore.QObject, metaclass=AnalysisMeta):
         Connects UI elements so they do stuff when interacted with.
         '''
 
-class AnalysisMainInterface(AnalysisBase, ABC):
+class AnalysisMainInterface(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
     '''
     Abstract class of the analysis main window.
     '''
@@ -58,9 +58,11 @@ class AnalysisMainInterface(AnalysisBase, ABC):
         # interacted with by some its widgets
         self.data = None
 
-class AnalysisTab(AnalysisBase):
+class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
     '''
-    Abstract class of an analysis tab. The tab should have the following:
+    Abstract class of an analysis tab. The tab should be a promoted QWidget
+    which is a child of the main window's toolbar. The tab should have the
+    following:
 
     - One QBoxLayout instance, containing at least one radio button
           (Recommend QVBoxLayout)
@@ -70,22 +72,26 @@ class AnalysisTab(AnalysisBase):
     functions.
     '''
 
-    def __init__(self, parent:AnalysisMainInterface, push_name:str,
-                 layout_name:str, options:dict={}, *args, **kwargs):
+    def _activate(self, push_name:str, layout_name:str, options:dict={},
+                  *args, **kwargs):
         '''
-        Initiation method. As a tab is part of the main program, requires the
-        parent AnalysisMain instance as an argument, as well as the object
-        name of its QPushButton and QBoxLayout instances.
-        
+        Activation method. This method is similar to __init__, but for promoted
+        widgets, the initialiser is called before any of its children are
+        added, and as such, self.findChild fails to find anything. Instead,
+        call when everything is loaded, ie. in the class for AnalysisMain to
+        add functionality to the analysis tab.
+
+        Requires the object name of its QPushButton and QBoxLayout instances
+        as mentioned in the class docstring.
+
         May optionally give an options dictionary, which allows the user to
         select further options when a radio button is selected. The dictionary
         has key: radio button index (int) and value: name of the QGroupBox to
         show when that button is selected.
         '''
-        super().__init__(parent, *args, **kwargs)
         # for speed, turn box names into the objects themselves
         for index, box_name in options.items():
-            options[index] = self.parent().findChild(QtWidgets.QGroupBox, box_name)
+            options[index] = self.findChild(QtWidgets.QGroupBox, box_name)
             if options[index] is None:
                 raise ValueError(f'QGroupBox with name {box_name} was not found')
         self.options = options
@@ -102,10 +108,10 @@ class AnalysisTab(AnalysisBase):
         derived class can add further implementation to this method by using
         `super().findObjects(push_name, box_name)`.
         '''
-        self.push = self.parent().findChild(QtWidgets.QPushButton, push_name)
+        self.push = self.findChild(QtWidgets.QPushButton, push_name)
         if self.push is None:
             raise ValueError(f'QPushButton with name {push_name} was not found')
-        layout = self.parent().findChild(QtWidgets.QBoxLayout, layout_name)
+        layout = self.findChild(QtWidgets.QBoxLayout, layout_name)
         if layout is None:
             raise ValueError(f'QBoxLayout with name {layout_name} was not found')
         self.radio = [layout.itemAt(i).widget() for i in range(layout.count())]
@@ -183,11 +189,11 @@ class AnalysisTab(AnalysisBase):
         '''
         try:
             p = subprocess.run(args, universal_newlines=True, input=input,
-                               cwd=self.parent().dir_edit.text(),
-                               timeout=float(self.parent().timeout_spinbox.value()),
+                               cwd=self.window().dir_edit.text(),
+                               timeout=float(self.window().timeout_spinbox.value()),
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                check=True)
-            self.parent().text.setPlainText(p.stdout)
+            self.window().text.setPlainText(p.stdout)
             return p.stdout
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
             # something went wrong executing the function. add the console
@@ -216,7 +222,7 @@ class AnalysisTab(AnalysisBase):
         ...    ...    ...    ...   ...
         am.1   am.2   am.3   ...   am.n
 
-        and stores floats found in it in an numpy array self.parent().data.
+        and stores floats found in it in an numpy array self.window().data.
         Each cell should be in a numeric form that can be converted into a
         float like 0.123 or 1.234E-10, etc., and cells are seperated with any
         number of spaces (or tabs).
@@ -232,16 +238,16 @@ class AnalysisTab(AnalysisBase):
         regex.
 
         If write_text is True, writes the file or iterable into the 'Text'
-        output tab self.parent().text.
+        output tab self.window().text.
         '''
         data = []
         if write_text:
             # clear text view if write_text is true
-            self.parent().text.clear()
+            self.window().text.clear()
         for line in iterable:
             # write line to text view if write_text is true
             if write_text:
-                self.parent().text.appendPlainText(line[:-1])
+                self.window().text.appendPlainText(line[:-1])
             # ignore finding floats on this line if matches regex
             if ignore_regex and re.search(ignore_regex, line):
                 continue
@@ -261,4 +267,4 @@ class AnalysisTab(AnalysisBase):
             # nothing found
             raise ValueError('No floats found in iterable. Check console '
                              'output to see what went wrong?')
-        self.parent().data = np.array(data)
+        self.window().data = np.array(data)

@@ -22,12 +22,12 @@ from .analysis_results import AnalysisResults
 from .analysis_system import AnalysisSystem
 from .analysis_directdynamics import AnalysisDirectDynamics
 
-class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
+class AnalysisMain(AnalysisMainInterface):
     '''
     UI of the main program.
 
-    Also consists of convenience functions for plotting to the UI's graph and
-    for writing to the UI's text screen.
+    Also consists of functions for plotting to the UI's graph and for writing
+    to the UI's text screen.
     '''
     def __init__(self):
         '''
@@ -40,17 +40,20 @@ class AnalysisMain(QtWidgets.QMainWindow, AnalysisMainInterface):
         # ui file
         super().__init__(ui_file=ui_file)
 
+        # activate analysis tabs. these classes dictate functionality for each
+        # analysis tab
+        for class_, object_name in zip(
+                [AnalysisConvergence, AnalysisIntegrator, AnalysisResults,
+                 AnalysisSystem, AnalysisDirectDynamics],
+                ['analconv_tab', 'analint_tab', 'analres_tab',
+                 'analsys_tab', 'analdd_tab']
+            ):
+            self.findChild(class_, object_name)._activate()
+
         # set properties of the plot graph
         self.tweakGraph()
         # set text in dir_edit to be the current working directory
         self.directoryChanged()
-        # the program is futher composed of classes which dictate
-        # function for each analysis tab
-        self.convergence = AnalysisConvergence(self)
-        self.integrator = AnalysisIntegrator(self)
-        self.results =  AnalysisResults(self)
-        self.system = AnalysisSystem(self)
-        self.directdynamics = AnalysisDirectDynamics(self)
         # the title of the graph if title is set to 'automatic'. set through
         # default_title argument of self.changePlotTitle
         self.default_title = ''

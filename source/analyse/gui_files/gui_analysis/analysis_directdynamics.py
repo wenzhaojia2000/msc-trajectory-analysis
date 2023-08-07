@@ -12,22 +12,23 @@ import re
 import sqlite3
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisMainInterface, AnalysisTab
+from .ui_base import AnalysisTab
 
 class AnalysisDirectDynamics(AnalysisTab):
     '''
-    Defines functionality for the 'Analyse Direct Dynamics' tab of the analysis
-    GUI.
+    Promoted widget that defines functionality for the 'Analyse Direct
+    Dynamics' tab of the analysis GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface):
+    def _activate(self):
         '''
-        Initiation method.
+        Activation method. See the documentation in AnalysisTab for more
+        information.
         '''
-        super().__init__(parent=parent, push_name='analdd_push',
-                         layout_name='analdd_layout', options={
-                             1: 'gwptraj_box', 2: 'findpes_box',
-                             3: 'clean_box', 4: 'sql_box'
-                        })
+        super()._activate(push_name='analdd_push', layout_name='analdd_layout',
+                          options={
+                              1: 'gwptraj_box', 2: 'findpes_box',
+                              3: 'clean_box', 4: 'sql_box'
+                          })
         # one of the boxes inside findpes should be hidden
         self.findpesOptionChanged()
 
@@ -38,29 +39,29 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box 'gwp trajectory options'
-        self.gwptraj_task = self.parent().findChild(QtWidgets.QComboBox, 'gwptraj_task')
-        self.gwptraj_mode = self.parent().findChild(QtWidgets.QSpinBox, 'gwptraj_mode')
+        self.gwptraj_task = self.findChild(QtWidgets.QComboBox, 'gwptraj_task')
+        self.gwptraj_mode = self.findChild(QtWidgets.QSpinBox, 'gwptraj_mode')
         # group box 'pes/apes options'
-        self.findpes_type = self.parent().findChild(QtWidgets.QComboBox, 'findpes_type')
+        self.findpes_type = self.findChild(QtWidgets.QComboBox, 'findpes_type')
         self.findpes_task = [
-            self.parent().findChild(QtWidgets.QRadioButton, 'findpes_int'),
-            self.parent().findChild(QtWidgets.QRadioButton, 'findpes_mat')
+            self.findChild(QtWidgets.QRadioButton, 'findpes_int'),
+            self.findChild(QtWidgets.QRadioButton, 'findpes_mat')
         ]
-        self.findpes_int_box = self.parent().findChild(QtWidgets.QFrame, 'findpes_int_box')
-        self.findpes_mat_box = self.parent().findChild(QtWidgets.QFrame, 'findpes_mat_box')
-        self.findpes_emin = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'findpes_emin')
-        self.findpes_emax = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'findpes_emax')
-        self.findpes_state = self.parent().findChild(QtWidgets.QSpinBox, 'findpes_state')
-        self.findpes_tol = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'findpes_tol')
+        self.findpes_int_box = self.findChild(QtWidgets.QFrame, 'findpes_int_box')
+        self.findpes_mat_box = self.findChild(QtWidgets.QFrame, 'findpes_mat_box')
+        self.findpes_emin = self.findChild(QtWidgets.QDoubleSpinBox, 'findpes_emin')
+        self.findpes_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'findpes_emax')
+        self.findpes_state = self.findChild(QtWidgets.QSpinBox, 'findpes_state')
+        self.findpes_tol = self.findChild(QtWidgets.QDoubleSpinBox, 'findpes_tol')
         # group box 'clean database options'
-        self.clean_testint = self.parent().findChild(QtWidgets.QCheckBox, 'clean_testint')
-        self.clean_rmdup = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rmdup')
-        self.clean_mindb = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'clean_mindb')
-        self.clean_rmfail = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rmfail')
-        self.clean_rminterp = self.parent().findChild(QtWidgets.QCheckBox, 'clean_rminterp')
+        self.clean_testint = self.findChild(QtWidgets.QCheckBox, 'clean_testint')
+        self.clean_rmdup = self.findChild(QtWidgets.QCheckBox, 'clean_rmdup')
+        self.clean_mindb = self.findChild(QtWidgets.QDoubleSpinBox, 'clean_mindb')
+        self.clean_rmfail = self.findChild(QtWidgets.QCheckBox, 'clean_rmfail')
+        self.clean_rminterp = self.findChild(QtWidgets.QCheckBox, 'clean_rminterp')
         # group box 'query'
-        self.sql_allowwrite = self.parent().findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
-        self.sql_query = self.parent().findChild(QtWidgets.QPlainTextEdit, 'sql_query')
+        self.sql_allowwrite = self.findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
+        self.sql_query = self.findChild(QtWidgets.QPlainTextEdit, 'sql_query')
 
     def connectObjects(self):
         '''
@@ -136,8 +137,8 @@ class AnalysisDirectDynamics(AnalysisTab):
                     self.querydb()
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
-            self.parent().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
+            self.window().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
 
     def calcrate(self):
         '''
@@ -152,15 +153,15 @@ class AnalysisDirectDynamics(AnalysisTab):
         
         and plots the number of calculations per timestep against time.
         '''
-        filepath = Path(self.parent().dir_edit.text())/'log'
+        filepath = Path(self.window().dir_edit.text())/'log'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find log file in directory')
         times = []
         n_calcs = []
-        self.parent().text.clear()
+        self.window().text.clear()
         with open(filepath, mode='r', encoding='utf-8') as f:
             for line in f:
-                self.parent().text.appendPlainText(line[:-1])
+                self.window().text.appendPlainText(line[:-1])
                 # find a line with time[fs] in it and get time 
                 if re.search(r'time\[fs\]', line):
                     try:
@@ -179,13 +180,13 @@ class AnalysisDirectDynamics(AnalysisTab):
         if len(times) == 0:
             # nothing found?
             raise ValueError('Invalid log file')
-        self.parent().data = np.array([times, n_calcs])
+        self.window().data = np.array([times, n_calcs])
 
         # start plotting, depending on options
-        self.parent().resetPlot(True)
-        self.parent().setPlotLabels(title='Calculations per time step',
+        self.window().resetPlot(True)
+        self.window().setPlotLabels(title='Calculations per time step',
                                     bottom='Time (fs)', left='QC calculations')
-        self.parent().graph.plot(self.parent().data[0, :], self.parent().data[1, :],
+        self.window().graph.plot(self.window().data[0, :], self.window().data[1, :],
                                  name='QC calculations', pen='r')
 
     def gwptraj(self):
@@ -207,32 +208,32 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         # -trj outputs a trajectory file only
         self.runCmd('gwptraj', '-trj')
-        filepath = Path(self.parent().dir_edit.text())/'trajectory'
+        filepath = Path(self.window().dir_edit.text())/'trajectory'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, None)
-        if self.parent().keep_files.isChecked() is False:
+        if self.window().keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
 
         # add contents of showd1d.log to text view
-        filepath = Path(self.parent().dir_edit.text())/'gwptraj.log'
+        filepath = Path(self.window().dir_edit.text())/'gwptraj.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
-                self.parent().text.appendPlainText(f'{"-"*80}\n{f.read()}')
-            if self.parent().keep_files.isChecked() is False:
+                self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
+            if self.window().keep_files.isChecked() is False:
                 filepath.unlink()
         
         # find ngwp from input. if input not found ask user for value
         try:
-            with open(Path(self.parent().dir_edit.text())/'input', mode='r',
+            with open(Path(self.window().dir_edit.text())/'input', mode='r',
                       encoding='utf-8') as f:
                 txt = f.read()
                 # IndexError raised when ngwp not found
                 ngwp = int(re.findall(r'ngwp\s*?=\s*?(\d+)', txt)[0])
         except (FileNotFoundError, IndexError):
             ngwp, ok = QtWidgets.QInputDialog.getInt(
-                parent=self.parent(),
+                parent=self.window(),
                 title='Input ngwp',
                 label='Cannot find input file or read ngwp from input file.'
                 'Please enter the number of GWPs present (this should be ngwp'
@@ -245,29 +246,29 @@ class AnalysisDirectDynamics(AnalysisTab):
         mode = self.gwptraj_mode.value()
         # the number of columns is 2*number of gaussians*number of modes. the
         # 2 is from the momenta being written after the gwp centers
-        ncol = self.parent().data.shape[1]
+        ncol = self.window().data.shape[1]
         nmode = ncol//(2*ngwp)
         if mode > nmode:
             raise ValueError(f'Mode {mode} is larger than number of modes {nmode}')
         # start plotting
-        self.parent().resetPlot(True)        
+        self.window().resetPlot(True)
         if self.gwptraj_task.currentIndex() == 0:
             # task is plot centre coordinates, which make up the first half of
             # the columns in trajectory file
             offset = mode
-            self.parent().setPlotLabels(title='GWP function centre coordinates',
+            self.window().setPlotLabels(title='GWP function centre coordinates',
                                         bottom='Time (fs)', left='GWP Center (au)')
         else:
             # task is plot momentum, which make up the second half of the
             # columns in trajectory file
             offset = ncol//2 + mode
-            self.parent().setPlotLabels(title='GWP function momentum',
+            self.window().setPlotLabels(title='GWP function momentum',
                                         bottom='Time (fs)', left='GWP Momentum (au)')
         # plot line for each gaussian. columns are written for each gaussian
         # with ascending mode. to pick the gaussians for one mode we skip
         # nmode columns each time until we get to ngwp lines
         for i, col in enumerate(range(offset, offset+ngwp*nmode, nmode)):
-            self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, col],
+            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, col],
                                      pen=(i, ngwp))
 
     def findpes(self):
@@ -276,11 +277,11 @@ class AnalysisDirectDynamics(AnalysisTab):
         within a certain user-defined interval or where energies between two
         states match within a tolerance.
         '''
-        filepath = Path(self.parent().dir_edit.text())/'database.sql'
+        filepath = Path(self.window().dir_edit.text())/'database.sql'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find database.sql file in directory')
         con = sqlite3.connect(f'file:{filepath}?mode=ro', uri=True,
-                              timeout=float(self.parent().timeout_spinbox.value()))
+                              timeout=float(self.window().timeout_spinbox.value()))
         cur = con.cursor()
         # the number of electronic states
         nroot = cur.execute('SELECT Nroot FROM refdb;').fetchone()[0]
@@ -332,12 +333,12 @@ class AnalysisDirectDynamics(AnalysisTab):
         con.close()
 
         # format result
-        self.parent().tab_widget.setCurrentIndex(0)
+        self.window().tab_widget.setCurrentIndex(0)
         if res:
             post=f'Query was:\n{query}'
         else:
             post=f'No rows returned\n\nQuery was:\n{query}'
-        self.parent().writeTable(res, header=[col[0] for col in cur.description],
+        self.window().writeTable(res, header=[col[0] for col in cur.description],
                                  pre=description, post=post)
 
     def checkdb(self):
@@ -356,7 +357,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         elif self.clean_rmfail.isChecked():
             clean_options.append('-c')
         # switch to text view to see output
-        self.parent().tab_widget.setCurrentIndex(0)
+        self.window().tab_widget.setCurrentIndex(0)
         self.runCmd('checkdb', *clean_options)
 
     def querydb(self):
@@ -365,7 +366,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         with nice formatting.
         '''
         query = self.sql_query.toPlainText()
-        filepath = Path(self.parent().dir_edit.text())/'database.sql'
+        filepath = Path(self.window().dir_edit.text())/'database.sql'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find database.sql file in directory')
         if self.sql_allowwrite.isChecked():
@@ -373,17 +374,17 @@ class AnalysisDirectDynamics(AnalysisTab):
         else:
             mode = 'ro'
         con = sqlite3.connect(f'file:{filepath}?mode={mode}', uri=True,
-                              timeout=float(self.parent().timeout_spinbox.value()),
+                              timeout=float(self.window().timeout_spinbox.value()),
                               isolation_level=None)
         cur = con.cursor()
         res = cur.execute(query).fetchall()
         con.close()
 
         # format result
-        self.parent().tab_widget.setCurrentIndex(0)
+        self.window().tab_widget.setCurrentIndex(0)
         if res:
             post=None
         else:
             post='No rows returned'
-        self.parent().writeTable(res, header=[col[0] for col in cur.description],
+        self.window().writeTable(res, header=[col[0] for col in cur.description],
                                  pre=f'Executing:\n{query}\n', post=post)

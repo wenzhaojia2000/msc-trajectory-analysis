@@ -10,20 +10,22 @@ the main UI class.
 from pathlib import Path
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisMainInterface, AnalysisTab
+from .ui_base import AnalysisTab
 
 class AnalysisSystem(AnalysisTab):
     '''
-    Defines functionality for the 'Analyse System' tab of the analysis GUI.
+    Promoted widget that defines functionality for the 'Analyse System' tab of
+    the analysis GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface):
+    def _activate(self):
         '''
-        Initiation method.
+        Activation method. See the documentation in AnalysisTab for more
+        information.
         '''
-        super().__init__(parent=parent, push_name='analsys_push',
-                         layout_name='analsys_layout', options={
-                             0: 'den1d_box', 3: 'showpes_box'
-                        })
+        super()._activate(push_name='analsys_push', layout_name='analsys_layout',
+                          options={
+                              0: 'den1d_box', 3: 'showpes_box'
+                          })
 
     def findObjects(self, push_name:str, box_name:str):
         '''
@@ -32,11 +34,11 @@ class AnalysisSystem(AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box '1d density options'
-        self.den1d_dof = self.parent().findChild(QtWidgets.QSpinBox, 'den1d_dof')
-        self.den1d_state = self.parent().findChild(QtWidgets.QSpinBox, 'den1d_state')
+        self.den1d_dof = self.findChild(QtWidgets.QSpinBox, 'den1d_dof')
+        self.den1d_state = self.findChild(QtWidgets.QSpinBox, 'den1d_state')
         # group box 'pes options'
-        self.showpes_type = self.parent().findChild(QtWidgets.QComboBox, 'showpes_type')
-        self.showpes_state = self.parent().findChild(QtWidgets.QSpinBox, 'showpes_state')
+        self.showpes_type = self.findChild(QtWidgets.QComboBox, 'showpes_type')
+        self.showpes_state = self.findChild(QtWidgets.QSpinBox, 'showpes_state')
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -59,8 +61,8 @@ class AnalysisSystem(AnalysisTab):
                     self.showpes()
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
-            self.parent().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
+            self.window().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
 
     def showd1d(self):
         '''
@@ -94,46 +96,46 @@ class AnalysisSystem(AnalysisTab):
 
         # find filename of command output
         if self.den1d_state.value() == 1:
-            filepath = Path(self.parent().dir_edit.text())/f'den1d_{den1d_options[0]}'
+            filepath = Path(self.window().dir_edit.text())/f'den1d_{den1d_options[0]}'
         else:
-            filepath = Path(self.parent().dir_edit.text())/f'den1d_{"_".join(den1d_options)}'
+            filepath = Path(self.window().dir_edit.text())/f'den1d_{"_".join(den1d_options)}'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 4, ignore_regex=r'^plot|^set')
             # split the matrix into chunks depending on its time column
-            n_interval = np.unique(self.parent().data[:, 1]).size
-            self.parent().data = np.split(self.parent().data, n_interval)
-        if self.parent().keep_files.isChecked() is False:
+            n_interval = np.unique(self.window().data[:, 1]).size
+            self.window().data = np.split(self.window().data, n_interval)
+        if self.window().keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
 
         # add contents of showd1d.log to text view
-        filepath = Path(self.parent().dir_edit.text())/'showd1d.log'
+        filepath = Path(self.window().dir_edit.text())/'showd1d.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
-                self.parent().text.appendPlainText(f'{"-"*80}\n{f.read()}')
-            if self.parent().keep_files.isChecked() is False:
+                self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
+            if self.window().keep_files.isChecked() is False:
                 filepath.unlink()
 
         # adjust slider properties, connect to showd1dChangePlot slot
-        self.parent().slider.setMaximum(len(self.parent().data)-1)
-        self.parent().slider.setSliderPosition(0)
+        self.window().slider.setMaximum(len(self.window().data)-1)
+        self.window().slider.setSliderPosition(0)
         try:
-            self.parent().slider.valueChanged.disconnect()
+            self.window().slider.valueChanged.disconnect()
         except TypeError:
             # happens if slider has no connections
             pass
         finally:
-            self.parent().slider.valueChanged.connect(self.showd1dChangePlot)
+            self.window().slider.valueChanged.connect(self.showd1dChangePlot)
         # start plotting
-        self.parent().resetPlot(True, animated=True)
-        self.parent().setPlotLabels(title='1D density evolution',
+        self.window().resetPlot(True, animated=True)
+        self.window().setPlotLabels(title='1D density evolution',
                                     bottom=f'DOF {den1d_options[0]} (au)',
                                     left='Density',
-                                    top=f't={self.parent().data[0][0][1]}')
-        self.parent().graph.plot(self.parent().data[0][:, 0], self.parent().data[0][:, 2],
+                                    top=f't={self.window().data[0][0][1]}')
+        self.window().graph.plot(self.window().data[0][:, 0], self.window().data[0][:, 2],
                                  name='Re(phi)', pen='r')
-        self.parent().graph.plot(self.parent().data[0][:, 0], self.parent().data[0][:, 3],
+        self.window().graph.plot(self.window().data[0][:, 0], self.window().data[0][:, 3],
                                  name='Im(phi)', pen='b')
 
     @QtCore.pyqtSlot()
@@ -142,18 +144,18 @@ class AnalysisSystem(AnalysisTab):
         Allows the user to move the slider to control time when using the
         showd1d analysis.
         '''
-        data_items = self.parent().graph.listDataItems()
-        slider_pos = int(self.parent().slider.value())
-        if self.parent().data and len(data_items) == 2:
+        data_items = self.window().graph.listDataItems()
+        slider_pos = int(self.window().slider.value())
+        if self.window().data and len(data_items) == 2:
             re, im = data_items
             if re.name() == 'Re(phi)' and im.name() == 'Im(phi)':
-                self.parent().setPlotLabels(
-                    top=f't={self.parent().data[slider_pos][0][1]} fs'
+                self.window().setPlotLabels(
+                    top=f't={self.window().data[slider_pos][0][1]} fs'
                 )
-                re.setData(self.parent().data[slider_pos][:, 0],
-                           self.parent().data[slider_pos][:, 2])
-                im.setData(self.parent().data[slider_pos][:, 0],
-                           self.parent().data[slider_pos][:, 3])
+                re.setData(self.window().data[slider_pos][:, 0],
+                           self.window().data[slider_pos][:, 2])
+                im.setData(self.window().data[slider_pos][:, 0],
+                           self.window().data[slider_pos][:, 3])
 
     def showpes(self):
         '''
@@ -178,13 +180,13 @@ class AnalysisSystem(AnalysisTab):
         '''
         # if a plot file already exists, this won't work as we can't type
         # the option to overwrite.
-        filepath = Path(self.parent().dir_edit.text())/'pes.xyz'
+        filepath = Path(self.window().dir_edit.text())/'pes.xyz'
         filepath.unlink(missing_ok=True)
 
         # temporary popup to get information for now. will need to read input
         # to get mode names and add gui radio buttons + spinbox for each mode
         coords, ok = QtWidgets.QInputDialog.getMultiLineText(
-            self.parent(),
+            self.window(),
             'Input coordinates',
             'Write one mode on each line, with its name (not index!) then '
             'either x, y, or value'
@@ -207,24 +209,24 @@ class AnalysisSystem(AnalysisTab):
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f)
-        if self.parent().keep_files.isChecked() is False:
+        if self.window().keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
 
         # start plotting
-        self.parent().resetPlot(switch_to_plot=True)
-        if self.parent().data.shape[1] == 3:
+        self.window().resetPlot(switch_to_plot=True)
+        if self.window().data.shape[1] == 3:
             # contour plot
             # convert from list xyz coordinate data to grid data
-            x = np.unique(self.parent().data[:, 0])
-            y = np.unique(self.parent().data[:, 1])
-            z = np.array(self.parent().data[:, 2]).reshape(x.shape[0], y.shape[0])
-            self.parent().setPlotLabels(title=self.showpes_type.currentText(),
+            x = np.unique(self.window().data[:, 0])
+            y = np.unique(self.window().data[:, 1])
+            z = np.array(self.window().data[:, 2]).reshape(x.shape[0], y.shape[0])
+            self.window().setPlotLabels(title=self.showpes_type.currentText(),
                                         bottom='DOF x (au)', left='DOF y (au)')
-            self.parent().plotContours(x, y, z, 21)
+            self.window().plotContours(x, y, z, 21)
         else:
             # line plot
-            self.parent().setPlotLabels(title=self.showpes_type.currentText(),
+            self.window().setPlotLabels(title=self.showpes_type.currentText(),
                                         bottom='DOF x (au)', left='PES')
-            self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 1],
+            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                      name='PES', pen='r')

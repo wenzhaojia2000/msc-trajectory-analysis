@@ -9,21 +9,22 @@ in the main UI class.
 
 from pathlib import Path
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisMainInterface, AnalysisTab
+from .ui_base import AnalysisTab
 
 class AnalysisResults(AnalysisTab):
     '''
-    Defines functionality for the "Analyse Results" tab of the analysis
-    GUI.
+    Promoted widget that defines functionality for the "Analyse Results" tab of
+    the analysis GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface):
+    def _activate(self):
         '''
-        Initiation method.
+        Activation method. See the documentation in AnalysisTab for more
+        information.
         '''
-        super().__init__(parent=parent, push_name='analres_push',
-                         layout_name='analres_layout', options={
-                             1: 'autocol_box'
-                        })
+        super()._activate(push_name='analres_push', layout_name='analres_layout',
+                          options={
+                              1: 'autocol_box'
+                          })
 
     def findObjects(self, push_name:str, box_name:str):
         '''
@@ -32,13 +33,13 @@ class AnalysisResults(AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box 'autocorrelation options'
-        self.autocol_prefac = self.parent().findChild(QtWidgets.QComboBox, 'autocol_prefac')
-        self.autocol_emin = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'autocol_emin')
-        self.autocol_emax = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'autocol_emax')
-        self.autocol_unit = self.parent().findChild(QtWidgets.QComboBox, 'autocol_unit')
-        self.autocol_tau = self.parent().findChild(QtWidgets.QDoubleSpinBox, 'autocol_tau')
-        self.autocol_iexp = self.parent().findChild(QtWidgets.QSpinBox, 'autocol_iexp')
-        self.autocol_func = self.parent().findChild(QtWidgets.QComboBox, 'autocol_filfunc')
+        self.autocol_prefac = self.findChild(QtWidgets.QComboBox, 'autocol_prefac')
+        self.autocol_emin = self.findChild(QtWidgets.QDoubleSpinBox, 'autocol_emin')
+        self.autocol_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'autocol_emax')
+        self.autocol_unit = self.findChild(QtWidgets.QComboBox, 'autocol_unit')
+        self.autocol_tau = self.findChild(QtWidgets.QDoubleSpinBox, 'autocol_tau')
+        self.autocol_iexp = self.findChild(QtWidgets.QSpinBox, 'autocol_iexp')
+        self.autocol_func = self.findChild(QtWidgets.QComboBox, 'autocol_filfunc')
 
     def connectObjects(self):
         '''
@@ -67,8 +68,8 @@ class AnalysisResults(AnalysisTab):
                     self.runCmd('rdeigval')
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
-            self.parent().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
+            self.window().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
     def autocolOptionChanged(self):
@@ -95,11 +96,11 @@ class AnalysisResults(AnalysisTab):
         use the 'rdauto' command, as it essentially just prints out the auto
         file anyway.
         '''
-        filepath = Path(self.parent().dir_edit.text())/'auto'
+        filepath = Path(self.window().dir_edit.text())/'auto'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find auto file in directory')
         # reset text
-        self.parent().text.clear()
+        self.window().text.clear()
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             try:
@@ -108,14 +109,14 @@ class AnalysisResults(AnalysisTab):
                 raise ValueError('Invalid auto file') from None
 
         # start plotting
-        self.parent().resetPlot(True)
-        self.parent().setPlotLabels(title='Autocorrelation function',
+        self.window().resetPlot(True)
+        self.window().setPlotLabels(title='Autocorrelation function',
                                     bottom='Time (fs)', left='C(t)')
-        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 1],
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='Real autocorrelation', pen='r')
-        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 2],
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
                                  name='Imag. autocorrelation', pen='b')
-        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 3],
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 3],
                                  name='Abs. autocorrelation', pen='g')
 
     def autospec(self):
@@ -155,19 +156,19 @@ class AnalysisResults(AnalysisTab):
             case 1:
                 self.runCmd('autospec', '-EP', *autocol_options)
 
-        filepath = Path(self.parent().dir_edit.text())/'spectrum.pl'
+        filepath = Path(self.window().dir_edit.text())/'spectrum.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 4, r'^#')
-        if self.parent().keep_files.isChecked() is False:
+        if self.window().keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
 
         # start plotting
-        self.parent().resetPlot(True)
-        self.parent().setPlotLabels(title='Autocorrelation spectrum',
+        self.window().resetPlot(True)
+        self.window().setPlotLabels(title='Autocorrelation spectrum',
                                     bottom=f'Energy ({self.autocol_unit.currentText()})',
                                     left='Spectrum')
-        self.parent().graph.plot(self.parent().data[:, 0],
-                                 self.parent().data[:, self.autocol_func.currentIndex()%3+1],
+        self.window().graph.plot(self.window().data[:, 0],
+                                 self.window().data[:, self.autocol_func.currentIndex()%3+1],
                                  name='Autocorrelation spectrum', pen='r')

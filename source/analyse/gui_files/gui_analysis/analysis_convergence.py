@@ -9,21 +9,22 @@ included in the main UI class.
 
 from pathlib import Path
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisMainInterface, AnalysisTab
+from .ui_base import AnalysisTab
 
 class AnalysisConvergence(AnalysisTab):
     '''
-    Defines functionality for the "Analyse Convergence" tab of the analysis
-    GUI.
+    Promoted widget that defines functionality for the "Analyse Convergence"
+    tab of the analysis GUI.
     '''
-    def __init__(self, parent:AnalysisMainInterface):
+    def _activate(self):
         '''
-        Initiation method.
+        Activation method. See the documentation in AnalysisTab for more
+        information.
         '''
-        super().__init__(parent=parent, push_name='analconv_push',
-                         layout_name='analconv_layout', options={
-                             1: 'gpop_box'
-                        })
+        super()._activate(push_name='analconv_push', layout_name='analconv_layout',
+                          options={
+                              1: 'gpop_box'
+                          })
 
     def findObjects(self, push_name:str, box_name:str):
         '''
@@ -32,8 +33,8 @@ class AnalysisConvergence(AnalysisTab):
         '''
         super().findObjects(push_name, box_name)
         # group box 'grid population options'
-        self.gpop_nz = self.parent().findChild(QtWidgets.QSpinBox, 'gpop_nz')
-        self.gpop_dof = self.parent().findChild(QtWidgets.QSpinBox, 'gpop_dof')
+        self.gpop_nz = self.findChild(QtWidgets.QSpinBox, 'gpop_nz')
+        self.gpop_dof = self.findChild(QtWidgets.QSpinBox, 'gpop_dof')
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -60,8 +61,8 @@ class AnalysisConvergence(AnalysisTab):
                     self.runCmd('norm')
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
-            self.parent().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.parent(), 'Error', f'{type(e).__name__}: {e}')
+            self.window().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
 
     def rdgpop(self):
         '''
@@ -86,25 +87,25 @@ class AnalysisConvergence(AnalysisTab):
         ]
         self.runCmd('rdgpop', '-w', *gpop_options)
 
-        filepath = Path(self.parent().dir_edit.text())/'gpop.pl'
+        filepath = Path(self.window().dir_edit.text())/'gpop.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 5, r'^#')
-        if self.parent().keep_files.isChecked() is False:
+        if self.window().keep_files.isChecked() is False:
             # delete intermediate file
             filepath.unlink()
 
         # start plotting
-        self.parent().resetPlot(True)
-        self.parent().setPlotLabels(title='Grid edge population',
+        self.window().resetPlot(True)
+        self.window().setPlotLabels(title='Grid edge population',
                                     bottom='Time (fs)', left='Population')
-        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 1],
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='Grid (begin)', pen='r')
-        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 2],
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
                                  name='Grid (end)',
                                  pen={'color': 'r', 'style': QtCore.Qt.DashLine})
-        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 3],
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 3],
                                  name='Basis (begin)', pen='b')
-        self.parent().graph.plot(self.parent().data[:, 0], self.parent().data[:, 4],
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 4],
                                  name='Basis (end)',
                                  pen={'color': 'b', 'style': QtCore.Qt.DashLine})

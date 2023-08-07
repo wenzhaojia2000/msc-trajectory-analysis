@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Analyse</string>
+   <string>Quantics analysis</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -84,7 +84,7 @@
         <property name="tabSpacing">
          <number>4</number>
         </property>
-        <widget class="QWidget" name="analconv_tab">
+        <widget class="AnalysisConvergence" name="analconv_tab">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -214,7 +214,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analint_tab">
+        <widget class="AnalysisIntegrator" name="analint_tab">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -349,7 +349,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analres_tab">
+        <widget class="AnalysisResults" name="analres_tab">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -667,7 +667,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analsys_tab">
+        <widget class="AnalysisSystem" name="analsys_tab">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -852,7 +852,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="analdd_tab">
+        <widget class="AnalysisDirectDynamics" name="analdd_tab">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -1401,6 +1401,36 @@
    <class>PlotWidget</class>
    <extends>QWidget</extends>
    <header>pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnalysisConvergence</class>
+   <extends>QWidget</extends>
+   <header>gui_analysis.analysis_convergence</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnalysisIntegrator</class>
+   <extends>QWidget</extends>
+   <header>gui_analysis.analysis_integrator</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnalysisResults</class>
+   <extends>QWidget</extends>
+   <header>gui_analysis.analysis_results</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnalysisSystem</class>
+   <extends>QWidget</extends>
+   <header>gui_analysis.analysis_system</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnalysisDirectDynamics</class>
+   <extends>QWidget</extends>
+   <header>gui_analysis.analysis_directdynamics</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
