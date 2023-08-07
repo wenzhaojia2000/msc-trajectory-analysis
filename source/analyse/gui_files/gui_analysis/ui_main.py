@@ -47,6 +47,10 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
                  'analsys_tab', 'analdd_tab']
             ):
             self.findChild(class_, object_name)._activate()
+        # set a main window icon. try to find the PsiPhi file in doc/graphics
+        # (from file location, go up 4 folders for the main quantics directory)
+        icon = Path(__file__).parents[4]/'doc/graphics/PsiPhi_logo.png'
+        self.setWindowIcon(QtGui.QIcon(str(icon)))
 
         self.findObjects()
         self.connectObjects()
