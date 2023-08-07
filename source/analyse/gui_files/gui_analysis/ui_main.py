@@ -13,16 +13,16 @@ import subprocess
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.exporters
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore, QtGui, uic
 
-from .ui_base import AnalysisMainInterface
+from .ui_base import AnalysisBase, AnalysisMeta
 from .analysis_convergence import AnalysisConvergence
 from .analysis_integrator import AnalysisIntegrator
 from .analysis_results import AnalysisResults
 from .analysis_system import AnalysisSystem
 from .analysis_directdynamics import AnalysisDirectDynamics
 
-class AnalysisMain(AnalysisMainInterface):
+class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
     '''
     UI of the main program.
 
@@ -33,13 +33,11 @@ class AnalysisMain(AnalysisMainInterface):
         '''
         The method that is called when a Ui instance is initiated.
         '''
-        # find absolute path to the .ui file (so it won't look whereever the
-        # script was run)
-        ui_file = Path(__file__).parent/'ui_analysis.ui'
-        # call the inherited classes' __init__ method with the location of the
-        # ui file
-        super().__init__(ui_file=ui_file)
-
+        # call the inherited class' __init__ method
+        super().__init__()
+        # load the .ui file (from the folder this .py file is in rather than
+        # wherever this is executed)
+        uic.loadUi(Path(__file__).parent/'ui_analysis.ui', self)
         # activate analysis tabs. these classes dictate functionality for each
         # analysis tab
         for class_, object_name in zip(
@@ -50,6 +48,8 @@ class AnalysisMain(AnalysisMainInterface):
             ):
             self.findChild(class_, object_name)._activate()
 
+        self.findObjects()
+        self.connectObjects()
         # set properties of the plot graph
         self.tweakGraph()
         # set text in dir_edit to be the current working directory
@@ -57,6 +57,9 @@ class AnalysisMain(AnalysisMainInterface):
         # the title of the graph if title is set to 'automatic'. set through
         # default_title argument of self.changePlotTitle
         self.default_title = ''
+        # data which may be displayed by the window, and may or may not be
+        # interacted with by some its widgets
+        self.data = None
 
     def findObjects(self):
         '''

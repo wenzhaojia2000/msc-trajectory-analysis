@@ -711,6 +711,9 @@
             </item>
             <item>
              <widget class="QRadioButton" name="analsys_4">
+              <property name="statusTip">
+               <string>Executes showsys -pes and plots a line/contour plot for the PES along the specified coordinates.</string>
+              </property>
               <property name="text">
                <string>Plot potential energy surface</string>
               </property>
@@ -857,7 +860,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>335</width>
+           <width>322</width>
            <height>877</height>
           </rect>
          </property>

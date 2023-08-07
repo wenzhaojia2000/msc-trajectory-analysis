@@ -2,7 +2,8 @@
 '''
 @author: 19081417
 
-Consists of superclasses which the main UI and UI tabs extend from.
+Consists of the abstract class for the analysis tabs in the main UI, as well
+as the superclass which the main UI and UI tabs extend from.
 '''
 
 from abc import ABC, ABCMeta, abstractmethod
@@ -12,7 +13,7 @@ import re
 import subprocess
 import numpy as np
 
-from PyQt5 import QtWidgets, QtCore, uic
+from PyQt5 import QtWidgets, QtCore
 
 class AnalysisMeta(type(QtCore.QObject), ABCMeta):
     '''
@@ -39,24 +40,6 @@ class AnalysisBase(ABC):
         '''
         Connects UI elements so they do stuff when interacted with.
         '''
-
-class AnalysisMainInterface(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
-    '''
-    Abstract class of the analysis main window.
-    '''
-    def __init__(self, ui_file, *args, **kwargs):
-        '''
-        Initiation method. Requires a .ui file generated from Qt designer for
-        the base-level UI.
-        '''
-        super().__init__(*args, **kwargs)
-        uic.loadUi(ui_file, self)
-        # following requires implementation of the abstract methods
-        self.findObjects()
-        self.connectObjects()
-        # data which may be displayed by the window, and may or may not be
-        # interacted with by some its widgets
-        self.data = None
 
 class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
     '''
