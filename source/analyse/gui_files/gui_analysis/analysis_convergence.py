@@ -91,9 +91,6 @@ class AnalysisConvergence(AnalysisTab):
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 5, r'^#')
-        if self.window().keep_files.isChecked() is False:
-            # delete intermediate file
-            filepath.unlink()
 
         # start plotting
         self.window().resetPlot(True)

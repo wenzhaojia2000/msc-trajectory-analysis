@@ -105,17 +105,12 @@ class AnalysisSystem(AnalysisTab):
             # split the matrix into chunks depending on its time column
             n_interval = np.unique(self.window().data[:, 1]).size
             self.window().data = np.split(self.window().data, n_interval)
-        if self.window().keep_files.isChecked() is False:
-            # delete intermediate file
-            filepath.unlink()
 
         # add contents of showd1d.log to text view
         filepath = Path(self.window().dir_edit.text())/'showd1d.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
-            if self.window().keep_files.isChecked() is False:
-                filepath.unlink()
 
         # adjust slider properties, connect to showd1dChangePlot slot
         self.window().slider.setMaximum(len(self.window().data)-1)
@@ -209,9 +204,6 @@ class AnalysisSystem(AnalysisTab):
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f)
-        if self.window().keep_files.isChecked() is False:
-            # delete intermediate file
-            filepath.unlink()
 
         # start plotting
         self.window().resetPlot(switch_to_plot=True)

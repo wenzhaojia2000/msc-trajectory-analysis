@@ -82,7 +82,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.exit = self.findChild(QtWidgets.QAction, 'action_exit')
         self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
         self.line_wrap = self.findChild(QtWidgets.QAction, 'line_wrap')
-        self.keep_files = self.findChild(QtWidgets.QAction, 'keep_files_checkbox')
+        self.cleanup = self.findChild(QtWidgets.QAction, 'cleanup')
 
         # set icon of the dir_edit_dialog
         self.dir_edit_dialog.setIcon(self.style().standardIcon(
@@ -100,6 +100,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.menu_dir.triggered.connect(self.chooseDirectory)
         self.exit.triggered.connect(lambda x: self.close())
         self.line_wrap.triggered.connect(self.changeLineWrap)
+        self.cleanup.triggered.connect(self.cleanupDirectory)
 
         # add a timeout spinbox to the timeout menu
         self.timeout_spinbox = QtWidgets.QDoubleSpinBox(self)
@@ -205,6 +206,49 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             self.text.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
 
     @QtCore.pyqtSlot()
+    def cleanupDirectory(self):
+        '''
+        Asks the user whether to delete any output files associated with
+        analysis quantics programs (not from quantics itself), eg. trajectory
+        from gwptraj, gpop.pl from rdgpop. If so, removes them.
+        '''
+        # glob-type filenames to remove
+        file_glob = [
+            'den1d_*',
+            'trajectory',
+            # pl files
+            'gpop.pl'
+            'spectrum.pl',
+            # log files
+            'gwptraj.log',
+            'showd1d.log',
+            # xyz files
+            'pes.xyz',
+        ]
+        # find the output files actually present in the directory
+        files = []
+        cdir = Path(self.window().dir_edit.text())
+        for glob in file_glob:
+            files.extend(list(cdir.glob(glob)))
+
+        if files:
+            clicked = QtWidgets.QMessageBox.question(
+                self, 'Delete these files?', 'These files will be deleted:\n' +\
+                '\n'.join([file.name for file in files])
+            )
+            if clicked == QtWidgets.QMessageBox.Yes:
+                for file in files:
+                    file.unlink()
+                QtWidgets.QMessageBox.information(
+                    self, 'Success', 'Deletion successful.'
+                )
+        else:
+            QtWidgets.QMessageBox.information(
+                self, 'No files found',
+                'Found no analysis output files in this directory.'
+            )
+
+    @QtCore.pyqtSlot()
     def changePlotTitle(self):
         '''
         Changes the title of the graph, by setting it to the default title if
@@ -242,11 +286,11 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
                 'FileNotFoundError: Please install ffmpeg to call this function.')
             return None
         # obtain a savename for the file
-        savename, _ = QtWidgets.QFileDialog.getSaveFileName(self,
+        savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
             "Save File", self.dir_edit.text() + '/Untitled.mp4',
             "Video (*.mp4);;All files (*)"
         )
-        if savename == '':
+        if not ok:
             # user cancels operation
             return None
         # add .mp4 suffix to savename if not already
@@ -320,7 +364,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
                 if isinstance(value, str):
                     value = (value,)
                 self.graph.setLabel(key, *value, color='k')
-    
+
     def plotContours(self, x:np.array, y:np.array, z:np.array, n_levels:int):
         '''
         Given numpy arrays x with shape (N,), y with shape (M,) and z with

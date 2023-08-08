@@ -212,17 +212,12 @@ class AnalysisDirectDynamics(AnalysisTab):
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, None)
-        if self.window().keep_files.isChecked() is False:
-            # delete intermediate file
-            filepath.unlink()
 
         # add contents of showd1d.log to text view
         filepath = Path(self.window().dir_edit.text())/'gwptraj.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
-            if self.window().keep_files.isChecked() is False:
-                filepath.unlink()
         
         # find ngwp from input. if input not found ask user for value
         try:

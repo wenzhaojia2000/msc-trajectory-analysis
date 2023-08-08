@@ -510,7 +510,7 @@
                </item>
                <item>
                 <property name="text">
-                 <string>au/Hartree</string>
+                 <string>au</string>
                 </property>
                </item>
                <item>
@@ -860,7 +860,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>322</width>
+           <width>335</width>
            <height>877</height>
           </rect>
          </property>
@@ -1347,8 +1347,8 @@
      </property>
     </widget>
     <addaction name="timeout_menu"/>
+    <addaction name="cleanup"/>
     <addaction name="line_wrap"/>
-    <addaction name="keep_files_checkbox"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_options"/>
@@ -1365,15 +1365,15 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="keep_files_checkbox">
+  <action name="cleanup">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
-    <string>Keep intermediate files</string>
+    <string>Cleanup directory</string>
    </property>
    <property name="statusTip">
-    <string>Keep any files generated from quantics programs.</string>
+    <string>Remove all output files generated from quantics analysis programs.</string>
    </property>
   </action>
   <action name="action_exit">
