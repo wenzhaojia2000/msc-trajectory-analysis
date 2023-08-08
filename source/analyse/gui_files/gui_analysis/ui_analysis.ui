@@ -1348,6 +1348,7 @@
     </widget>
     <addaction name="timeout_menu"/>
     <addaction name="cleanup"/>
+    <addaction name="no_command"/>
     <addaction name="line_wrap"/>
    </widget>
    <addaction name="menu_file"/>
@@ -1396,6 +1397,17 @@
    </property>
    <property name="statusTip">
     <string>In text view, break long lines into multiple lines.</string>
+   </property>
+  </action>
+  <action name="no_command">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>No command mode</string>
+   </property>
+   <property name="statusTip">
+    <string>(Experimental) Do not execute quantics analysis commands, read from an existing output file.</string>
    </property>
   </action>
  </widget>

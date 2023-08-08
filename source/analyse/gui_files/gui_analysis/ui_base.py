@@ -170,6 +170,8 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         'ls', '-A', '/home/'. The keyword input is the a string to feed to
         stdin after the command execution.
         '''
+        if self.window().no_command.isChecked():
+            return None
         try:
             p = subprocess.run(args, universal_newlines=True, input=input,
                                cwd=self.window().dir_edit.text(),

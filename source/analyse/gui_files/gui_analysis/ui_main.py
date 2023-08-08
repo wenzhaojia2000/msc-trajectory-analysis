@@ -81,8 +81,9 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.timeout_menu = self.findChild(QtWidgets.QMenu, 'timeout_menu')
         self.exit = self.findChild(QtWidgets.QAction, 'action_exit')
         self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
-        self.line_wrap = self.findChild(QtWidgets.QAction, 'line_wrap')
         self.cleanup = self.findChild(QtWidgets.QAction, 'cleanup')
+        self.no_command = self.findChild(QtWidgets.QAction, 'no_command')
+        self.line_wrap = self.findChild(QtWidgets.QAction, 'line_wrap')
 
         # set icon of the dir_edit_dialog
         self.dir_edit_dialog.setIcon(self.style().standardIcon(
@@ -99,8 +100,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
         self.menu_dir.triggered.connect(self.chooseDirectory)
         self.exit.triggered.connect(lambda x: self.close())
-        self.line_wrap.triggered.connect(self.changeLineWrap)
         self.cleanup.triggered.connect(self.cleanupDirectory)
+        self.line_wrap.triggered.connect(self.changeLineWrap)
 
         # add a timeout spinbox to the timeout menu
         self.timeout_spinbox = QtWidgets.QDoubleSpinBox(self)
