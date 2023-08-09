@@ -109,7 +109,7 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         # show the update options box when certain result is selected
         for radio in self.radio:
             radio.clicked.connect(self.optionSelected)
-        
+
     @QtCore.pyqtSlot()
     def optionSelected(self):
         '''
@@ -136,7 +136,7 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         Freezes the tab's push button given until func is executed. Can be used
         as a decorator using @AnalysisTab.freezeContinue or as a function using
         AnalysisTab.freezeContinue(func)(self, *args, **kwargs).
-        
+
         Note: If func raises an exception, continue will not be restored. You
         should ensure func does not crash by eg. wrapping it in a try-except
         block.
@@ -160,41 +160,6 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             self.push.setText("Continue")
             return value
         return wrapper
-
-    def runCmd(self, *args, input:str=None) -> str:
-        '''
-        Execute the shell command sent by args. Returns and shows the result in
-        the main window's output's text tab.
-
-        args should be a series of strings with commas representing spaces, eg.
-        'ls', '-A', '/home/'. The keyword input is the a string to feed to
-        stdin after the command execution.
-        '''
-        if self.window().no_command.isChecked():
-            return None
-        try:
-            p = subprocess.run(args, universal_newlines=True, input=input,
-                               cwd=self.window().dir_edit.text(),
-                               timeout=float(self.window().timeout_spinbox.value()),
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                               check=True)
-            self.window().text.setPlainText(p.stdout)
-            return p.stdout
-        except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
-            # something went wrong executing the function. add the console
-            # stdout to the end of the error string, then raise error again.
-            if e.stdout:
-                msg = (f'{e} At the moment of this error, the console output '
-                       f'was:\n\n{e.stdout}')
-            # TimeoutExpired and CalledProcessError do not have an attribute
-            # for message, instead generating the message by overloading
-            # __str__. workaround by just raising the base error type
-            raise subprocess.SubprocessError(msg) from None
-        except FileNotFoundError as e:
-            # custom message
-            e.strerror = 'The program cannot be found'
-            e.filename = args[0]
-            raise
 
     def readFloats(self, iterable:list, floats_per_line:int=None,
                    ignore_regex:re.Pattern|str=None, write_text:bool=False):
@@ -253,3 +218,65 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             raise ValueError('No floats found in iterable. Check console '
                              'output to see what went wrong?')
         self.window().data = np.array(data)
+
+    def runCmd(self, *args, input:str=None) -> str:
+        '''
+        Execute the shell command sent by args. Returns and shows the result in
+        the main window's output's text tab.
+
+        args should be a series of strings with commas representing spaces, eg.
+        'ls', '-A', '/home/'. The keyword input is the a string to feed to
+        stdin after the command execution.
+        '''
+        if self.window().no_command.isChecked():
+            return None
+        try:
+            p = subprocess.run(args, universal_newlines=True, input=input,
+                               cwd=self.window().dir_edit.text(),
+                               timeout=float(self.window().timeout_spinbox.value()),
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               check=True)
+            self.window().text.setPlainText(p.stdout)
+            return p.stdout
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
+            # something went wrong executing the function. add the console
+            # stdout to the end of the error string, then raise error again.
+            if e.stdout:
+                msg = (f'{e} At the moment of this error, the console output '
+                       f'was:\n\n{e.stdout}')
+            # TimeoutExpired and CalledProcessError do not have an attribute
+            # for message, instead generating the message by overloading
+            # __str__. workaround by just raising the base error type
+            raise subprocess.SubprocessError(msg) from None
+        except FileNotFoundError as e:
+            # custom message
+            e.strerror = 'The program cannot be found'
+            e.filename = args[0]
+            raise
+
+    @staticmethod
+    def getModes(inputfile:str) -> list:
+        '''
+        Returns a list of mode names given the location of the input file (can
+        be a Path object).
+        '''
+        with open(inputfile, mode='r', encoding='utf-8') as f:
+            txt = f.read()
+            # find modes in SPF-BASIS-SECTION
+            spf_section = re.findall(r'SPF-BASIS-SECTION\n(.*)\nend-spf-basis-section',
+                                     txt, re.DOTALL)
+            # if section does not exist, might be direct dynamics. find in
+            # nmode subsection in INITIAL-GEOMETRY-SECTION
+            ddmode_section = re.findall(r'nmode\n(.*)\nend-nmode', txt, re.DOTALL)
+            if spf_section:
+                # a list of modes are displayed before an = sign. match all of
+                # them, split by comma, then remove surrounding whitespace
+                modes = [mode.strip() for line in re.findall(r'.+(?==)', spf_section[0])\
+                                      for mode in line.split(',')]
+            elif ddmode_section:
+                # a list of modes are the first entry in each line (assuming
+                # mode names can't have whitespace in them).
+                modes = re.findall(r'^\s*\S+', ddmode_section[0], re.MULTILINE)
+            else:
+                raise ValueError('Cannot find modes in input file')
+        return modes

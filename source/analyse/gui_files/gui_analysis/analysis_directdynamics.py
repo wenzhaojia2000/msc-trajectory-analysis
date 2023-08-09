@@ -143,14 +143,14 @@ class AnalysisDirectDynamics(AnalysisTab):
     def calcrate(self):
         '''
         Reads the log and looks for lines of the following format
-        
+
         time[fs]       t1
         ...
         No. QC calculations :     N1.1
         ...
         No. QC calculations :     N1.n
         ... (etc)
-        
+
         and plots the number of calculations per timestep against time.
         '''
         filepath = Path(self.window().dir_edit.text())/'log'
@@ -162,7 +162,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         with open(filepath, mode='r', encoding='utf-8') as f:
             for line in f:
                 self.window().text.appendPlainText(line[:-1])
-                # find a line with time[fs] in it and get time 
+                # find a line with time[fs] in it and get time
                 if re.search(r'time\[fs\]', line):
                     try:
                         time = float(re.search(r'[+-]?\d+(?:\.\d*)?', line)[0])
@@ -198,7 +198,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         t.2    A1.2   A2.2   ...   An.2   B1.2   ...   Bn.2   ... repeat for momenta
         ...    ...    ...    ...   ...    ...    ...   ...    ... repeat for momenta
         t.m    A1.m   A2.m   ...   An.m   B1.m   ...   Bn.m   ... repeat for momenta
-        
+
         where t is time, ABCDE... are gaussian wavepackets (GWPs), and 1...n
         are the modes. The columns are then repeated for momenta instead of
         GWP center coordinates.
@@ -218,7 +218,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
-        
+
         # find ngwp from input. if input not found ask user for value
         try:
             with open(Path(self.window().dir_edit.text())/'input', mode='r',

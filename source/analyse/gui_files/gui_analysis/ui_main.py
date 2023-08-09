@@ -437,7 +437,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.colourbar.setLevels((levels[0], levels[-1]))
         self.colourbar.show()
 
-    def writeTable(self, table:list, header:list=None, colwidth:int=16, 
+    def writeTable(self, table:list, header:list=None, colwidth:int=16,
                    pre:str=None, post:str=None):
         '''
         Function that writes a table (list of lists or tuples) into a formatted
