@@ -54,7 +54,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
 
         self.findObjects()
         self.connectObjects()
-        # set properties of the plot graph
+        # set properties of the text view and plot graph
+        self.tweakText()
         self.tweakGraph()
         # set text in dir_edit to be the current working directory
         self.directoryChanged()
@@ -83,7 +84,6 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
         self.cleanup = self.findChild(QtWidgets.QAction, 'cleanup')
         self.no_command = self.findChild(QtWidgets.QAction, 'no_command')
-        self.line_wrap = self.findChild(QtWidgets.QAction, 'line_wrap')
 
         # set icon of the dir_edit_dialog
         self.dir_edit_dialog.setIcon(self.style().standardIcon(
@@ -101,7 +101,6 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.menu_dir.triggered.connect(self.chooseDirectory)
         self.exit.triggered.connect(lambda x: self.close())
         self.cleanup.triggered.connect(self.cleanupDirectory)
-        self.line_wrap.triggered.connect(self.changeLineWrap)
 
         # add a timeout spinbox to the timeout menu
         self.timeout_spinbox = QtWidgets.QDoubleSpinBox(self)
@@ -112,6 +111,19 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         timeout_action = QtWidgets.QWidgetAction(self)
         timeout_action.setDefaultWidget(self.timeout_spinbox)
         self.timeout_menu.addAction(timeout_action)
+
+    def tweakText(self):
+        '''
+        Sets the additional actions of a custom menu in the text tab, which is
+        opened when right-clicking on the text view. When the context menu is
+        requested, these actions are added into the menu.
+        '''
+        self.save_text = QtWidgets.QAction('Save text')
+        self.save_text.triggered.connect(self.saveText)
+        self.line_wrap = QtWidgets.QAction('Line Wrap')
+        self.line_wrap.setCheckable(True)
+        self.line_wrap.triggered.connect(self.changeLineWrap)
+        self.text.customContextMenuRequested.connect(self.showTextMenu)
 
     def tweakGraph(self):
         '''
@@ -197,16 +209,6 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             self.dir_edit.setText(dirname)
 
     @QtCore.pyqtSlot()
-    def changeLineWrap(self):
-        '''
-        Changes the line wrapping in the text view.
-        '''
-        if self.line_wrap.isChecked():
-            self.text.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
-        else:
-            self.text.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
-
-    @QtCore.pyqtSlot()
     def cleanupDirectory(self):
         '''
         Asks the user whether to delete any output files associated with
@@ -248,6 +250,49 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
                 self, 'No files found',
                 'Found no analysis output files in this directory.'
             )
+
+    @QtCore.pyqtSlot(QtCore.QPoint)
+    def showTextMenu(self, point):
+        '''
+        Shows a custom context menu when right-clicking on the text view.
+        '''
+        # create a standard menu (with copy and select all) and add to it
+        text_menu = self.text.createStandardContextMenu(point)
+        # when right-clicked, add the extra actions in tweakText and show the
+        # menu at the point (mapToGlobal to translate to where window is)
+        text_menu.exec_(
+            text_menu.actions() + [self.save_text, self.line_wrap],
+            self.text.mapToGlobal(point)
+        )
+
+    @QtCore.pyqtSlot()
+    def saveText(self):
+        '''
+        Saves an .txt file of the current text in the text view.
+        '''
+        # obtain a savename for the file
+        savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+            "Save File", self.dir_edit.text() + '/Untitled.txt',
+            "Text (*.txt);;All files (*)"
+        )
+        if not ok:
+            # user cancels operation
+            return None
+        with open(savename, mode='w', encoding='utf-8') as s:
+            s.write(self.text.toPlainText())
+        QtWidgets.QMessageBox.information(
+            self, 'Success', 'Save text successful.'
+        )
+
+    @QtCore.pyqtSlot()
+    def changeLineWrap(self):
+        '''
+        Changes the line wrapping in the text view.
+        '''
+        if self.line_wrap.isChecked():
+            self.text.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
+        else:
+            self.text.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
 
     @QtCore.pyqtSlot()
     def changePlotTitle(self):
@@ -323,6 +368,9 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             return None
         # delete the temporary folder
         shutil.rmtree(temp_directory)
+        QtWidgets.QMessageBox.information(
+            self, 'Success', 'Save video successful.'
+        )
         return None
 
     def resetPlot(self, switch_to_plot:bool=False, animated:bool=False):
