@@ -145,8 +145,10 @@ class CustomPlotWidget(pg.PlotWidget):
         QtWidgets.QApplication.restoreOverrideCursor()
 
         # run ffmpeg to generate video https://stackoverflow.com/questions/24961127
+        # no error if height not divisible by 2 https://stackoverflow.com/questions/20847674/
         args = ['ffmpeg', '-y', '-framerate', '30', '-pattern_type', 'glob', '-i',
-                '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', str(savename)]
+                '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-vf',
+                'pad=ceil(iw/2)*2:ceil(ih/2)*2:color=white', str(savename)]
         try:
             subprocess.run(args, cwd=temp_directory, check=True)
         except subprocess.CalledProcessError as e:
@@ -205,7 +207,7 @@ class CustomPlotWidget(pg.PlotWidget):
     def plotContours(self, x:np.array, y:np.array, z:np.array, n_levels:int):
         '''
         Given numpy arrays x with shape (N,), y with shape (M,) and z with
-        shape (N, M), plots n_level contour lines with levels ranging from
+        shape (M, N), plots n_level contour lines with levels ranging from
         min(z) to max(z). Shows a colourbar to the side.
         '''
         colours = self.colourmap.getLookupTable(nPts=n_levels, mode=pg.ColorMap.QCOLOR)
