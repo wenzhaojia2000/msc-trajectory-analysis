@@ -109,6 +109,8 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         # show the update options box when certain result is selected
         for radio in self.radio:
             radio.clicked.connect(self.optionSelected)
+        # refresh options if directory has changed
+        self.window().dir_edit.textChanged.connect(self.optionSelected)
 
     @QtCore.pyqtSlot()
     def optionSelected(self):

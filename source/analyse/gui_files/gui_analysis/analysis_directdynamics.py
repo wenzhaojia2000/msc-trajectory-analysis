@@ -182,9 +182,9 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.window().data = np.array([times, n_calcs])
 
         # start plotting, depending on options
-        self.window().resetPlot(True)
-        self.window().setPlotLabels(title='Calculations per time step',
-                                    bottom='Time (fs)', left='QC calculations')
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='Calculations per time step',
+                                      bottom='Time (fs)', left='QC calculations')
         self.window().graph.plot(self.window().data[0, :], self.window().data[1, :],
                                  name='QC calculations', pen='r')
 
@@ -245,19 +245,19 @@ class AnalysisDirectDynamics(AnalysisTab):
         if mode > nmode:
             raise ValueError(f'Mode {mode} is larger than number of modes {nmode}')
         # start plotting
-        self.window().resetPlot(True)
+        self.window().graph.reset(switch_to_plot=True)
         if self.gwptraj_task.currentIndex() == 0:
             # task is plot centre coordinates, which make up the first half of
             # the columns in trajectory file
             offset = mode
-            self.window().setPlotLabels(title='GWP function centre coordinates',
-                                        bottom='Time (fs)', left='GWP Center (au)')
+            self.window().graph.setLabels(title='GWP function centre coordinates',
+                                          bottom='Time (fs)', left='GWP Center (au)')
         else:
             # task is plot momentum, which make up the second half of the
             # columns in trajectory file
             offset = ncol//2 + mode
-            self.window().setPlotLabels(title='GWP function momentum',
-                                        bottom='Time (fs)', left='GWP Momentum (au)')
+            self.window().graph.setLabels(title='GWP function momentum',
+                                          bottom='Time (fs)', left='GWP Momentum (au)')
         # plot line for each gaussian. columns are written for each gaussian
         # with ascending mode. to pick the gaussians for one mode we skip
         # nmode columns each time until we get to ngwp lines

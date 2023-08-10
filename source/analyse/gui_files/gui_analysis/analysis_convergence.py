@@ -92,9 +92,9 @@ class AnalysisConvergence(AnalysisTab):
             self.readFloats(f, 5, r'^#')
 
         # start plotting
-        self.window().resetPlot(True)
-        self.window().setPlotLabels(title='Grid edge population',
-                                    bottom='Time (fs)', left='Population')
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='Grid edge population',
+                                      bottom='Time (fs)', left='Population')
         self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='Grid (begin)', pen='r')
         self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],

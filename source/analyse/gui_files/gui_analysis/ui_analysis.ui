@@ -224,7 +224,7 @@
          <x>0</x>
          <y>0</y>
          <width>356</width>
-         <height>348</height>
+         <height>358</height>
         </rect>
        </property>
        <attribute name="label">
@@ -675,9 +675,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-162</y>
          <width>335</width>
-         <height>480</height>
+         <height>520</height>
         </rect>
        </property>
        <attribute name="label">
@@ -822,8 +822,24 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="showpes_coord_label">
+             <property name="text">
+              <string>Coordinate selection</string>
+             </property>
+            </widget>
+           </item>
            <item row="3" column="0" colspan="2">
             <widget class="QScrollArea" name="showpes_coord_box">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>127</height>
+              </size>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustToContents</enum>
+             </property>
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
@@ -833,18 +849,11 @@
                 <x>0</x>
                 <y>0</y>
                 <width>287</width>
-                <height>85</height>
+                <height>125</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_10"/>
              </widget>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="showpes_coord_label">
-             <property name="text">
-              <string>Coordinate selection</string>
-             </property>
             </widget>
            </item>
           </layout>
@@ -1311,7 +1320,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
-         <widget class="PlotWidget" name="output_plot" native="true"/>
+         <widget class="CustomPlotWidget" name="output_plot" native="true"/>
         </item>
         <item>
          <widget class="QSlider" name="output_slider">
@@ -1417,9 +1426,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PlotWidget</class>
+   <class>CustomPlotWidget</class>
    <extends>QWidget</extends>
-   <header>pyqtgraph</header>
+   <header>gui_analysis.ui_plot</header>
    <container>1</container>
   </customwidget>
   <customwidget>

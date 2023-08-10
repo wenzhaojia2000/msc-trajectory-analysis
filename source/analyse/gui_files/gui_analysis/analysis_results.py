@@ -108,9 +108,9 @@ class AnalysisResults(AnalysisTab):
                 raise ValueError('Invalid auto file') from None
 
         # start plotting
-        self.window().resetPlot(True)
-        self.window().setPlotLabels(title='Autocorrelation function',
-                                    bottom='Time (fs)', left='C(t)')
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='Autocorrelation function',
+                                      bottom='Time (fs)', left='C(t)')
         self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='Real autocorrelation', pen='r')
         self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
@@ -161,10 +161,10 @@ class AnalysisResults(AnalysisTab):
             self.readFloats(f, 4, r'^#')
 
         # start plotting
-        self.window().resetPlot(True)
-        self.window().setPlotLabels(title='Autocorrelation spectrum',
-                                    bottom=f'Energy ({self.autocol_unit.currentText()})',
-                                    left='Spectrum')
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='Autocorrelation spectrum',
+                                      bottom=f'Energy ({self.autocol_unit.currentText()})',
+                                      left='Spectrum')
         self.window().graph.plot(self.window().data[:, 0],
                                  self.window().data[:, self.autocol_func.currentIndex()%3+1],
                                  name='Autocorrelation spectrum', pen='r')

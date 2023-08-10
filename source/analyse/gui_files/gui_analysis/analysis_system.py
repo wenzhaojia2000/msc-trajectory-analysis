@@ -123,11 +123,11 @@ class AnalysisSystem(AnalysisTab):
         finally:
             self.window().slider.valueChanged.connect(self.showd1dChangePlot)
         # start plotting
-        self.window().resetPlot(True, animated=True)
-        self.window().setPlotLabels(title='1D density evolution',
-                                    bottom=f'DOF {den1d_options[0]} (au)',
-                                    left='Density',
-                                    top=f't={self.window().data[0][0][1]}')
+        self.window().graph.reset(switch_to_plot=True, animated=True)
+        self.window().graph.setLabels(title='1D density evolution',
+                                      bottom=f'DOF {den1d_options[0]} (au)',
+                                      left='Density',
+                                      top=f't={self.window().data[0][0][1]}')
         self.window().graph.plot(self.window().data[0][:, 0], self.window().data[0][:, 2],
                                  name='Re(phi)', pen='r')
         self.window().graph.plot(self.window().data[0][:, 0], self.window().data[0][:, 3],
@@ -144,7 +144,7 @@ class AnalysisSystem(AnalysisTab):
         if self.window().data and len(data_items) == 2:
             re, im = data_items
             if re.name() == 'Re(phi)' and im.name() == 'Im(phi)':
-                self.window().setPlotLabels(
+                self.window().graph.setLabels(
                     top=f't={self.window().data[slider_pos][0][1]} fs'
                 )
                 re.setData(self.window().data[slider_pos][:, 0],
@@ -206,19 +206,19 @@ class AnalysisSystem(AnalysisTab):
             self.readFloats(f)
 
         # start plotting
-        self.window().resetPlot(switch_to_plot=True)
+        self.window().graph.reset(switch_to_plot=True)
         if self.window().data.shape[1] == 3:
             # contour plot
             # convert from list xyz coordinate data to grid data
             x = np.unique(self.window().data[:, 0])
             y = np.unique(self.window().data[:, 1])
             z = np.array(self.window().data[:, 2]).reshape(x.shape[0], y.shape[0])
-            self.window().setPlotLabels(title=self.showpes_type.currentText(),
-                                        bottom='DOF x (au)', left='DOF y (au)')
-            self.window().plotContours(x, y, z, 21)
+            self.window().graph.setLabels(title=self.showpes_type.currentText(),
+                                          bottom='DOF x (au)', left='DOF y (au)')
+            self.window().graph.plotContours(x, y, z, 21)
         else:
             # line plot
-            self.window().setPlotLabels(title=self.showpes_type.currentText(),
-                                        bottom='DOF x (au)', left='PES')
+            self.window().graph.setLabels(title=self.showpes_type.currentText(),
+                                          bottom='DOF x (au)', left='PES')
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                      name='PES', pen='r')

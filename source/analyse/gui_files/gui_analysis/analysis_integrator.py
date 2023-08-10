@@ -121,19 +121,19 @@ class AnalysisIntegrator(AnalysisTab):
         # display sorted text
         text = "\n".join([line[-1] for line in self.window().data])
         self.window().text.setPlainText(f'{pre}\n{text}\n\n{post}')
-        self.window().resetPlot()
+        self.window().graph.reset()
 
         # start plotting
-        self.window().setPlotLabels(title='Subroutine timings', left='')
+        self.window().graph.setLabels(title='Subroutine timings', left='')
         # this is a horizontal bar chart so everything is spun 90 deg. can't
         # do a normal vertical one as pyqtgraph can't rotate tick names (yet)
         if self.timing_sort.currentIndex() == 0:
             # plot cpu if 'name' is selected (names don't have values)
             values = [row[3] for row in self.window().data]
-            self.window().setPlotLabels(bottom='CPU')
+            self.window().graph.setLabels(bottom='CPU')
         else:
             values = [row[self.timing_sort.currentIndex()] for row in self.window().data]
-            self.window().setPlotLabels(bottom=self.timing_sort.currentText())
+            self.window().graph.setLabels(bottom=self.timing_sort.currentText())
         names = [row[0] for row in self.window().data]
         positions = list(range(1, len(values)+1))
         bar = BarGraphItem(x0=0, y=positions, height=0.6, width=values)
@@ -164,16 +164,16 @@ class AnalysisIntegrator(AnalysisTab):
         self.readFloats(output.split('\n'), 4)
 
         # start plotting, depending on options
-        self.window().resetPlot(True)
+        self.window().graph.reset(switch_to_plot=True)
         if plot_error:
-            self.window().setPlotLabels(title='Update file errors',
-                                        bottom='Time (fs)', left='Error')
+            self.window().graph.setLabels(title='Update file errors',
+                                          bottom='Time (fs)', left='Error')
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
                                      name='Error of A-vector', pen='r')
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 3],
                                      name='Error of SPFs', pen='b')
         else:
-            self.window().setPlotLabels(title='Update file step size',
-                                        bottom='Time (fs)', left='Step size (fs)')
+            self.window().graph.setLabels(title='Update file step size',
+                                          bottom='Time (fs)', left='Step size (fs)')
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                      name='Step size', pen='r')
