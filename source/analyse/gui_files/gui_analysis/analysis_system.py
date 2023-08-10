@@ -7,7 +7,6 @@ System' tab of the analysis GUI. A class instance of this should be included in
 the main UI class.
 '''
 
-from pathlib import Path
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisTab
@@ -39,6 +38,7 @@ class AnalysisSystem(AnalysisTab):
         # group box 'pes options'
         self.showpes_type = self.findChild(QtWidgets.QComboBox, 'showpes_type')
         self.showpes_state = self.findChild(QtWidgets.QSpinBox, 'showpes_state')
+        self.showpes_coord = self.findChild(QtWidgets.QWidget, 'showpes_coord')
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -96,9 +96,9 @@ class AnalysisSystem(AnalysisTab):
 
         # find filename of command output
         if self.den1d_state.value() == 1:
-            filepath = Path(self.window().dir_edit.text())/f'den1d_{den1d_options[0]}'
+            filepath = self.window().cwd/f'den1d_{den1d_options[0]}'
         else:
-            filepath = Path(self.window().dir_edit.text())/f'den1d_{"_".join(den1d_options)}'
+            filepath = self.window().cwd/f'den1d_{"_".join(den1d_options)}'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 4, ignore_regex=r'^plot|^set')
@@ -107,7 +107,7 @@ class AnalysisSystem(AnalysisTab):
             self.window().data = np.split(self.window().data, n_interval)
 
         # add contents of showd1d.log to text view
-        filepath = Path(self.window().dir_edit.text())/'showd1d.log'
+        filepath = self.window().cwd/'showd1d.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
@@ -175,7 +175,7 @@ class AnalysisSystem(AnalysisTab):
         '''
         # if a plot file already exists, this won't work as we can't type
         # the option to overwrite.
-        filepath = Path(self.window().dir_edit.text())/'pes.xyz'
+        filepath = self.window().cwd/'pes.xyz'
         filepath.unlink(missing_ok=True)
 
         # temporary popup to get information for now. will need to read input

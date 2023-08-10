@@ -7,7 +7,6 @@ Direct Dynamics' tab of the analysis GUI. A class instance of this should be
 included in the main UI class.
 '''
 
-from pathlib import Path
 import re
 import sqlite3
 import numpy as np
@@ -153,7 +152,7 @@ class AnalysisDirectDynamics(AnalysisTab):
 
         and plots the number of calculations per timestep against time.
         '''
-        filepath = Path(self.window().dir_edit.text())/'log'
+        filepath = self.window().cwd/'log'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find log file in directory')
         times = []
@@ -208,20 +207,20 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         # -trj outputs a trajectory file only
         self.runCmd('gwptraj', '-trj')
-        filepath = Path(self.window().dir_edit.text())/'trajectory'
+        filepath = self.window().cwd/'trajectory'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, None)
 
         # add contents of showd1d.log to text view
-        filepath = Path(self.window().dir_edit.text())/'gwptraj.log'
+        filepath = self.window().cwd/'gwptraj.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
 
         # find ngwp from input. if input not found ask user for value
         try:
-            with open(Path(self.window().dir_edit.text())/'input', mode='r',
+            with open(self.window().cwd/'input', mode='r',
                       encoding='utf-8') as f:
                 txt = f.read()
                 # IndexError raised when ngwp not found
@@ -272,7 +271,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         within a certain user-defined interval or where energies between two
         states match within a tolerance.
         '''
-        filepath = Path(self.window().dir_edit.text())/'database.sql'
+        filepath = self.window().cwd/'database.sql'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find database.sql file in directory')
         con = sqlite3.connect(f'file:{filepath}?mode=ro', uri=True,
@@ -361,7 +360,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         with nice formatting.
         '''
         query = self.sql_query.toPlainText()
-        filepath = Path(self.window().dir_edit.text())/'database.sql'
+        filepath = self.window().cwd/'database.sql'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find database.sql file in directory')
         if self.sql_allowwrite.isChecked():

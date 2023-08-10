@@ -7,7 +7,6 @@ Results' tab of the analysis GUI. A class instance of this should be included
 in the main UI class.
 '''
 
-from pathlib import Path
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisTab
 
@@ -96,7 +95,7 @@ class AnalysisResults(AnalysisTab):
         use the 'rdauto' command, as it essentially just prints out the auto
         file anyway.
         '''
-        filepath = Path(self.window().dir_edit.text())/'auto'
+        filepath = self.window().cwd/'auto'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find auto file in directory')
         # reset text
@@ -156,7 +155,7 @@ class AnalysisResults(AnalysisTab):
             case 1:
                 self.runCmd('autospec', '-EP', *autocol_options)
 
-        filepath = Path(self.window().dir_edit.text())/'spectrum.pl'
+        filepath = self.window().cwd/'spectrum.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 4, r'^#')

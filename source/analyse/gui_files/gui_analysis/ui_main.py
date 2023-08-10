@@ -176,6 +176,13 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         # hide until a contour plot is plotted
         self.colourbar.hide()
 
+    @property
+    def cwd(self):
+        '''
+        Returns the Path object of the current directory.
+        '''
+        return Path(self.dir_edit.text())
+
     @QtCore.pyqtSlot()
     def directoryChanged(self):
         '''
@@ -220,7 +227,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             'den1d_*',
             'trajectory',
             # pl files
-            'gpop.pl'
+            'gpop.pl',
             'spectrum.pl',
             # log files
             'gwptraj.log',
@@ -230,9 +237,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         ]
         # find the output files actually present in the directory
         files = []
-        cdir = Path(self.window().dir_edit.text())
         for glob in file_glob:
-            files.extend(list(cdir.glob(glob)))
+            files.extend(list(self.cwd.glob(glob)))
 
         if files:
             clicked = QtWidgets.QMessageBox.question(

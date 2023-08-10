@@ -7,7 +7,6 @@ Integrator' tab of the analysis GUI. A class instance of this should be
 included in the main UI class.
 '''
 
-from pathlib import Path
 import re
 from PyQt5 import QtWidgets, QtCore
 from pyqtgraph import BarGraphItem
@@ -81,7 +80,7 @@ class AnalysisIntegrator(AnalysisTab):
         Plots a bar graph of the column selected by the user, and also outputs
         the timing file sorted by the selected column in the text tab.
         '''
-        filepath = Path(self.window().dir_edit.text())/'timing'
+        filepath = self.window().cwd/'timing'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find timing file in directory')
         with open(filepath, mode='r', encoding='utf-8') as f:

@@ -232,10 +232,9 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             return None
         try:
             p = subprocess.run(args, universal_newlines=True, input=input,
-                               cwd=self.window().dir_edit.text(),
-                               timeout=float(self.window().timeout_spinbox.value()),
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                               check=True)
+                               cwd=self.window().cwd, check=True,
+                               timeout=self.window().timeout_spinbox.value(),
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             self.window().text.setPlainText(p.stdout)
             return p.stdout
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
@@ -254,13 +253,12 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             e.filename = args[0]
             raise
 
-    @staticmethod
-    def getModes(inputfile:str) -> list:
+    def getModes(self) -> list:
         '''
-        Returns a list of mode names given the location of the input file (can
-        be a Path object).
+        Returns a list of mode names from the input file in the current
+        directory.
         '''
-        with open(inputfile, mode='r', encoding='utf-8') as f:
+        with open(self.window().cwd/'input', mode='r', encoding='utf-8') as f:
             txt = f.read()
             # find modes in SPF-BASIS-SECTION
             spf_section = re.findall(r'SPF-BASIS-SECTION\n(.*)\nend-spf-basis-section',

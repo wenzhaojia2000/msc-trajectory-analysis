@@ -7,7 +7,6 @@ Convergence' tab of the analysis GUI. A class instance of this should be
 included in the main UI class.
 '''
 
-from pathlib import Path
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisTab
 
@@ -87,7 +86,7 @@ class AnalysisConvergence(AnalysisTab):
         ]
         self.runCmd('rdgpop', '-w', *gpop_options)
 
-        filepath = Path(self.window().dir_edit.text())/'gpop.pl'
+        filepath = self.window().cwd/'gpop.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f, 5, r'^#')
