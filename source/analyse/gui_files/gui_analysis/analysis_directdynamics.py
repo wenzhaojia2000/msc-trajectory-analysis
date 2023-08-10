@@ -332,8 +332,8 @@ class AnalysisDirectDynamics(AnalysisTab):
             post=f'Query was:\n{query}'
         else:
             post=f'No rows returned\n\nQuery was:\n{query}'
-        self.window().writeTable(res, header=[col[0] for col in cur.description],
-                                 pre=description, post=post)
+        self.window().text.writeTable(res, header=[col[0] for col in cur.description],
+                                      pre=description, post=post)
 
     def checkdb(self):
         '''
@@ -380,5 +380,5 @@ class AnalysisDirectDynamics(AnalysisTab):
             post=None
         else:
             post='No rows returned'
-        self.window().writeTable(res, header=[col[0] for col in cur.description],
-                                 pre=f'Executing:\n{query}\n', post=post)
+        self.window().text.writeTable(res, header=[col[0] for col in cur.description],
+                                      pre=f'Executing:\n{query}\n', post=post)

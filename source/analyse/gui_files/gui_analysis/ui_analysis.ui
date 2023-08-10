@@ -1289,7 +1289,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <widget class="QPlainTextEdit" name="output_text">
+         <widget class="CustomTextWidget" name="output_text">
           <property name="font">
            <font>
             <family>Courier</family>
@@ -1460,6 +1460,11 @@
    <extends>QWidget</extends>
    <header>gui_analysis.analysis_directdynamics</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CustomTextWidget</class>
+   <extends>QPlainTextEdit</extends>
+   <header>gui_analysis.ui_text</header>
   </customwidget>
  </customwidgets>
  <tabstops>
