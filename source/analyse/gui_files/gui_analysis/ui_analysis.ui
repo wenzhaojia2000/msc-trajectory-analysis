@@ -675,9 +675,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-162</y>
+         <y>-113</y>
          <width>335</width>
-         <height>520</height>
+         <height>480</height>
         </rect>
        </property>
        <attribute name="label">
@@ -831,29 +831,13 @@
            </item>
            <item row="3" column="0" colspan="2">
             <widget class="QScrollArea" name="showpes_coord_box">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>127</height>
-              </size>
-             </property>
              <property name="sizeAdjustPolicy">
               <enum>QAbstractScrollArea::AdjustToContents</enum>
              </property>
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
-             <widget class="QWidget" name="showpes_coord">
-              <property name="geometry">
-               <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>287</width>
-                <height>125</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_10"/>
-             </widget>
+             <widget class="CoordinateSelector" name="showpes_coord"/>
             </widget>
            </item>
           </layout>
@@ -1465,6 +1449,12 @@
    <class>CustomTextWidget</class>
    <extends>QPlainTextEdit</extends>
    <header>gui_analysis.ui_text</header>
+  </customwidget>
+  <customwidget>
+   <class>CoordinateSelector</class>
+   <extends>QWidget</extends>
+   <header>gui_analysis.ui_coordselect</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

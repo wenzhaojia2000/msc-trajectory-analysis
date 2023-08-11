@@ -254,29 +254,3 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             e.strerror = 'The program cannot be found'
             e.filename = args[0]
             raise
-
-    def getModes(self) -> list:
-        '''
-        Returns a list of mode names from the input file in the current
-        directory.
-        '''
-        with open(self.window().cwd/'input', mode='r', encoding='utf-8') as f:
-            txt = f.read()
-            # find modes in SPF-BASIS-SECTION
-            spf_section = re.findall(r'SPF-BASIS-SECTION\n(.*)\nend-spf-basis-section',
-                                     txt, re.DOTALL)
-            # if section does not exist, might be direct dynamics. find in
-            # nmode subsection in INITIAL-GEOMETRY-SECTION
-            ddmode_section = re.findall(r'nmode\n(.*)\nend-nmode', txt, re.DOTALL)
-            if spf_section:
-                # a list of modes are displayed before an = sign. match all of
-                # them, split by comma, then remove surrounding whitespace
-                modes = [mode.strip() for line in re.findall(r'.+(?==)', spf_section[0])\
-                                      for mode in line.split(',')]
-            elif ddmode_section:
-                # a list of modes are the first entry in each line (assuming
-                # mode names can't have whitespace in them).
-                modes = re.findall(r'^\s*\S+', ddmode_section[0], re.MULTILINE)
-            else:
-                raise ValueError('Cannot find modes in input file')
-        return modes
