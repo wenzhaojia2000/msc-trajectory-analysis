@@ -20,14 +20,11 @@ from .analysis_directdynamics import AnalysisDirectDynamics
 
 class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
     '''
-    UI of the main program.
-
-    Also consists of functions for plotting to the UI's graph and for writing
-    to the UI's text screen.
+    UI of the main window.
     '''
     def __init__(self):
         '''
-        The method that is called when a Ui instance is initiated.
+        The method that is called when the instance is initialised.
         '''
         # call the inherited class' __init__ method
         super().__init__()
@@ -112,7 +109,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
     @QtCore.pyqtSlot()
     def directoryChanged(self):
         '''
-        Action to perform when the user edits the directory textbox.
+        Action to perform when the user edits the directory textbox. The
+        entered value must be a directory, otherwise raises an error.
         '''
         # set to cwd when the program is opened or everything is deleted
         if self.dir_edit.text() == '':
@@ -131,8 +129,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
     @QtCore.pyqtSlot()
     def chooseDirectory(self):
         '''
-        Allows user to choose a directory using a menu when the directory
-        button is clicked.
+        Allows user to choose a directory using a menu. Sets self.dir_edit
+        (and thus self.cwd) when finished.
         '''
         dirname = QtWidgets.QFileDialog.getExistingDirectory(self,
             'Open directory', self.dir_edit.text(),

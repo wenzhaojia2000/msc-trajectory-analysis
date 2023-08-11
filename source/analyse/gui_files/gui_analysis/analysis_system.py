@@ -10,6 +10,7 @@ the main UI class.
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisTab
+from .ui_coordselect import CoordinateSelector
 
 class AnalysisSystem(AnalysisTab):
     '''
@@ -38,7 +39,22 @@ class AnalysisSystem(AnalysisTab):
         # group box 'pes options'
         self.showpes_type = self.findChild(QtWidgets.QComboBox, 'showpes_type')
         self.showpes_state = self.findChild(QtWidgets.QSpinBox, 'showpes_state')
-        self.showpes_coord = self.findChild(QtWidgets.QWidget, 'showpes_coord')
+        self.showpes_coord_box = self.findChild(QtWidgets.QScrollArea, 'showpes_coord_box')
+        self.showpes_coord = self.findChild(CoordinateSelector, 'showpes_coord')
+
+    @QtCore.pyqtSlot()
+    def optionSelected(self):
+        '''
+        Shows per-analysis options in a QGroupBox if a valid option is checked.
+        '''
+        super().optionSelected()
+        if self.radio[3].isChecked():
+            self.showpes_coord.refresh()
+            # allow the scroll area to resize up to a maximum size. extra +2
+            # because scroll bar appears otherwise (for some reason)
+            self.showpes_coord_box.setFixedHeight(
+                2 + min(self.showpes_coord.height(), 130)
+            )
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -178,24 +194,24 @@ class AnalysisSystem(AnalysisTab):
         filepath = self.window().cwd/'pes.xyz'
         filepath.unlink(missing_ok=True)
 
-        # temporary popup to get information for now. will need to read input
-        # to get mode names and add gui radio buttons + spinbox for each mode
-        coords, ok = QtWidgets.QInputDialog.getMultiLineText(
-            self.window(),
-            'Input coordinates',
-            'Write one mode on each line, with its name (not index!) then '
-            'either x, y, or value'
-        )
-        if not ok:
-            raise ValueError('User cancelled operation')
-
+        coords = str(self.showpes_coord)
+        if not coords:
+            # error in coordinate selection, use popup to get information.
+            coords, ok = QtWidgets.QInputDialog.getMultiLineText(
+                self.window(),
+                'Input coordinates',
+                'Write one mode on each line, with its name (not index!) then '
+                'either x, y, or value'
+            )
+            if not ok:
+                raise ValueError('User cancelled operation')
         inp = ''
         # choose task (10)
         inp += {0: '10\n2\n', 1: '10\n1\n'}[self.showpes_type.currentIndex()]
         # choose state (60), plot one state only (1)
         inp += f'60\n1\n{self.showpes_state.value()}\n'
         # choose coordinates (20)
-        inp += f'20\n{coords}\n0\n'
+        inp += f'20\n{coords}\n'
         # save data to xyz file (5), enter name, then exit (0)
         inp += '5\npes.xyz\n0'
         # run the command
@@ -214,11 +230,13 @@ class AnalysisSystem(AnalysisTab):
             y = np.unique(self.window().data[:, 1])
             z = np.array(self.window().data[:, 2]).reshape(x.shape[0], y.shape[0])
             self.window().graph.setLabels(title=self.showpes_type.currentText(),
-                                          bottom='DOF x (au)', left='DOF y (au)')
+                                          bottom=f'DOF {self.showpes_coord.xcoord} (au)',
+                                          left=f'DOF {self.showpes_coord.ycoord} (au)')
             self.window().graph.plotContours(x, y, z, 21)
         else:
             # line plot
             self.window().graph.setLabels(title=self.showpes_type.currentText(),
-                                          bottom='DOF x (au)', left='PES')
+                                          bottom=f'DOF {self.showpes_coord.xcoord} (au)',
+                                          left='PES')
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                      name='PES', pen='r')
