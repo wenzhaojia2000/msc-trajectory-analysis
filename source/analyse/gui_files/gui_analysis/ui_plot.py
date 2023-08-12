@@ -28,7 +28,7 @@ class CustomPlotWidget(pg.PlotWidget):
         
         For the widget to work, requires the following to be present in
         self.window():
-            - QSlider self.window().slider
+            - QSlider self.window().scrubber
             - QTextEdit self.window().dir_edit
             - QTabWidget self.window().tab_widget
         '''
@@ -137,11 +137,11 @@ class CustomPlotWidget(pg.PlotWidget):
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         # export image for each frame, into the temporary directory
         exporter = pg.exporters.ImageExporter(self.plotItem)
-        for i in range(self.window().slider.minimum(), self.window().slider.maximum()+1):
-            self.window().slider.setSliderPosition(i)
+        for i in range(self.window().scrubber.minimum(), self.window().scrubber.maximum()+1):
+            self.window().scrubber.setSliderPosition(i)
             exporter.export(str(temp_directory/f'{i:05}.png'))
             # force pyqt to update slider immediately, so user can see progress
-            self.window().slider.repaint()
+            self.window().scrubber.repaint()
         QtWidgets.QApplication.restoreOverrideCursor()
 
         # run ffmpeg to generate video https://stackoverflow.com/questions/24961127
@@ -167,8 +167,8 @@ class CustomPlotWidget(pg.PlotWidget):
         '''
         Resets the graph for replotting. Call this method before plotting
         something new. Use switch_to_plot to switch the tab menu so users can
-        see the new plot. Use animated to enable the slider and 'save video'
-        options to prepare for an animated plot.
+        see the new plot. Use animated to enable the media player and 'save
+        video' options to prepare for an animated plot.
         '''
         self.clear()
         self.getPlotItem().enableAutoRange()
@@ -178,10 +178,10 @@ class CustomPlotWidget(pg.PlotWidget):
         self.colourbar.hide()
         self.toggleLegend()
         if animated:
-            self.window().slider.show()
+            self.window().media_box.show()
             self.save_video.setVisible(True)
         else:
-            self.window().slider.hide()
+            self.window().media_box.hide()
             self.save_video.setVisible(False)
         if switch_to_plot:
             self.window().tab_widget.setCurrentIndex(1)

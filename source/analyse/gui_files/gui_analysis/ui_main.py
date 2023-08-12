@@ -64,20 +64,26 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.tab_widget = self.findChild(QtWidgets.QTabWidget, 'tab_widget')
         self.text = self.findChild(CustomTextWidget, 'output_text')
         self.graph = self.findChild(CustomPlotWidget, 'output_plot')
-        self.slider = self.findChild(QtWidgets.QSlider, 'output_slider')
         # menu items
         self.timeout_menu = self.findChild(QtWidgets.QMenu, 'timeout_menu')
         self.exit = self.findChild(QtWidgets.QAction, 'action_exit')
         self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
         self.cleanup = self.findChild(QtWidgets.QAction, 'cleanup')
         self.no_command = self.findChild(QtWidgets.QAction, 'no_command')
+        # animated plot items
+        self.media_box = self.findChild(QtWidgets.QWidget, 'output_media_box')
+        self.scrubber = self.findChild(QtWidgets.QSlider, 'media_scrubber')
+        self.ffstart = self.findChild(QtWidgets.QToolButton, 'media_ffstart')
+        self.play = self.findChild(QtWidgets.QToolButton, 'media_play')
+        self.ffend = self.findChild(QtWidgets.QToolButton, 'media_ffend')
 
-        # set icon of the dir_edit_dialog
-        self.dir_edit_dialog.setIcon(self.style().standardIcon(
-            QtWidgets.QStyle.SP_DirLinkIcon
-        ))
-        # hide slider initially
-        self.slider.hide()
+        # set icons for tool buttons
+        self.dir_edit_dialog.setIcon(self.getIcon('SP_DirLinkIcon'))
+        self.ffstart.setIcon(self.getIcon('SP_MediaSkipBackward'))
+        self.play.setIcon(self.getIcon('SP_MediaPlay'))
+        self.ffend.setIcon(self.getIcon('SP_MediaSkipForward'))
+        # hide scrubber and media buttons initially
+        self.media_box.hide()
 
     def connectObjects(self):
         '''
@@ -86,8 +92,16 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.dir_edit.editingFinished.connect(self.directoryChanged)
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
         self.menu_dir.triggered.connect(self.chooseDirectory)
-        self.exit.triggered.connect(lambda x: self.close())
         self.cleanup.triggered.connect(self.cleanupDirectory)
+        self.exit.triggered.connect(lambda: self.close())
+        self.ffstart.clicked.connect(lambda: self.scrubber.setValue(self.scrubber.minimum()))
+        self.ffend.clicked.connect(lambda: self.scrubber.setValue(self.scrubber.maximum()))
+        # connect the play button to a timer
+        self.play.clicked.connect(self.startStopAnimation)
+        self.timer = QtCore.QTimer(self.play)
+        self.timer.timeout.connect(
+            lambda: self.scrubber.setValue(self.scrubber.value() + 1)
+        )
 
         # add a timeout spinbox to the timeout menu
         self.timeout_spinbox = QtWidgets.QDoubleSpinBox(self)
@@ -98,6 +112,13 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         timeout_action = QtWidgets.QWidgetAction(self)
         timeout_action.setDefaultWidget(self.timeout_spinbox)
         self.timeout_menu.addAction(timeout_action)
+
+    def getIcon(self, icon_name:str) -> QtGui.QIcon:
+        '''
+        Convenience function to get one of Qt's built in icons. See a list here:
+            https://www.pythonguis.com/faq/built-in-qicons-pyqt/
+        '''
+        return self.style().standardIcon(getattr(QtWidgets.QStyle, icon_name))
 
     @property
     def cwd(self):
@@ -180,3 +201,19 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
                 self, 'No files found',
                 'Found no analysis output files in this directory.'
             )
+
+    @QtCore.pyqtSlot()
+    def startStopAnimation(self):
+        '''
+        Starts and stops the automatic playback of an animated plot.
+        '''
+        if self.play.isChecked():
+            self.play.setIcon(self.style().standardIcon(
+                QtWidgets.QStyle.SP_MediaPause
+            ))
+            self.timer.start(25)
+        else:
+            self.play.setIcon(self.style().standardIcon(
+                QtWidgets.QStyle.SP_MediaPlay
+            ))
+            self.timer.stop()
