@@ -177,6 +177,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             # log files
             'gwptraj.log',
             'showd1d.log',
+            'showsys.log',
             # xyz files
             'pes.xyz',
         ]

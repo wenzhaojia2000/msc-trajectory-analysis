@@ -220,6 +220,11 @@ class AnalysisSystem(AnalysisTab):
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.readFloats(f)
+        # set contents of showsys.log to text view
+        filepath = self.window().cwd/'showsys.log'
+        if filepath.is_file():
+            with open(filepath, mode='r', encoding='utf-8') as f:
+                self.window().text.setPlainText(f'{"-"*80}\n{f.read()}')
 
         # start plotting
         self.window().graph.reset(switch_to_plot=True)
