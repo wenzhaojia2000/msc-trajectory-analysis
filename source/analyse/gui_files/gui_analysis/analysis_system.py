@@ -7,6 +7,7 @@ System' tab of the analysis GUI. A class instance of this should be included in
 the main UI class.
 '''
 
+import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisTab
@@ -24,7 +25,7 @@ class AnalysisSystem(AnalysisTab):
         '''
         super()._activate(push_name='analsys_push', layout_name='analsys_layout',
                           options={
-                              0: 'den1d_box', 3: 'showpes_box'
+                              0: 'den1d_box', 1: 'den2d_box', 3: 'showpes_box'
                           })
 
     def findObjects(self, push_name:str, box_name:str):
@@ -36,6 +37,10 @@ class AnalysisSystem(AnalysisTab):
         # group box '1d density options'
         self.den1d_dof = self.findChild(QtWidgets.QSpinBox, 'den1d_dof')
         self.den1d_state = self.findChild(QtWidgets.QSpinBox, 'den1d_state')
+        # group box '2d density options'
+        self.den2d_state = self.findChild(QtWidgets.QSpinBox, 'den2d_state')
+        self.den2d_coord_box = self.findChild(QtWidgets.QScrollArea, 'den2d_coord_box')
+        self.den2d_coord = self.findChild(CoordinateSelector, 'den2d_coord')
         # group box 'pes options'
         self.showpes_type = self.findChild(QtWidgets.QComboBox, 'showpes_type')
         self.showpes_state = self.findChild(QtWidgets.QSpinBox, 'showpes_state')
@@ -48,10 +53,15 @@ class AnalysisSystem(AnalysisTab):
         Shows per-analysis options in a QGroupBox if a valid option is checked.
         '''
         super().optionSelected()
-        if self.radio[3].isChecked():
-            self.showpes_coord.refresh()
+        if self.radio[1].isChecked():
+            self.den2d_coord.refresh()
             # allow the scroll area to resize up to a maximum size. extra +2
             # because scroll bar appears otherwise (for some reason)
+            self.den2d_coord_box.setFixedHeight(
+                2 + min(self.den2d_coord.height(), 130)
+            )
+        if self.radio[3].isChecked():
+            self.showpes_coord.refresh()
             self.showpes_coord_box.setFixedHeight(
                 2 + min(self.showpes_coord.height(), 130)
             )
@@ -70,9 +80,9 @@ class AnalysisSystem(AnalysisTab):
                 case 'analsys_1': # plot 1d density evolution
                     self.showd1d()
                 case 'analsys_2': # plot 2d density evolution
-                    self.runCmd('showsys')
+                    self.showd2d()
                 case 'analsys_3': # plot diabatic state population
-                    self.runCmd('plstate')
+                    self.runCmd('statepop')
                 case 'analsys_4': # plot potential energy surface
                     self.showpes()
         except Exception as e:
@@ -128,16 +138,16 @@ class AnalysisSystem(AnalysisTab):
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
 
-        # adjust slider properties, connect to showd1dChangePlot slot
-        self.window().slider.setMaximum(len(self.window().data)-1)
-        self.window().slider.setSliderPosition(0)
+        # adjust scrubber properties, connect to showd1dChangePlot slot
+        self.window().scrubber.setMaximum(len(self.window().data)-1)
+        self.window().scrubber.setSliderPosition(0)
         try:
-            self.window().slider.valueChanged.disconnect()
+            self.window().scrubber.valueChanged.disconnect()
         except TypeError:
-            # happens if slider has no connections
+            # happens if scrubber has no connections
             pass
         finally:
-            self.window().slider.valueChanged.connect(self.showd1dChangePlot)
+            self.window().scrubber.valueChanged.connect(self.showd1dChangePlot)
         # start plotting
         self.window().graph.reset(switch_to_plot=True, animated=True)
         self.window().graph.setLabels(title='1D density evolution',
@@ -152,28 +162,139 @@ class AnalysisSystem(AnalysisTab):
     @QtCore.pyqtSlot()
     def showd1dChangePlot(self):
         '''
-        Allows the user to move the slider to control time when using the
+        Allows the user to move the scrubber to control time when using the
         showd1d analysis.
         '''
         data_items = self.window().graph.listDataItems()
-        slider_pos = int(self.window().slider.value())
+        scrubber_pos = int(self.window().scrubber.value())
         if self.window().data and len(data_items) == 2:
             re, im = data_items
             if re.name() == 'Re(phi)' and im.name() == 'Im(phi)':
                 self.window().graph.setLabels(
-                    top=f't={self.window().data[slider_pos][0][1]} fs'
+                    top=f't={self.window().data[scrubber_pos][0][1]} fs'
                 )
-                re.setData(self.window().data[slider_pos][:, 0],
-                           self.window().data[slider_pos][:, 2])
-                im.setData(self.window().data[slider_pos][:, 0],
-                           self.window().data[slider_pos][:, 3])
+                re.setData(self.window().data[scrubber_pos][:, 0],
+                           self.window().data[scrubber_pos][:, 2])
+                im.setData(self.window().data[scrubber_pos][:, 0],
+                           self.window().data[scrubber_pos][:, 3])
+
+    def showd2d(self):
+        '''
+        Reads the xyz file from the menu-driven output of showsys -nopes, with
+        the default task of 'plot diabatic reduced density'.
+        The menu entries that are navigated by this function are:
+            20 (coordinate selection)
+            60 (choose state)
+        The format of the xyz file should be
+             x.1   y.1   z.1.1.1
+             x.1   y.1   z.1.1.2
+             ...   ...   ...
+             x.1   y.n   z.1.1.n
+             x.2   y.1   z.1.2.1
+             ...   ...   ...
+             x.m   y.n   z.1.m.n
+                                           (Two empty lines here to seperate
+                                            time intervals)
+             x.1   y.1   z.2.1.1           (Repeat for timestep 2)
+             ...   ...   ...               (etc. until tfinal)
+
+        The x and y values should be the same for all intervals, and x.1 < x.2
+        < ... x.m with same for y.
+
+        Unfortunately a 'time' column is not included here unlike with the
+        1D density, so it will have to be gathered from the input file -- not
+        implemented yet.
+        '''
+        # if a plot file already exists, this won't work as we can't type
+        # the option to overwrite.
+        filepath = self.window().cwd/'den2d.xyz'
+        filepath.unlink(missing_ok=True)
+
+        coords = str(self.den2d_coord)
+        if not coords:
+            # error in coordinate selection, use popup to get information.
+            coords, ok = QtWidgets.QInputDialog.getMultiLineText(
+                self.window(),
+                'Input coordinates',
+                'Write one mode on each line, with its name (not index!) then '
+                'either x, y, or value'
+            )
+            if not ok:
+                raise ValueError('User cancelled operation')
+        elif self.den2d_coord.ycoord is None:
+            # this function currently only deals with 2d densities -- user
+            # can use showd1d if they want 1d densities
+            raise ValueError('A y coordinate was not selected')
+        inp = ''
+        # choose state (60), plot one state only (1)
+        inp += f'60\n1\n{self.den2d_state.value()}\n'
+        # choose coordinates (20)
+        inp += f'20\n{coords}\n'
+        # save data to xyz file (5), enter name, then exit (0)
+        inp += '5\nden2d.xyz\n0'
+        # run the command
+        self.runCmd('showsys', '-nopes', input=inp)
+
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            # this file essentially has xyz data for each time interval. there
+            # are two empty lines between the data for each time interval.
+            # annoyingly, one of the empty lines has whitespace in it, so we
+            # can't simply match \n{3} -- have to match newline and possible
+            # whitespace
+            intervals = [self.readFloats(i.split('\n')) for i \
+                         in re.split(r'(?:\n\s*){3}', f.read()) if i != '']
+            # create list of 2d matrices for z, one for each time interval
+            zt = []
+            # for each interval, convert from list xyz coordinate data to grid
+            # data
+            for i, interval in enumerate(intervals):
+                # assume x, y are same for each interval, so shape of z can be
+                # inferred from the first pass
+                if i == 0:
+                    x = np.unique(interval[:, 0])
+                    y = np.unique(interval[:, 1])
+                zt.append(np.array(interval[:, 2]).reshape(x.shape[0], y.shape[0]))
+        self.window().data = np.array(zt)
+
+        # set contents of showsys.log to text view
+        filepath = self.window().cwd/'showsys.log'
+        if filepath.is_file():
+            with open(filepath, mode='r', encoding='utf-8') as f:
+                self.window().text.setPlainText(f'{"-"*80}\n{f.read()}')
+
+        # adjust scrubber properties, connect to showd2dChangePlot slot
+        self.window().scrubber.setMaximum(len(self.window().data)-1)
+        self.window().scrubber.setSliderPosition(0)
+        try:
+            self.window().scrubber.valueChanged.disconnect()
+        except TypeError:
+            # happens if scrubber has no connections
+            pass
+        finally:
+            self.window().scrubber.valueChanged.connect(self.showd2dChangePlot)
+        self.window().graph.reset(switch_to_plot=True, animated=True)
+        self.window().graph.setLabels(title='2D Density',
+                                      bottom=f'DOF {self.den2d_coord.xcoord} (au)',
+                                      left=f'DOF {self.den2d_coord.ycoord} (au)')
+        levels = np.linspace(self.window().data.min(), self.window().data.max(), 21)
+        self.window().graph.plotContours(x, y, self.window().data[0], levels)
+
+    @QtCore.pyqtSlot()
+    def showd2dChangePlot(self):
+        '''
+        Allows the user to move the scrubber to control time when using the
+        showd2d analysis.
+        '''
+        scrubber_pos = int(self.window().scrubber.value())
+        for isocurve in self.window().graph.getPlotItem().items:
+            isocurve.setData(self.window().data[scrubber_pos])
 
     def showpes(self):
         '''
         Reads the xyz file from the menu-driven output of showsys -pes.
         The menu entries that are navigated by this function are:
             10 (choose task)
-            20 (coordinate selection, using popup for the time being)
+            20 (coordinate selection)
             60 (choose state)
         The format of the xyz file should be
              x.1   y.1   z.1.1

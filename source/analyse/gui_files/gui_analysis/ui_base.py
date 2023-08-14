@@ -174,7 +174,8 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         ...    ...    ...    ...   ...
         am.1   am.2   am.3   ...   am.n
 
-        and stores floats found in it in an numpy array self.window().data.
+        then returns floats found in it.
+
         Each cell should be in a numeric form that can be converted into a
         float like 0.123 or 1.234E-10, etc., and cells are seperated with any
         number of spaces (or tabs).
@@ -220,6 +221,7 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             raise ValueError('No floats found in iterable. Check console '
                              'output to see what went wrong?')
         self.window().data = np.array(data)
+        return self.window().data
 
     def runCmd(self, *args, input:str=None) -> str:
         '''
