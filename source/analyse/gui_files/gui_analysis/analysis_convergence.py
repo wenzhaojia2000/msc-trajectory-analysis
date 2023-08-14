@@ -89,7 +89,7 @@ class AnalysisConvergence(AnalysisTab):
         filepath = self.window().cwd/'gpop.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f, 5, r'^#')
+            self.window().data = self.readFloats(f, 5, ignore_regex=r'^#')
 
         # start plotting
         self.window().graph.reset(switch_to_plot=True)

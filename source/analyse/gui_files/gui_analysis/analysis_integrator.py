@@ -161,7 +161,7 @@ class AnalysisIntegrator(AnalysisTab):
         '''
         output = self.runCmd('rdupdate')
         # assemble data matrix
-        self.readFloats(output.split('\n'), 4)
+        self.window().data = self.readFloats(output.split('\n'), 4)
 
         # start plotting, depending on options
         self.window().graph.reset(switch_to_plot=True)

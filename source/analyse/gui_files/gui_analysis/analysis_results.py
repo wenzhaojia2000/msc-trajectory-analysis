@@ -102,8 +102,10 @@ class AnalysisResults(AnalysisTab):
         self.window().text.clear()
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
+            self.window().text.setPlainText(f.read())
+            f.seek(0)
             try:
-                self.readFloats(f, 4, write_text=True)
+                self.window().data = self.readFloats(f, 4)
             except ValueError:
                 raise ValueError('Invalid auto file') from None
 
@@ -158,7 +160,7 @@ class AnalysisResults(AnalysisTab):
         filepath = self.window().cwd/'spectrum.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f, 4, r'^#')
+            self.window().data = self.readFloats(f, 4, ignore_regex=r'^#')
 
         # start plotting
         self.window().graph.reset(switch_to_plot=True)

@@ -210,7 +210,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         filepath = self.window().cwd/'trajectory'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f, None)
+            self.window().data = self.readFloats(f)
 
         # add contents of showd1d.log to text view
         filepath = self.window().cwd/'gwptraj.log'

@@ -127,7 +127,7 @@ class AnalysisSystem(AnalysisTab):
             filepath = self.window().cwd/f'den1d_{"_".join(den1d_options)}'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f, 4, ignore_regex=r'^plot|^set')
+            self.window().data = self.readFloats(f, 4, ignore_regex=r'^plot|^set')
             # split the matrix into chunks depending on its time column
             n_interval = np.unique(self.window().data[:, 1]).size
             self.window().data = np.split(self.window().data, n_interval)
@@ -340,7 +340,7 @@ class AnalysisSystem(AnalysisTab):
 
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.readFloats(f)
+            self.window().data = self.readFloats(f)
         # set contents of showsys.log to text view
         filepath = self.window().cwd/'showsys.log'
         if filepath.is_file():

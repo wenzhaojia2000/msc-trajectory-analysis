@@ -163,8 +163,9 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             return value
         return wrapper
 
-    def readFloats(self, iterable:list, floats_per_line:int=None,
-                   ignore_regex:re.Pattern|str=None, write_text:bool=False):
+    @staticmethod
+    def readFloats(iterable:list, floats_per_line:int=None,
+                   ignore_regex:re.Pattern|str=None) -> np.ndarray:
         '''
         Function that reads a file or list of strings that is formatted in a
         'grid', ie. in the form
@@ -189,18 +190,9 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
 
         If ignore_regex is set, the function ignores lines that match the
         regex.
-
-        If write_text is True, writes the file or iterable into the 'Text'
-        output tab self.window().text.
         '''
         data = []
-        if write_text:
-            # clear text view if write_text is true
-            self.window().text.clear()
         for line in iterable:
-            # write line to text view if write_text is true
-            if write_text:
-                self.window().text.appendPlainText(line[:-1])
             # ignore finding floats on this line if matches regex
             if ignore_regex and re.search(ignore_regex, line):
                 continue
@@ -220,8 +212,7 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             # nothing found
             raise ValueError('No floats found in iterable. Check console '
                              'output to see what went wrong?')
-        self.window().data = np.array(data)
-        return self.window().data
+        return np.array(data)
 
     def runCmd(self, *args, input:str=None) -> str:
         '''
