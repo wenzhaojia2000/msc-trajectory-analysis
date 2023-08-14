@@ -204,14 +204,18 @@ class CustomPlotWidget(pg.PlotWidget):
                     value = (value,)
                 self.setLabel(key, *value, color='k')
 
-    def plotContours(self, x:np.array, y:np.array, z:np.array, n_levels:int):
+    def plotContours(self, x:np.array, y:np.array, z:np.array, levels:int|list):
         '''
         Given numpy arrays x with shape (N,), y with shape (M,) and z with
-        shape (M, N), plots n_level contour lines with levels ranging from
-        min(z) to max(z). Shows a colourbar to the side.
+        shape (M, N), plots a contour graph. Shows a colourbar to the side.
+
+        If levels is an integer, plots n_level contour lines with levels
+        ranging from min(z) to max(z). If it is a list, the contour lines are
+        plotted for the levels given in the list.
         '''
-        colours = self.colourmap.getLookupTable(nPts=n_levels, mode=pg.ColorMap.QCOLOR)
-        levels = np.linspace(z.min(), z.max(), n_levels)
+        if isinstance(levels, int):
+            levels = np.linspace(z.min(), z.max(), levels)
+        colours = self.colourmap.getLookupTable(nPts=len(levels), mode=pg.ColorMap.QCOLOR)
         # a single contour line is known as an isocurve in pyqtgraph. it does
         # not accept x or y values, only the data (z). to display it properly
         # we need to transform it using QtGui.QTransform first.
@@ -220,7 +224,7 @@ class CustomPlotWidget(pg.PlotWidget):
         tr.scale((x.max() - x.min()) / np.shape(z)[0],
                  (y.max() - y.min()) / np.shape(z)[1])
         # create the isocurves, transforming each one
-        for i in range(n_levels):
+        for i in range(len(levels)):
             c = pg.IsocurveItem(data=z, level=levels[i], pen=colours[i])
             c.setTransform(tr)
             self.getPlotItem().addItem(c)
