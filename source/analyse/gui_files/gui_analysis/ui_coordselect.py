@@ -31,7 +31,7 @@ class CoordinateSelector(QtWidgets.QWidget):
 
         For the widget to work, requires the following to be present in
         self.window():
-            - Property self.window().cwd (which requires self.window().dir_edit)
+            - QLineEdit self.window().dir_edit (and self.window().cwd)
         '''
         super().__init__(*args, **kwargs)
         # set a vertical box layout for this widget

@@ -49,8 +49,10 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.connectObjects()
         # set text in dir_edit to be the current working directory
         self.directoryChanged()
-        # data which may be displayed by the window, and may or may not be
-        # interacted with by some its widgets
+        # data (array or numpy array) that is used to display the plot, which
+        # should be updated for each replot. may be accessed by signals in
+        # animated plots. can be saved using the 'save .npy data' action in the
+        # plot widget.
         self.data = None
 
     def findObjects(self):

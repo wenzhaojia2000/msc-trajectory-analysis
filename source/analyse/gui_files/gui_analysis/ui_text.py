@@ -22,7 +22,7 @@ class CustomTextWidget(QtWidgets.QPlainTextEdit):
         
         For the widget to work, requires the following to be present in
         self.window():
-            - QTextEdit self.window().dir_edit
+            - QLineEdit self.window().dir_edit (and self.window().cwd)
         '''
         super().__init__(*args, **kwargs)
         # menu actions
@@ -56,7 +56,7 @@ class CustomTextWidget(QtWidgets.QPlainTextEdit):
         '''
         # obtain a savename for the file
         savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
-            "Save File", self.window().dir_edit.text() + '/Untitled.txt',
+            "Save File", str(self.window().cwd / 'Untitled.txt'),
             "Text (*.txt);;All files (*)"
         )
         if not ok:

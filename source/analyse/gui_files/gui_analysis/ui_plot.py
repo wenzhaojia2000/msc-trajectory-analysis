@@ -28,8 +28,9 @@ class CustomPlotWidget(pg.PlotWidget):
         
         For the widget to work, requires the following to be present in
         self.window():
+            - self.window().data
             - QSlider self.window().scrubber
-            - QTextEdit self.window().dir_edit
+            - QLineEdit self.window().dir_edit (and self.window().cwd)
             - QTabWidget self.window().tab_widget
         '''
         super().__init__(*args, **kwargs)
@@ -50,6 +51,9 @@ class CustomPlotWidget(pg.PlotWidget):
         context_menu = self.getPlotItem().vb.menu
         plot_menu = self.getPlotItem().ctrlMenu
 
+        # save .npy file
+        self.save_npy = context_menu.addAction("Save .npy data")
+        self.save_npy.triggered.connect(self.saveData)
         # save video action (off by default)
         self.save_video = context_menu.addAction("Save video")
         self.save_video.triggered.connect(self.saveVideo)
@@ -107,6 +111,31 @@ class CustomPlotWidget(pg.PlotWidget):
             legend.hide()
 
     @QtCore.pyqtSlot()
+    def saveData(self):
+        '''
+        Saves the array or numpy array present in self.window().data into a
+        numpy (.npy) file.
+        '''
+        if self.window().data is None:
+            QtWidgets.QMessageBox.information(
+                self, 'No data', 'No data have been plotted yet.'
+            )
+            return None
+        # obtain a savename for the file
+        savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+            "Save File", str(self.window().cwd / 'Untitled.npy'),
+            "Numpy file (*.npy);;All files (*)"
+        )
+        if not ok:
+            # user cancels operation
+            return None
+        np.save(savename, self.window().data)
+        QtWidgets.QMessageBox.information(
+            self, 'Success', 'Save data successful.'
+        )
+        return None
+
+    @QtCore.pyqtSlot()
     def saveVideo(self):
         '''
         Saves an .mp4 file of the current plot (which should be animated with
@@ -121,7 +150,7 @@ class CustomPlotWidget(pg.PlotWidget):
             return None
         # obtain a savename for the file
         savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
-            "Save File", self.window().dir_edit.text() + '/Untitled.mp4',
+            "Save File", str(self.window().cwd / 'Untitled.mp4'),
             "Video (*.mp4);;All files (*)"
         )
         if not ok:
