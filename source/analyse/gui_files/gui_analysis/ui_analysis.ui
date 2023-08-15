@@ -172,6 +172,19 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QPushButton" name="media_speed">
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Speed</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -792,7 +805,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-183</y>
+         <y>0</y>
          <width>335</width>
          <height>666</height>
         </rect>

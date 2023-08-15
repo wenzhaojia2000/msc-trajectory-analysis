@@ -165,18 +165,15 @@ class AnalysisSystem(AnalysisTab):
         Allows the user to move the scrubber to control time when using the
         showd1d analysis.
         '''
-        data_items = self.window().graph.listDataItems()
+        re, im = self.window().graph.listDataItems()
         scrubber_pos = int(self.window().scrubber.value())
-        if self.window().data and len(data_items) == 2:
-            re, im = data_items
-            if re.name() == 'Re(phi)' and im.name() == 'Im(phi)':
-                self.window().graph.setLabels(
-                    top=f't={self.window().data[scrubber_pos][0][1]} fs'
-                )
-                re.setData(self.window().data[scrubber_pos][:, 0],
-                           self.window().data[scrubber_pos][:, 2])
-                im.setData(self.window().data[scrubber_pos][:, 0],
-                           self.window().data[scrubber_pos][:, 3])
+        self.window().graph.setLabels(
+            top=f't={self.window().data[scrubber_pos][0][1]} fs'
+        )
+        re.setData(self.window().data[scrubber_pos][:, 0],
+                   self.window().data[scrubber_pos][:, 2])
+        im.setData(self.window().data[scrubber_pos][:, 0],
+                   self.window().data[scrubber_pos][:, 3])
 
     def showd2d(self):
         '''

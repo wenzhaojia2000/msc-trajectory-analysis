@@ -78,6 +78,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.ffstart = self.findChild(QtWidgets.QToolButton, 'media_ffstart')
         self.play = self.findChild(QtWidgets.QToolButton, 'media_play')
         self.ffend = self.findChild(QtWidgets.QToolButton, 'media_ffend')
+        self.speed_button = self.findChild(QtWidgets.QPushButton, 'media_speed')
+        self.speed = 30.0 # animation speed set by speed_button
 
         # set icons for tool buttons
         self.dir_edit_dialog.setIcon(self.getIcon('SP_DirLinkIcon'))
@@ -98,6 +100,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.exit.triggered.connect(lambda: self.close())
         self.ffstart.clicked.connect(lambda: self.scrubber.setValue(self.scrubber.minimum()))
         self.ffend.clicked.connect(lambda: self.scrubber.setValue(self.scrubber.maximum()))
+        self.speed_button.clicked.connect(self.changeSpeed)
         # connect the play button to a timer
         self.play.clicked.connect(self.startStopAnimation)
         self.timer = QtCore.QTimer(self.play)
@@ -214,9 +217,23 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             self.play.setIcon(self.style().standardIcon(
                 QtWidgets.QStyle.SP_MediaPause
             ))
-            self.timer.start(25)
+            self.timer.start(int(1000/self.speed))
         else:
             self.play.setIcon(self.style().standardIcon(
                 QtWidgets.QStyle.SP_MediaPlay
             ))
             self.timer.stop()
+
+    @QtCore.pyqtSlot()
+    def changeSpeed(self):
+        '''
+        Opens a popup allowing the user to select a new playback speed.
+        '''
+        speed, ok = QtWidgets.QInputDialog.getDouble(
+            self.window(),
+            'Input speed',
+            'Enter the animation playback speed or video framerate per second:',
+            self.speed
+        )
+        if ok:
+            self.speed = speed

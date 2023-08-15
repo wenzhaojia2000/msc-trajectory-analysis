@@ -29,6 +29,7 @@ class CustomPlotWidget(pg.PlotWidget):
         For the widget to work, requires the following to be present in
         self.window():
             - self.window().data
+            - self.window().speed
             - QSlider self.window().scrubber
             - QLineEdit self.window().dir_edit (and self.window().cwd)
             - QTabWidget self.window().tab_widget
@@ -175,8 +176,9 @@ class CustomPlotWidget(pg.PlotWidget):
 
         # run ffmpeg to generate video https://stackoverflow.com/questions/24961127
         # no error if height not divisible by 2 https://stackoverflow.com/questions/20847674/
-        args = ['ffmpeg', '-y', '-framerate', '30', '-pattern_type', 'glob', '-i',
-                '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-vf',
+        args = ['ffmpeg', '-y', '-framerate', str(self.window().speed),
+                '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264',
+                '-pix_fmt', 'yuv420p', '-vf',
                 'pad=ceil(iw/2)*2:ceil(ih/2)*2:color=white', str(savename)]
         try:
             subprocess.run(args, cwd=temp_directory, check=True)
