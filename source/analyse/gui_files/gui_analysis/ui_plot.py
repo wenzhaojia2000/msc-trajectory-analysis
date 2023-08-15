@@ -130,6 +130,9 @@ class CustomPlotWidget(pg.PlotWidget):
         if not ok:
             # user cancels operation
             return None
+        # if the savename already exists np.save does not overwrite, but
+        # appends to file. just change this by removing it if it exists
+        Path(savename).unlink(missing_ok=True)
         np.save(savename, self.window().data)
         QtWidgets.QMessageBox.information(
             self, 'Success', 'Save data successful.'

@@ -21,7 +21,7 @@ class CoordinateSelector(QtWidgets.QWidget):
     Limitations:
         - Not yet possible to select a cut using a vector (or file)
         - Not yet possible to select coordinate bounds (xmin, xmax, ymin, ymax)
-        - Not yet possible to select to select x, y, z units
+        - Not yet possible to select x, y, z units
         - Not yet possible to retrieve mode labels from a ML-BASIS-SECTION.
     '''
 
