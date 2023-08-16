@@ -82,7 +82,7 @@ class AnalysisSystem(AnalysisTab):
                 case 'analsys_2': # plot 2d density evolution
                     self.showd2d()
                 case 'analsys_3': # plot diabatic state population
-                    self.runCmd('statepop')
+                    self.statepop()
                 case 'analsys_4': # plot potential energy surface
                     self.showpes()
         except Exception as e:
@@ -285,6 +285,34 @@ class AnalysisSystem(AnalysisTab):
         scrubber_pos = int(self.window().scrubber.value())
         for isocurve in self.window().graph.getPlotItem().items:
             isocurve.setData(self.window().data[scrubber_pos])
+
+    def statepop(self):
+        '''
+        Reads the file output of using statepop, which is expected to be in
+        the format, where each cell is a float,
+
+        t.1    s1.1    s2.1    ...   sn.1
+        t.2    s1.2    s2.2    ...   sn.2
+        ...    ...     ...     ...    ...
+        t.m    s1.m    s2.m    ...   sn.m
+
+        where t is time and s1 ... sn are the populations for that time for
+        state n. Plots time and population for each state.
+        '''
+        self.runCmd('statepop', '-w')
+        filepath = self.window().cwd/'spops'
+        # assemble data matrix
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            self.window().data = self.readFloats(f, ignore_regex=r'^#')
+
+        # start plotting
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='State population',
+                                      bottom='Time (fs)', left='Population')
+        n_states = self.window().data.shape[1] - 1 # minus time column
+        for i in range(1, n_states + 1):
+            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, i],
+                                     name=f'State {i}', pen=(i-1, n_states))
 
     def showpes(self):
         '''

@@ -232,7 +232,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QVBoxLayout" name="analconv_layout" stretch="0,0,0,0,0,0">
+         <layout class="QVBoxLayout" name="analconv_layout" stretch="0,0,0,0,0">
           <item>
            <widget class="QRadioButton" name="analconv_1">
             <property name="text">
@@ -256,26 +256,19 @@
           <item>
            <widget class="QRadioButton" name="analconv_3">
             <property name="text">
-             <string>Plot populations of states</string>
+             <string>Plot populations of natural orbitals</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QRadioButton" name="analconv_4">
             <property name="text">
-             <string>Plot populations of natural orbitals</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analconv_5">
-            <property name="text">
              <string>Plot coordinate expectation values</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="analconv_6">
+           <widget class="QRadioButton" name="analconv_5">
             <property name="text">
              <string>Plot time-evolution of norm of wavefunction</string>
             </property>
@@ -353,8 +346,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>248</width>
-         <height>236</height>
+         <width>356</width>
+         <height>354</height>
         </rect>
        </property>
        <attribute name="label">
@@ -488,7 +481,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>330</width>
+         <width>335</width>
          <height>383</height>
         </rect>
        </property>
@@ -805,8 +798,8 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
-         <width>277</width>
+         <y>-312</y>
+         <width>335</width>
          <height>666</height>
         </rect>
        </property>
@@ -831,6 +824,9 @@
           </item>
           <item>
            <widget class="QRadioButton" name="analsys_2">
+            <property name="statusTip">
+             <string>Executes showsys -nopes and plots an animated 2D density evolution.</string>
+            </property>
             <property name="text">
              <string>Plot 2D density evolution</string>
             </property>
@@ -838,6 +834,9 @@
           </item>
           <item>
            <widget class="QRadioButton" name="analsys_3">
+            <property name="statusTip">
+             <string>Executes statepop and plots populations for each state.</string>
+            </property>
             <property name="text">
              <string>Plot diabatic state population</string>
             </property>
@@ -948,8 +947,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>98</width>
-                <height>28</height>
+                <width>287</width>
+                <height>85</height>
                </rect>
               </property>
              </widget>
@@ -1019,8 +1018,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>98</width>
-                <height>28</height>
+                <width>287</width>
+                <height>85</height>
                </rect>
               </property>
              </widget>
@@ -1593,7 +1592,6 @@
   <tabstop>analconv_2</tabstop>
   <tabstop>analconv_3</tabstop>
   <tabstop>analconv_4</tabstop>
-  <tabstop>analconv_6</tabstop>
   <tabstop>analconv_push</tabstop>
   <tabstop>analint_1</tabstop>
   <tabstop>analint_2</tabstop>

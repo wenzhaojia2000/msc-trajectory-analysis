@@ -173,18 +173,26 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         from gwptraj, gpop.pl from rdgpop. If so, removes them.
         '''
         # glob-type filenames to remove
+        # ^ means this file is not associated with a command that is called in
+        # this ui
         file_glob = [
             'den1d_*',
+            'dens2d_*', # ^dengen
+            'spops',
             'trajectory',
             # pl files
             'gpop.pl',
+            'spop.pl', # ^rdcheck -spop (same function as statepop)
             'spectrum.pl',
             # log files
+            'ausw.log',
+            'dengen.log', # ^dengen
             'gwptraj.log',
             'showd1d.log',
             'showsys.log',
             # xyz files
             'pes.xyz',
+            'den2d.xyz',
         ]
         # find the output files actually present in the directory
         files = []
