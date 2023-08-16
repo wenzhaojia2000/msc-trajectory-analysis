@@ -25,11 +25,11 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         super()._activate(push_name='analdd_push', layout_name='analdd_layout',
                           options={
-                              1: 'gwptraj_box', 2: 'findpes_box',
+                              1: 'gwptraj_box', 2: 'ddpesgeo_box',
                               3: 'clean_box', 4: 'sql_box'
                           })
-        # one of the boxes inside findpes should be hidden
-        self.findpesOptionChanged()
+        # one of the boxes inside ddpesgeo should be hidden
+        self.ddpesgeoOptionChanged()
 
     def findObjects(self, push_name:str, box_name:str):
         '''
@@ -41,17 +41,17 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.gwptraj_task = self.findChild(QtWidgets.QComboBox, 'gwptraj_task')
         self.gwptraj_mode = self.findChild(QtWidgets.QSpinBox, 'gwptraj_mode')
         # group box 'pes/apes options'
-        self.findpes_type = self.findChild(QtWidgets.QComboBox, 'findpes_type')
-        self.findpes_task = [
-            self.findChild(QtWidgets.QRadioButton, 'findpes_int'),
-            self.findChild(QtWidgets.QRadioButton, 'findpes_mat')
+        self.ddpesgeo_type = self.findChild(QtWidgets.QComboBox, 'ddpesgeo_type')
+        self.ddpesgeo_task = [
+            self.findChild(QtWidgets.QRadioButton, 'ddpesgeo_int'),
+            self.findChild(QtWidgets.QRadioButton, 'ddpesgeo_mat')
         ]
-        self.findpes_int_box = self.findChild(QtWidgets.QFrame, 'findpes_int_box')
-        self.findpes_mat_box = self.findChild(QtWidgets.QFrame, 'findpes_mat_box')
-        self.findpes_emin = self.findChild(QtWidgets.QDoubleSpinBox, 'findpes_emin')
-        self.findpes_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'findpes_emax')
-        self.findpes_state = self.findChild(QtWidgets.QSpinBox, 'findpes_state')
-        self.findpes_tol = self.findChild(QtWidgets.QDoubleSpinBox, 'findpes_tol')
+        self.ddpesgeo_int_box = self.findChild(QtWidgets.QFrame, 'ddpesgeo_int_box')
+        self.ddpesgeo_mat_box = self.findChild(QtWidgets.QFrame, 'ddpesgeo_mat_box')
+        self.ddpesgeo_emin = self.findChild(QtWidgets.QDoubleSpinBox, 'ddpesgeo_emin')
+        self.ddpesgeo_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'ddpesgeo_emax')
+        self.ddpesgeo_state = self.findChild(QtWidgets.QSpinBox, 'ddpesgeo_state')
+        self.ddpesgeo_tol = self.findChild(QtWidgets.QDoubleSpinBox, 'ddpesgeo_tol')
         # group box 'clean database options'
         self.clean_testint = self.findChild(QtWidgets.QCheckBox, 'clean_testint')
         self.clean_rmdup = self.findChild(QtWidgets.QCheckBox, 'clean_rmdup')
@@ -68,8 +68,8 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         super().connectObjects()
         # in pes/apes box, show certain options only when checked
-        for radio in self.findpes_task:
-            radio.clicked.connect(self.findpesOptionChanged)
+        for radio in self.ddpesgeo_task:
+            radio.clicked.connect(self.ddpesgeoOptionChanged)
         # in clean database box, show certain options only when checked
         self.clean_rmdup.stateChanged.connect(self.cleanOptionChanged)
         self.clean_rmfail.stateChanged.connect(self.cleanOptionChanged)
@@ -77,14 +77,14 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.sql_query.textChanged.connect(self.sqlChanged)
 
     @QtCore.pyqtSlot()
-    def findpesOptionChanged(self):
+    def ddpesgeoOptionChanged(self):
         '''
         Allows the user to change task-specific options depending on whether
         the interval task or the match task is selected
         '''
-        options = {0: self.findpes_int_box, 1: self.findpes_mat_box}
+        options = {0: self.ddpesgeo_int_box, 1: self.ddpesgeo_mat_box}
         for radio, box in options.items():
-            if self.findpes_task[radio].isChecked():
+            if self.ddpesgeo_task[radio].isChecked():
                 box.show()
             else:
                 box.hide()
@@ -129,7 +129,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                 case 'analdd_2': # plot wavepacket basis function trajectories
                     self.gwptraj()
                 case 'analdd_3': # inspect PES/APES in database
-                    self.findpes()
+                    self.ddpesgeo()
                 case 'analdd_4': # check or clean database
                     self.checkdb()
                 case 'analdd_5': # query database
@@ -265,75 +265,154 @@ class AnalysisDirectDynamics(AnalysisTab):
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, col],
                                      pen=(i, ngwp))
 
-    def findpes(self):
+    def ddpesgeo(self):
         '''
-        Find database entries in the pes/apes + geo table where energies are
-        within a certain user-defined interval or where energies between two
-        states match within a tolerance.
+        Finds molecule geometries where energies of the PES/APES are within
+        a certain user-defined interval or where energies between two states
+        match within a tolerance.
+
+        The output in text view is in the form
+
+        STATE X [& Y] {
+
+            ID: 12345
+            ----------------------------------------
+                     eng_X |           eng_Y |   ... (relevant states highlighted)
+            1.23456789e+01 |  1.23456789e+01 |   ...
+            ----------------------------------------
+            Atom 1       x y z
+            Atom 2       x y z
+            ...
+
+            ... repeat for all matches
+
+        }
+        ... repeat for more states
         '''
         filepath = self.window().cwd/'database.sql'
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find database.sql file in directory')
         con = sqlite3.connect(f'file:{filepath}?mode=ro', uri=True,
-                              timeout=float(self.window().timeout_spinbox.value()))
+                              timeout=self.window().timeout_spinbox.value())
         cur = con.cursor()
+        version = cur.execute('SELECT dbversion FROM versions;').fetchone()[0]
+        match version:
+            case 4:
+                self._ddpesgeoV4(con, cur)
+            case x:
+                raise NotImplementedError('ddpesgeo not implemented for DB'
+                                         f'version {x}')
+
+    def _ddpesgeoV4(self, con:sqlite3.Connection, cur:sqlite3.Cursor):
+        '''
+        ddpesgeo implemented for DB version 4. See docstring for ddpesgeo for
+        more details.
+        '''
         # the number of electronic states
         nroot = cur.execute('SELECT Nroot FROM refdb;').fetchone()[0]
-        # the table to select entries
-        table = {0: 'pes', 1: 'apes'}[self.findpes_type.currentIndex()]
-        # generate the query. it will be a sequence of strings joined together
-        # with UNION, as a query is generated for each electronic state.
-        # nb: the method here uses f strings which is generally unsafe as it
-        # is vulnerable to sql injection. however, the user has access to the
-        # entire database anyway, so this is not an issue.
-        query = []
-        if self.findpes_task[0].isChecked():
+        # dictionary of the form {state(s) (frozenset): [list of entries]}
+        # where an entry is also a dict of form {id (int), energy (tuple),
+        # geo (np.ndarray where columns are x y z)}
+        pesgeo = {}
+        # since we join pes/apes table to geo but want to seperate the two
+        # after sql query, need to find the number of columns in geo table (not
+        # counting id so -1)
+        geo_length = cur.execute(
+            'SELECT COUNT(*) FROM pragma_table_info("geo");'
+        ).fetchall()[0][0] - 1
+        # get atom names in refdbrefgeom
+        atom_names = [col[0] for col in cur.execute(
+            'SELECT name FROM refdbrefgeom;'
+        ).fetchall()]
+
+        if self.ddpesgeo_type.currentIndex() == 0:
+            table = 'pes'
+            # dictionary mapping states to column names
+            state_name = {s: f'eng_{s}_{s}' for s in range(1, nroot+1)}
+        else:
+            table = 'apes'
+            state_name = {s: f'eng_{s}' for s in range(1, nroot+1)}
+
+        if self.ddpesgeo_task[0].isChecked():
             # task is find energies between interval
-            emin = self.findpes_emin.value()
-            emax = self.findpes_emax.value()
+            emin = self.ddpesgeo_emin.value()
+            emax = self.ddpesgeo_emax.value()
             description = (f'Finding database entries in {table} where '
                            f'energies between {emin} and {emax}')
+            # retrieve matching id + energies
             for s in range(1, nroot+1):
-                if table == 'pes':
-                    query.append(f'SELECT {s} AS "state", * FROM pes LEFT JOIN '
-                                 f'geo USING(id) WHERE eng_{s}_{s} BETWEEN '
-                                 f'{emin} AND {emax}')
-                else:
-                    query.append(f'SELECT {s} AS "state", * FROM apes LEFT JOIN '
-                                 f'geo USING(id) WHERE eng_{s} BETWEEN {emin} '
-                                 f'AND {emax}')
+                query = (f'SELECT * FROM {table} LEFT JOIN geo USING(id) '
+                         f'WHERE {state_name[s]} BETWEEN {emin} AND {emax};')
+                res = cur.execute(query).fetchall()
+                # add id, energies, geo. split geo into geo_length subarrays
+                # so there are 3 columns
+                pesgeo[frozenset({s})] = [{
+                    'id': entry[0], 'energies': entry[1:-geo_length],
+                    'geo': np.split(np.array(entry[-geo_length:]), geo_length//3)
+                } for entry in res]
         else:
             # task is find matching energies
-            s1 = self.findpes_state.value()
-            tol = self.findpes_tol.value()
-            if s1 > nroot:
-                raise ValueError(f'State {s1} cannot be greater than number of'
-                                 f'states {nroot}')
+            s1 = self.ddpesgeo_state.value()
+            tol = self.ddpesgeo_tol.value()
             description = (f'Finding database entries in {table} where '
                            f'energies match state {s1} (abs. tol. {tol})')
+            if s1 > nroot:
+                raise ValueError(f'State {s1} cannot be greater than number of '
+                                 f'states {nroot}')
             for s2 in range(1, nroot+1):
                 if s2 == s1:
                     continue
-                elif table == 'pes':
-                    query.append(f'SELECT {s1} AS "state1", {s2} AS "state2", * '
-                                 f'FROM pes LEFT JOIN geo USING(id) WHERE '
-                                 f'ABS(eng_{s2}_{s2} - eng_{s1}_{s1}) <= {tol}')
                 else:
-                    query.append(f'SELECT {s1} AS "state1", {s2} AS "state2", * '
-                                 f'FROM apes LEFT JOIN geo USING(id) WHERE '
-                                 f'ABS(eng_{s2} - eng_{s1}) <= {tol}')
-        query = '\nUNION\n'.join(query) + ';'
-        res = cur.execute(query).fetchall()
-        con.close()
+                    query = (f'SELECT * FROM {table} LEFT JOIN geo USING(id)'
+                             f'WHERE ABS({state_name[s2]} - {state_name[s1]}) <= {tol};')
+                res = cur.execute(query).fetchall()
+                # add id, energies, geo. split geo into geo_length subarrays
+                # so there are 3 columns
+                pesgeo[frozenset({s1, s2})] = [{
+                    'id': entry[0], 'energies': entry[1:-geo_length],
+                    'geo': np.split(np.array(entry[-geo_length:]), geo_length//3)
+                } for entry in res]
 
-        # format result
+        # format result and set text
+        self.window().text.clear()
+        # column names in the pes/apes table, but don't include id
+        col_names = [col[0] for col in cur.execute(
+            f'SELECT name FROM pragma_table_info("{table}");'
+        ).fetchall() if col[0] != 'id']
+        # html to add to self.window().text
+        html = f'<pre>{description}</pre><br/>'
+        for states, entries in pesgeo.items():
+            html += (f'<pre>STATE <b>{" & ".join(str(state) for state in states)}</b> '
+                     '{</pre><br/>')
+            for id_, energies, geo in [entry.values() for entry in entries]:
+                header = []
+                values = []
+                # format col_names and energies into a table
+                # if relevant state, make energy header and value bold
+                for i, name in enumerate(col_names):
+                    if name in [state_name[state] for state in states]:
+                        header.append(f'<b>{name:>15}</b>')
+                        values.append('<b>' + '{: .8e}'.format(energies[i]) + '</b>')
+                    else:
+                        header.append('{:>15}'.format(name))
+                        values.append('{: .8e}'.format(energies[i]))
+                html += (f'<pre>    ID: {id_}</pre>'
+                         f'<pre>    {"-"*16*len(header)}</pre>'
+                         f'<pre>    {" ".join(header)}</pre>'
+                         f'<pre>    {" ".join(values)}</pre>'
+                         f'<pre>    {"-"*16*len(header)}</pre>')
+                # format the geometries
+                for atom_name, xyz in zip(atom_names, geo):
+                    # format array, remove brackets at start and end
+                    xyz = np.array2string(xyz, formatter={
+                        'float': lambda x: '{: .8e}'.format(x)
+                    })[1:-1]
+                    html += f'<pre>    {atom_name:>3} {xyz}</pre>'
+                html += '<br/>'
+            html += '<pre>}</pre><br/>'
+        con.close()
         self.window().tab_widget.setCurrentIndex(0)
-        if res:
-            post=f'Query was:\n{query}'
-        else:
-            post=f'No rows returned\n\nQuery was:\n{query}'
-        self.window().text.writeTable(res, header=[col[0] for col in cur.description],
-                                      pre=description, post=post)
+        self.window().text.appendHtml(html)
 
     def checkdb(self):
         '''

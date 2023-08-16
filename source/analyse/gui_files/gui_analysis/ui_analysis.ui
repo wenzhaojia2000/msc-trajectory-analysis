@@ -353,8 +353,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>356</width>
-         <height>354</height>
+         <width>248</width>
+         <height>236</height>
         </rect>
        </property>
        <attribute name="label">
@@ -488,7 +488,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
+         <width>330</width>
          <height>383</height>
         </rect>
        </property>
@@ -806,7 +806,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
+         <width>277</width>
          <height>666</height>
         </rect>
        </property>
@@ -948,8 +948,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>287</width>
-                <height>85</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
              </widget>
@@ -1019,8 +1019,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>287</width>
-                <height>85</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
              </widget>
@@ -1166,20 +1166,20 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="findpes_box">
+         <widget class="QGroupBox" name="ddpesgeo_box">
           <property name="title">
            <string>PES/Geo Options</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_10">
            <item row="0" column="0">
-            <widget class="QLabel" name="findpes_type_label">
+            <widget class="QLabel" name="ddpesgeo_type_label">
              <property name="text">
               <string>Type</string>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QComboBox" name="findpes_type">
+            <widget class="QComboBox" name="ddpesgeo_type">
              <item>
               <property name="text">
                <string>Diabatic PES</string>
@@ -1193,7 +1193,7 @@
             </widget>
            </item>
            <item row="1" column="0" colspan="2">
-            <widget class="QRadioButton" name="findpes_int">
+            <widget class="QRadioButton" name="ddpesgeo_int">
              <property name="text">
               <string>Find energies between interval</string>
              </property>
@@ -1203,14 +1203,14 @@
             </widget>
            </item>
            <item row="2" column="0" colspan="2">
-            <widget class="QRadioButton" name="findpes_mat">
+            <widget class="QRadioButton" name="ddpesgeo_mat">
              <property name="text">
               <string>Find matching energies in other states</string>
              </property>
             </widget>
            </item>
            <item row="3" column="0" colspan="2">
-            <widget class="QFrame" name="findpes_int_box">
+            <widget class="QFrame" name="ddpesgeo_int_box">
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>
@@ -1219,7 +1219,7 @@
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
               <item row="1" column="0">
-               <widget class="QLabel" name="findpes_emax_label">
+               <widget class="QLabel" name="ddpesgeo_emax_label">
                 <property name="text">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;max&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
@@ -1229,7 +1229,7 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="findpes_emin_label">
+               <widget class="QLabel" name="ddpesgeo_emin_label">
                 <property name="text">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;min&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
@@ -1239,14 +1239,14 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="findpes_emax">
+               <widget class="QDoubleSpinBox" name="ddpesgeo_emax">
                 <property name="decimals">
                  <number>3</number>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="findpes_emin">
+               <widget class="QDoubleSpinBox" name="ddpesgeo_emin">
                 <property name="decimals">
                  <number>3</number>
                 </property>
@@ -1256,7 +1256,7 @@
             </widget>
            </item>
            <item row="4" column="0" colspan="2">
-            <widget class="QFrame" name="findpes_mat_box">
+            <widget class="QFrame" name="ddpesgeo_mat_box">
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>
@@ -1265,21 +1265,21 @@
              </property>
              <layout class="QGridLayout" name="gridLayout_9">
               <item row="0" column="0">
-               <widget class="QLabel" name="findpes_state_label">
+               <widget class="QLabel" name="ddpesgeo_state_label">
                 <property name="text">
                  <string>State</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="findpes_tol_label">
+               <widget class="QLabel" name="ddpesgeo_tol_label">
                 <property name="text">
                  <string>Tolerance</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="findpes_tol">
+               <widget class="QDoubleSpinBox" name="ddpesgeo_tol">
                 <property name="decimals">
                  <number>4</number>
                 </property>
@@ -1295,7 +1295,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QSpinBox" name="findpes_state">
+               <widget class="QSpinBox" name="ddpesgeo_state">
                 <property name="minimum">
                  <number>1</number>
                 </property>
