@@ -269,6 +269,12 @@
           </item>
           <item>
            <widget class="QRadioButton" name="analconv_5">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="statusTip">
+             <string>[Currently unavailable until norm is fixed.]</string>
+            </property>
             <property name="text">
              <string>Plot time-evolution of norm of wavefunction</string>
             </property>
@@ -358,11 +364,14 @@
          <layout class="QVBoxLayout" name="analint_layout" stretch="0,0,0,0">
           <item>
            <widget class="QRadioButton" name="analint_1">
-            <property name="text">
-             <string>Analyse Step Size</string>
+            <property name="enabled">
+             <bool>false</bool>
             </property>
-            <property name="checked">
-             <bool>true</bool>
+            <property name="statusTip">
+             <string>[Currently unavailable until rdsteps is fixed.]</string>
+            </property>
+            <property name="text">
+             <string>Analyse step size</string>
             </property>
            </widget>
           </item>
@@ -373,6 +382,9 @@
             </property>
             <property name="text">
              <string>Look at timing file</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -798,7 +810,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-312</y>
+         <y>0</y>
          <width>335</width>
          <height>666</height>
         </rect>

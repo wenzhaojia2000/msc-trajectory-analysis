@@ -57,7 +57,7 @@ class AnalysisConvergence(AnalysisTab):
                 case 'analconv_5': # plot coordinate expectation values
                     self.runCmd('rdcheck', 'qdq', '1', '1')
                 case 'analconv_6': # plot time-evolution of norm of wavefunction
-                    self.runCmd('norm')
+                    raise NotImplementedError
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
             self.window().tab_widget.setCurrentIndex(0)

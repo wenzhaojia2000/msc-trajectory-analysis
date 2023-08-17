@@ -48,7 +48,7 @@ class AnalysisIntegrator(AnalysisTab):
         try:
             match radio_name:
                 case 'analint_1': # analyse step size
-                    self.runCmd('rdsteps')
+                    raise NotImplementedError
                 case 'analint_2': # look at timing file
                     self.rdtiming()
                 case 'analint_3': # plot update file step size
