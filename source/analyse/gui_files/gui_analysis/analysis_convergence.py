@@ -7,6 +7,7 @@ Convergence' tab of the analysis GUI. A class instance of this should be
 included in the main UI class.
 '''
 
+import re
 from PyQt5 import QtWidgets, QtCore
 from .ui_base import AnalysisTab
 
@@ -22,7 +23,7 @@ class AnalysisConvergence(AnalysisTab):
         '''
         super()._activate(push_name='analconv_push', layout_name='analconv_layout',
                           options={
-                              1: 'gpop_box'
+                              0: 'ortho_box', 1: 'gpop_box'
                           })
 
     def findObjects(self, push_name:str, box_name:str):
@@ -31,6 +32,8 @@ class AnalysisConvergence(AnalysisTab):
         properties.
         '''
         super().findObjects(push_name, box_name)
+        # group box 'orthonormality options'
+        self.ortho_state = self.findChild(QtWidgets.QSpinBox, 'ortho_state')
         # group box 'grid population options'
         self.gpop_nz = self.findChild(QtWidgets.QSpinBox, 'gpop_nz')
         self.gpop_dof = self.findChild(QtWidgets.QSpinBox, 'gpop_dof')
@@ -46,8 +49,8 @@ class AnalysisConvergence(AnalysisTab):
                       if radio.isChecked()][0]
         try:
             match radio_name:
-                case 'analconv_1': # check orthonormality of spfs in psi file
-                    self.runCmd('ortho')
+                case 'analconv_1': # check orthonormality of spfs
+                    self.ortho()
                 case 'analconv_2': # plot populations of grid edges
                     self.rdgpop()
                 case 'analconv_3': # plot populations of states
@@ -62,6 +65,56 @@ class AnalysisConvergence(AnalysisTab):
             # switch to text tab to see if there are any other explanatory errors
             self.window().tab_widget.setCurrentIndex(0)
             QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
+
+    def ortho(self):
+        '''
+        Reads the command output of using ortho, which is expected to be in
+        the format, where each cell is a float,
+
+        [directory and mode information]
+        # Time[fs]  state  total   mode( 1) ...   mode( n)
+          t.1       sA     tot.A1  o.A1     ...   o.An
+          t.1       sB     tot.B1  o.B1     ...   o.Bn
+          ...       ...    ...     ...      ...   ...
+          t.1       sX     tot.X1  o.X1     ...   o.Xn
+
+          t.2       sA     tot.A2  o.A2     ...   o.An
+          ...       ...    ...     ...      ...   ...
+          t.m       sX     tot.Xm  o.Xm     ...   o.Xm
+        # Time[fs]  state  total   mode( 1) ... mode( n)
+
+        where t is time, sA, sB, ... sX are the states, 1 ... n are the modes,
+        and o is the orthonormality error for that state and mode.
+
+        Plots the orthonormality error for each mode for a given state.
+        '''
+        output = self.runCmd('ortho')
+        # get the relevant data we want (between the two #, but skip first line
+        # which is the header - see docstring)
+        match = re.findall(r'(?<=#).*?\n(.*)(?=#)', output, flags=re.DOTALL)
+        if len(match) != 1:
+            raise ValueError('Invalid ortho output?')
+        # assemble data matrix
+        self.window().data = self.readFloats(match[0].split('\n'))
+
+        # only select rows where state column equals user selected state, using
+        # a numpy mask
+        state = self.ortho_state.value()
+        arr = self.window().data[self.window().data[:, 1] == state, :]
+        if arr.size == 0:
+            max_state = self.window().data[:, 1].max()
+            raise ValueError(f'Selected state {state} is larger than highest '
+                             f'state {int(max_state)}')
+        # number of modes is number of columns minus time, state, total columns
+        n_modes = self.window().data.shape[1] - 3
+        # start plotting
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='SPF Orthonormality',
+                                      bottom='Time (fs)', left='Orthonormality error')
+        self.window().graph.plot(arr[:, 0], arr[:, 2], name='Total', pen='k')
+        for i in range(1, n_modes+1):
+            self.window().graph.plot(arr[:, 0], arr[:, 2+i],
+                                     name=f'Mode {i}', pen=(i-1, n_modes))
 
     def rdgpop(self):
         '''

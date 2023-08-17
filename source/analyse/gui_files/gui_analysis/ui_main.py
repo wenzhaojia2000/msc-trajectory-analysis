@@ -188,6 +188,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             'ausw.log',
             'dengen.log', # ^dengen
             'gwptraj.log',
+            'norm.log',
+            'ortho.log',
             'showd1d.log',
             'showsys.log',
             # xyz files
