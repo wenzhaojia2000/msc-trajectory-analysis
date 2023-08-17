@@ -387,7 +387,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <layout class="QVBoxLayout" name="analint_layout" stretch="0,0,0,0">
+         <layout class="QVBoxLayout" name="analint_layout" stretch="0,0,0,0,0">
           <item>
            <widget class="QRadioButton" name="analint_1">
             <property name="enabled">
@@ -404,7 +404,7 @@
           <item>
            <widget class="QRadioButton" name="analint_2">
             <property name="statusTip">
-             <string>Reads ./timing and plots a bar chart.</string>
+             <string>Reads ./timing and plots a bar chart of various subroutine calls.</string>
             </property>
             <property name="text">
              <string>Look at timing file</string>
@@ -417,6 +417,16 @@
           <item>
            <widget class="QRadioButton" name="analint_3">
             <property name="statusTip">
+             <string>Reads ./speed and plots the CPU and real time between each output.</string>
+            </property>
+            <property name="text">
+             <string>Plot speed file</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="analint_4">
+            <property name="statusTip">
              <string>Executes rdupdate and plots the step size.</string>
             </property>
             <property name="text">
@@ -425,7 +435,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="analint_4">
+           <widget class="QRadioButton" name="analint_5">
             <property name="statusTip">
              <string>Executes rdupdate and plots the error.</string>
             </property>

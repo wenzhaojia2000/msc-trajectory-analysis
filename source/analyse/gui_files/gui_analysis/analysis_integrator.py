@@ -51,9 +51,11 @@ class AnalysisIntegrator(AnalysisTab):
                     raise NotImplementedError
                 case 'analint_2': # look at timing file
                     self.rdtiming()
-                case 'analint_3': # plot update file step size
+                case 'analint_3': # plot speed file
+                    self.rdspeed()
+                case 'analint_4': # plot update file step size
                     self.rdupdate(plot_error=False)
-                case 'analint_4': # plot update file errors
+                case 'analint_5': # plot update file errors
                     self.rdupdate(plot_error=True)
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
@@ -84,16 +86,16 @@ class AnalysisIntegrator(AnalysisTab):
         if filepath.is_file() is False:
             raise FileNotFoundError('Cannot find timing file in directory')
         with open(filepath, mode='r', encoding='utf-8') as f:
-            text = f.read()
+            txt = f.read()
         # split after 'Clock' and before 'Total' (see docstring), so we have
         # three strings, with the middle being the data
-        splits = re.split(r'(?<=Clock)\n|\n(?=Total)', text, flags=re.IGNORECASE)
+        splits = re.split(r'(?<=Clock)\n|\n(?=Total)', txt, flags=re.IGNORECASE)
         if len(splits) != 3:
             raise ValueError('Invalid timing file')
-        pre, text, post = splits
+        pre, txt, post = splits
 
         arr = []
-        for line in text.split('\n'):
+        for line in txt.split('\n'):
             # should find one name and five floats per line (name, a, b, c, d,
             # e). after splitting by whitespace, floats should take up the last
             # 5 entries, and the name take up the rest
@@ -119,8 +121,8 @@ class AnalysisIntegrator(AnalysisTab):
         self.window().data = arr
 
         # display sorted text
-        text = "\n".join([line[-1] for line in self.window().data])
-        self.window().text.setPlainText(f'{pre}\n{text}\n\n{post}')
+        txt = "\n".join([line[-1] for line in self.window().data])
+        self.window().text.setPlainText(f'{pre}\n{txt}\n\n{post}')
         self.window().graph.reset()
 
         # start plotting
@@ -143,6 +145,34 @@ class AnalysisIntegrator(AnalysisTab):
         for i, label in enumerate(names):
             ticks.append((positions[i], label))
         self.window().graph.getAxis('left').setTicks([ticks])
+
+    def rdspeed(self):
+        '''
+        '''
+        filepath = self.window().cwd/'speed'
+        if filepath.is_file() is False:
+            raise FileNotFoundError('Cannot find speed file in directory')
+        # assemble data matrix
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            txt = f.read()
+            self.window().text.setPlainText(txt)
+            # for readFloats to work the date column in the file needs to be
+            # removed. match any dates and replace them with nothing
+            date_regex = r'\w{3} +\d{1,2} +\d{2}:\d{2}:\d{2}'
+            lines = re.sub(date_regex, '', txt).split('\n')
+            try:
+                self.window().data = self.readFloats(lines, 5, ignore_regex=r'^#')
+            except ValueError:
+                raise ValueError('Invalid speed file') from None
+
+        # start plotting
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='Speed file',
+                                      bottom='Propagation time (fs)', left='Time (s)')
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
+                                 name='CPU time', pen='r')
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 3],
+                                 name='Real time', pen='b')
 
     def rdupdate(self, plot_error:bool=False):
         '''

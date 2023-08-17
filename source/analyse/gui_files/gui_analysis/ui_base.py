@@ -205,8 +205,8 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             except ValueError:
                 pass
             else:
-                if (floats_per_line and len(matches) == floats_per_line)\
-                or (floats_per_line is None and len(matches) > 0):
+                if (floats_per_line and len(floats) == floats_per_line)\
+                or (floats_per_line is None and len(floats) > 0):
                     data.append(floats)
         if len(data) == 0:
             # nothing found
