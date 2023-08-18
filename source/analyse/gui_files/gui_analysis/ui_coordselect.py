@@ -71,7 +71,7 @@ class CoordinateSelector(QtWidgets.QWidget):
     def xcoord(self) -> str:
         '''
         Returns the mode label of the x coordinate chosen by the user. If
-        no mode is chosen to be 'x', returns None.
+        no DOF is chosen to be 'x', returns None.
         '''
         for i in range(self.layout().count()):
             label = self.layout().itemAt(i).widget().findChild(QtWidgets.QLabel)
@@ -83,7 +83,7 @@ class CoordinateSelector(QtWidgets.QWidget):
     def ycoord(self) -> str:
         '''
         Returns the mode label of the y coordinate chosen by the user. If
-        no mode is chosen to be 'y', returns None.
+        no DOF is chosen to be 'y', returns None.
         '''
         for i in range(self.layout().count()):
             label = self.layout().itemAt(i).widget().findChild(QtWidgets.QLabel)
@@ -140,7 +140,7 @@ class CoordinateSelector(QtWidgets.QWidget):
             ddmode_section = re.findall(r'nmode\n(.*)\nend-nmode',
                                         txt, re.DOTALL|re.IGNORECASE)
             if spf_section:
-                # a list of modes are displayed before an = sign, with a list
+                # a list of dofs are displayed before an = sign, with a list
                 # of digits after (maybe including id keyword). these may be on
                 # a single line. match the part before =, split by comma, then
                 # remove surrounding whitespace.
@@ -149,7 +149,7 @@ class CoordinateSelector(QtWidgets.QWidget):
                                       for mode in line.split(',')\
                                       if mode.strip() not in ['packets', 'gwp_type']]
             elif ddmode_section:
-                # a list of modes are the first entry in each line (assuming
+                # a list of dofs are the first entry in each line (assuming
                 # mode names can't have whitespace in them).
                 modes = re.findall(r'^\s*\S+', ddmode_section[0], re.MULTILINE)
             else:
@@ -159,14 +159,14 @@ class CoordinateSelector(QtWidgets.QWidget):
     def addModeLabels(self):
         '''
         Adds a mode subwidget for each mode label in self.mode_labels. The
-        user can then change the coordinate (x, y, or value) for that mode
+        user can then change the coordinate (x, y, or value) for that DOF
         in the subwidget.
 
-        If there is only one mode, it must be the 'x' coordinate.
+        If there is only one DOF, it must be the 'x' coordinate.
         '''
         if self.mode_labels:
             for i, mode in enumerate(self.mode_labels):
-                # add a new widget for each mode
+                # add a new widget for each dof
                 mode_widget = QtWidgets.QWidget(self)
                 mode_layout = QtWidgets.QHBoxLayout(mode_widget)
                 mode_layout.setContentsMargins(QtCore.QMargins(0,0,0,0))
@@ -200,10 +200,10 @@ class CoordinateSelector(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def selectChanged(self):
         '''
-        Allows the user to change the selection for each mode depending on the
+        Allows the user to change the selection for each DOF depending on the
         following constraints:
-            - If the mode is changed to 'value', allow the user to modify the
-              value spinbox, otherwise disable it.
+            - If the coordinate is changed to 'value', allow the user to modify
+              the value spinbox, otherwise disable it.
             - There can only be one 'x' coordinate and one 'y' coordinate at
               a single time.
         '''

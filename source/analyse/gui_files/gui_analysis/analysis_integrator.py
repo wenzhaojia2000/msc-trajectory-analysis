@@ -148,6 +148,20 @@ class AnalysisIntegrator(AnalysisTab):
 
     def rdspeed(self):
         '''
+        Reads the speed file, which is expected to be in the format
+
+        # [Lines beginning with # are ignored.]
+        t.1     cpu.1     d.1     date.1    real[s].1    real[h].1
+        t.2     cpu.2     d.2     date.2    real[s].2    real[h].2
+        ...     ...       ...     ...       ...          ...
+        t.m     cpu.m     d.m     date.m    real[s].m    real[h].m
+
+        where t is the propagation time, cpu is the CPU time, d is the delta in
+        CPU time (ignored), date is the date in form MMM DD hh:mm:ss (ignored),
+        and real is the real time in seconds [s] or hours [h] (hours ignored).
+
+        Plots the CPU time and real time against propagation time (d can be
+        re-calculated using a dy/dx transform in the context menu in pyqtgraph).
         '''
         filepath = self.window().cwd/'speed'
         if filepath.is_file() is False:
@@ -158,7 +172,7 @@ class AnalysisIntegrator(AnalysisTab):
             self.window().text.setPlainText(txt)
             # for readFloats to work the date column in the file needs to be
             # removed. match any dates and replace them with nothing
-            date_regex = r'\w{3} +\d{1,2} +\d{2}:\d{2}:\d{2}'
+            date_regex = r'\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}'
             lines = re.sub(date_regex, '', txt).split('\n')
             try:
                 self.window().data = self.readFloats(lines, 5, ignore_regex=r'^#')

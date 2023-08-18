@@ -53,13 +53,11 @@ class AnalysisConvergence(AnalysisTab):
                     self.ortho()
                 case 'analconv_2': # plot populations of grid edges
                     self.rdgpop()
-                case 'analconv_3': # plot populations of states
-                    self.runCmd('rdcheck', 'spop')
-                case 'analconv_4': # plot populations of natural orbitals
+                case 'analconv_3': # plot populations of natural orbitals
                     self.runCmd('rdcheck', 'natpop', '1', '1')
-                case 'analconv_5': # plot coordinate expectation values
+                case 'analconv_4': # plot coordinate expectation values
                     self.runCmd('rdcheck', 'qdq', '1', '1')
-                case 'analconv_6': # plot time-evolution of norm of wavefunction
+                case 'analconv_5': # plot time-evolution of norm of wavefunction
                     raise NotImplementedError
         except Exception as e:
             # switch to text tab to see if there are any other explanatory errors
