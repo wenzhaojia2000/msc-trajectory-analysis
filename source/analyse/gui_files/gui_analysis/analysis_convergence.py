@@ -23,7 +23,8 @@ class AnalysisConvergence(AnalysisTab):
         '''
         super()._activate(push_name='analconv_push', layout_name='analconv_layout',
                           options={
-                              0: 'ortho_box', 1: 'gpop_box', 2: 'natpop_box'
+                              0: 'ortho_box', 1: 'gpop_box', 2: 'natpop_box',
+                              3: 'qdq_box'
                           })
 
     def findObjects(self, push_name:str, box_name:str):
@@ -40,6 +41,9 @@ class AnalysisConvergence(AnalysisTab):
         # group box 'natural population options'
         self.natpop_mode = self.findChild(QtWidgets.QSpinBox, 'natpop_mode')
         self.natpop_state = self.findChild(QtWidgets.QSpinBox, 'natpop_state')
+        # group box 'coordinate expectation options'
+        self.qdq_dof = self.findChild(QtWidgets.QSpinBox, 'qdq_dof')
+        self.qdq_state = self.findChild(QtWidgets.QSpinBox, 'qdq_state')
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -59,7 +63,7 @@ class AnalysisConvergence(AnalysisTab):
                 case 'analconv_3': # plot populations of natural orbitals
                     self.natpop()
                 case 'analconv_4': # plot coordinate expectation values
-                    self.runCmd('rdcheck', 'qdq', '1', '1')
+                    self.qdq()
                 case 'analconv_5': # plot time-evolution of norm of wavefunction
                     raise NotImplementedError
         except Exception as e:
@@ -172,9 +176,9 @@ class AnalysisConvergence(AnalysisTab):
 
         where t is time and x is the natural population.
 
-        Plots the populations of natural orbitals.
+        Plots the populations of natural orbitals against time.
         '''
-        # additional arguments for rdgpop
+        # additional arguments for natpop
         natpop_options = [
             str(self.natpop_mode.value()),
             str(self.natpop_state.value())
@@ -193,3 +197,41 @@ class AnalysisConvergence(AnalysisTab):
                                       bottom='Time (fs)', left='Weight')
         self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='Population', pen='r')
+
+    def qdq(self):
+        '''
+        Reads the file output of using rdcheck qdq, which is expected to be
+        in the format, where each cell is a float,
+
+        t.1    q.1    dq.1
+        t.2    q.2    dq.2
+        ...    ...    ...
+        t.m    q.m    dq.m
+
+        where t is time, q is the expectation of the coordinate value <q> and
+        dq is the width of the <q>, <dq>.
+
+        Plots <q> and <dq> against time.
+        '''
+        # additional arguments for qdq
+        qdq_options = [
+            str(self.qdq_dof.value()),
+            str(self.qdq_state.value())
+        ]
+        self.runCmd('rdcheck', 'qdq', *qdq_options)
+
+        # find filename of command output
+        filepath = self.window().cwd/f'qdq_{"_".join(qdq_options)}.pl'
+        # assemble data matrix
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            self.window().data = self.readFloats(f, 3)
+
+        # start plotting
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='Coordinate expectation values',
+                                      bottom='Time (fs)',
+                                      left=f'DOF {self.qdq_dof.value()}')
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
+                                 name='q', pen='r')
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
+                                 name='dq', pen='b')

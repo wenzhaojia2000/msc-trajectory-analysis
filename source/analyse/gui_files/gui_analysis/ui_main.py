@@ -183,6 +183,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             # pl files
             'gpop.pl',
             'natpop_*.pl',
+            'qdq_*.pl',
             'spop.pl', # ^rdcheck spop (same function as statepop)
             'spectrum.pl',
             # log files

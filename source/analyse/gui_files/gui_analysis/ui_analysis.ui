@@ -222,9 +222,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-55</y>
+         <y>-203</y>
          <width>335</width>
-         <height>459</height>
+         <height>557</height>
         </rect>
        </property>
        <attribute name="label">
@@ -376,7 +376,7 @@
               <string>Mode</string>
              </property>
              <property name="buddy">
-              <cstring>gpop_nz</cstring>
+              <cstring>natpop_mode</cstring>
              </property>
             </widget>
            </item>
@@ -393,12 +393,55 @@
               <string>State</string>
              </property>
              <property name="buddy">
-              <cstring>gpop_dof</cstring>
+              <cstring>natpop_state</cstring>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
             <widget class="QSpinBox" name="natpop_state">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="qdq_box">
+          <property name="title">
+           <string>Coordinate expectation options</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_15">
+           <item row="0" column="0">
+            <widget class="QLabel" name="qdq_dof_label">
+             <property name="text">
+              <string>DOF</string>
+             </property>
+             <property name="buddy">
+              <cstring>qdq_dof</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSpinBox" name="qdq_dof">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="qdq_state_label">
+             <property name="text">
+              <string>State</string>
+             </property>
+             <property name="buddy">
+              <cstring>qdq_state</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="qdq_state">
              <property name="minimum">
               <number>1</number>
              </property>
@@ -1012,6 +1055,9 @@
              <property name="text">
               <string>State</string>
              </property>
+             <property name="buddy">
+              <cstring>den2d_state</cstring>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -1025,6 +1071,9 @@
             <widget class="QLabel" name="den2d_coord_label">
              <property name="text">
               <string>Coordinate Selection</string>
+             </property>
+             <property name="buddy">
+              <cstring>den2d_coord_box</cstring>
              </property>
             </widget>
            </item>
@@ -1073,12 +1122,18 @@
              <property name="text">
               <string>Type</string>
              </property>
+             <property name="buddy">
+              <cstring>showpes_type</cstring>
+             </property>
             </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="showpes_state_label">
              <property name="text">
               <string>State</string>
+             </property>
+             <property name="buddy">
+              <cstring>showpes_state</cstring>
              </property>
             </widget>
            </item>
@@ -1093,6 +1148,9 @@
             <widget class="QLabel" name="showpes_coord_label">
              <property name="text">
               <string>Coordinate selection</string>
+             </property>
+             <property name="buddy">
+              <cstring>showpes_coord_box</cstring>
              </property>
             </widget>
            </item>
@@ -1222,6 +1280,9 @@
              <property name="text">
               <string>Task</string>
              </property>
+             <property name="buddy">
+              <cstring>gwptraj_task</cstring>
+             </property>
             </widget>
            </item>
            <item row="0" column="1" rowspan="2">
@@ -1242,6 +1303,9 @@
             <widget class="QLabel" name="gwptraj_mode_label">
              <property name="text">
               <string>Mode</string>
+             </property>
+             <property name="buddy">
+              <cstring>gwptraj_mode</cstring>
              </property>
             </widget>
            </item>
@@ -1265,6 +1329,9 @@
             <widget class="QLabel" name="ddpesgeo_type_label">
              <property name="text">
               <string>Type</string>
+             </property>
+             <property name="buddy">
+              <cstring>ddpesgeo_type</cstring>
              </property>
             </widget>
            </item>
@@ -1316,6 +1383,9 @@
                 <property name="textFormat">
                  <enum>Qt::RichText</enum>
                 </property>
+                <property name="buddy">
+                 <cstring>ddpesgeo_emax</cstring>
+                </property>
                </widget>
               </item>
               <item row="0" column="0">
@@ -1325,6 +1395,9 @@
                 </property>
                 <property name="textFormat">
                  <enum>Qt::RichText</enum>
+                </property>
+                <property name="buddy">
+                 <cstring>ddpesgeo_emin</cstring>
                 </property>
                </widget>
               </item>
@@ -1359,12 +1432,18 @@
                 <property name="text">
                  <string>State</string>
                 </property>
+                <property name="buddy">
+                 <cstring>ddpesgeo_state</cstring>
+                </property>
                </widget>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="ddpesgeo_tol_label">
                 <property name="text">
                  <string>Tolerance</string>
+                </property>
+                <property name="buddy">
+                 <cstring>ddpesgeo_tol</cstring>
                 </property>
                </widget>
               </item>
@@ -1603,17 +1682,6 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="line_wrap">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Line wrap</string>
-   </property>
-   <property name="statusTip">
-    <string>In text view, break long lines into multiple lines.</string>
-   </property>
-  </action>
   <action name="no_command">
    <property name="checkable">
     <bool>true</bool>
@@ -1678,31 +1746,78 @@
  <tabstops>
   <tabstop>dir_edit</tabstop>
   <tabstop>dir_edit_dialog</tabstop>
-  <tabstop>toolbox</tabstop>
+  <tabstop>tab_widget</tabstop>
+  <tabstop>output_text</tabstop>
+  <tabstop>media_ffstart</tabstop>
+  <tabstop>media_play</tabstop>
+  <tabstop>media_ffend</tabstop>
+  <tabstop>media_scrubber</tabstop>
+  <tabstop>media_speed</tabstop>
   <tabstop>analconv_1</tabstop>
+  <tabstop>ortho_state</tabstop>
   <tabstop>analconv_2</tabstop>
+  <tabstop>gpop_nz</tabstop>
+  <tabstop>gpop_dof</tabstop>
   <tabstop>analconv_3</tabstop>
+  <tabstop>natpop_mode</tabstop>
+  <tabstop>natpop_state</tabstop>
   <tabstop>analconv_4</tabstop>
+  <tabstop>qdq_dof</tabstop>
+  <tabstop>qdq_state</tabstop>
+  <tabstop>analconv_5</tabstop>
   <tabstop>analconv_push</tabstop>
   <tabstop>analint_1</tabstop>
   <tabstop>analint_2</tabstop>
+  <tabstop>timing_sort</tabstop>
   <tabstop>analint_3</tabstop>
   <tabstop>analint_4</tabstop>
+  <tabstop>analint_5</tabstop>
   <tabstop>analint_push</tabstop>
   <tabstop>analres_1</tabstop>
   <tabstop>analres_2</tabstop>
-  <tabstop>analres_3</tabstop>
+  <tabstop>autocol_prefac</tabstop>
   <tabstop>autocol_emin</tabstop>
   <tabstop>autocol_emax</tabstop>
   <tabstop>autocol_unit</tabstop>
   <tabstop>autocol_tau</tabstop>
   <tabstop>autocol_iexp</tabstop>
+  <tabstop>autocol_filfunc</tabstop>
+  <tabstop>analres_3</tabstop>
   <tabstop>analres_push</tabstop>
   <tabstop>analsys_1</tabstop>
+  <tabstop>den1d_dof</tabstop>
+  <tabstop>den1d_state</tabstop>
   <tabstop>analsys_2</tabstop>
+  <tabstop>den2d_state</tabstop>
+  <tabstop>den2d_coord_box</tabstop>
   <tabstop>analsys_3</tabstop>
   <tabstop>analsys_4</tabstop>
+  <tabstop>showpes_type</tabstop>
+  <tabstop>showpes_state</tabstop>
+  <tabstop>showpes_coord_box</tabstop>
   <tabstop>analsys_push</tabstop>
+  <tabstop>analdd_1</tabstop>
+  <tabstop>analdd_2</tabstop>
+  <tabstop>gwptraj_task</tabstop>
+  <tabstop>gwptraj_mode</tabstop>
+  <tabstop>analdd_3</tabstop>
+  <tabstop>ddpesgeo_type</tabstop>
+  <tabstop>ddpesgeo_int</tabstop>
+  <tabstop>ddpesgeo_mat</tabstop>
+  <tabstop>ddpesgeo_emin</tabstop>
+  <tabstop>ddpesgeo_emax</tabstop>
+  <tabstop>ddpesgeo_state</tabstop>
+  <tabstop>ddpesgeo_tol</tabstop>
+  <tabstop>analdd_4</tabstop>
+  <tabstop>clean_testint</tabstop>
+  <tabstop>clean_rmdup</tabstop>
+  <tabstop>clean_mindb</tabstop>
+  <tabstop>clean_rmfail</tabstop>
+  <tabstop>clean_rminterp</tabstop>
+  <tabstop>analdd_5</tabstop>
+  <tabstop>sql_allowwrite</tabstop>
+  <tabstop>sql_query</tabstop>
+  <tabstop>analdd_push</tabstop>
  </tabstops>
  <resources/>
  <connections/>
