@@ -182,7 +182,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             'trajectory',
             # pl files
             'gpop.pl',
-            'spop.pl', # ^rdcheck -spop (same function as statepop)
+            'natpop_*.pl',
+            'spop.pl', # ^rdcheck spop (same function as statepop)
             'spectrum.pl',
             # log files
             'ausw.log',

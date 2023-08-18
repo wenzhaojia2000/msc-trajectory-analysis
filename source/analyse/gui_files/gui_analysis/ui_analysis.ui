@@ -222,9 +222,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-55</y>
          <width>335</width>
-         <height>361</height>
+         <height>459</height>
         </rect>
        </property>
        <attribute name="label">
@@ -356,6 +356,49 @@
            </item>
            <item row="1" column="1">
             <widget class="QSpinBox" name="gpop_dof">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="natpop_box">
+          <property name="title">
+           <string>Natural population options</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_14">
+           <item row="0" column="0">
+            <widget class="QLabel" name="natpop_mode_label">
+             <property name="text">
+              <string>Mode</string>
+             </property>
+             <property name="buddy">
+              <cstring>gpop_nz</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSpinBox" name="natpop_mode">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="natpop_state_label">
+             <property name="text">
+              <string>State</string>
+             </property>
+             <property name="buddy">
+              <cstring>gpop_dof</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="natpop_state">
              <property name="minimum">
               <number>1</number>
              </property>
@@ -528,7 +571,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-29</y>
          <width>335</width>
          <height>383</height>
         </rect>
@@ -846,7 +889,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-312</y>
          <width>335</width>
          <height>666</height>
         </rect>

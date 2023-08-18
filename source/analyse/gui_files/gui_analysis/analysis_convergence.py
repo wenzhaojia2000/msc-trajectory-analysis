@@ -23,7 +23,7 @@ class AnalysisConvergence(AnalysisTab):
         '''
         super()._activate(push_name='analconv_push', layout_name='analconv_layout',
                           options={
-                              0: 'ortho_box', 1: 'gpop_box'
+                              0: 'ortho_box', 1: 'gpop_box', 2: 'natpop_box'
                           })
 
     def findObjects(self, push_name:str, box_name:str):
@@ -37,6 +37,9 @@ class AnalysisConvergence(AnalysisTab):
         # group box 'grid population options'
         self.gpop_nz = self.findChild(QtWidgets.QSpinBox, 'gpop_nz')
         self.gpop_dof = self.findChild(QtWidgets.QSpinBox, 'gpop_dof')
+        # group box 'natural population options'
+        self.natpop_mode = self.findChild(QtWidgets.QSpinBox, 'natpop_mode')
+        self.natpop_state = self.findChild(QtWidgets.QSpinBox, 'natpop_state')
 
     @QtCore.pyqtSlot()
     @AnalysisTab.freezeContinue
@@ -54,7 +57,7 @@ class AnalysisConvergence(AnalysisTab):
                 case 'analconv_2': # plot populations of grid edges
                     self.rdgpop()
                 case 'analconv_3': # plot populations of natural orbitals
-                    self.runCmd('rdcheck', 'natpop', '1', '1')
+                    self.natpop()
                 case 'analconv_4': # plot coordinate expectation values
                     self.runCmd('rdcheck', 'qdq', '1', '1')
                 case 'analconv_5': # plot time-evolution of norm of wavefunction
@@ -156,3 +159,37 @@ class AnalysisConvergence(AnalysisTab):
         self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 4],
                                  name='Basis (end)',
                                  pen={'color': 'b', 'style': QtCore.Qt.DashLine})
+
+    def natpop(self):
+        '''
+        Reads the file output of using rdcheck natpop, which is expected to be
+        in the format, where each cell is a float,
+
+        t.1    x.1
+        t.2    x.2
+        ...    ...
+        t.m    x.m
+
+        where t is time and x is the natural population.
+
+        Plots the populations of natural orbitals.
+        '''
+        # additional arguments for rdgpop
+        natpop_options = [
+            str(self.natpop_mode.value()),
+            str(self.natpop_state.value())
+        ]
+        self.runCmd('rdcheck', 'natpop', *natpop_options)
+
+        # find filename of command output
+        filepath = self.window().cwd/f'natpop_{"_".join(natpop_options)}.pl'
+        # assemble data matrix
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            self.window().data = self.readFloats(f, 2)
+
+        # start plotting
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='Natural population',
+                                      bottom='Time (fs)', left='Weight')
+        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
+                                 name='Population', pen='r')
