@@ -25,7 +25,7 @@ class CustomPlotWidget(pg.PlotWidget):
     def __init__(self, *args, **kwargs):
         '''
         Constructor method.
-        
+
         For the widget to work, requires the following to be present in
         self.window():
             - self.window().data

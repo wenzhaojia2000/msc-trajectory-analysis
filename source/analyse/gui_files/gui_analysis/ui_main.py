@@ -64,6 +64,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.dir_edit = self.findChild(QtWidgets.QLineEdit, 'dir_edit')
         self.dir_edit_dialog = self.findChild(QtWidgets.QToolButton, 'dir_edit_dialog')
         self.tab_widget = self.findChild(QtWidgets.QTabWidget, 'tab_widget')
+        self.add_flags_box = self.findChild(QtWidgets.QGroupBox, 'add_flags_box')
+        self.add_flags = self.findChild(QtWidgets.QLineEdit, 'add_flags')
         self.text = self.findChild(CustomTextWidget, 'output_text')
         self.graph = self.findChild(CustomPlotWidget, 'output_plot')
         # menu items
@@ -71,6 +73,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.exit = self.findChild(QtWidgets.QAction, 'action_exit')
         self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
         self.cleanup = self.findChild(QtWidgets.QAction, 'cleanup')
+        self.allow_add_flags = self.findChild(QtWidgets.QAction, 'allow_add_flags')
         self.no_command = self.findChild(QtWidgets.QAction, 'no_command')
         # animated plot items
         self.media_box = self.findChild(QtWidgets.QWidget, 'output_media_box')
@@ -86,7 +89,8 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.ffstart.setIcon(self.getIcon('SP_MediaSkipBackward'))
         self.play.setIcon(self.getIcon('SP_MediaPlay'))
         self.ffend.setIcon(self.getIcon('SP_MediaSkipForward'))
-        # hide scrubber and media buttons initially
+        # hide additional flags box, scrubber and media buttons initially
+        self.add_flags_box.hide()
         self.media_box.hide()
 
     def connectObjects(self):
@@ -97,6 +101,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
         self.menu_dir.triggered.connect(self.chooseDirectory)
         self.cleanup.triggered.connect(self.cleanupDirectory)
+        self.allow_add_flags.triggered.connect(self.showAddFlags)
         self.exit.triggered.connect(lambda: self.close())
         self.ffstart.clicked.connect(lambda: self.scrubber.setValue(self.scrubber.minimum()))
         self.ffend.clicked.connect(lambda: self.scrubber.setValue(self.scrubber.maximum()))
@@ -219,6 +224,17 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
                 self, 'No files found',
                 'Found no analysis output files in this directory.'
             )
+
+    @QtCore.pyqtSlot()
+    def showAddFlags(self):
+        '''
+        Shows/hides the additional flags box if user allows additional flags
+        in the menu.
+        '''
+        if self.allow_add_flags.isChecked():
+            self.add_flags_box.show()
+        else:
+            self.add_flags_box.hide()
 
     @QtCore.pyqtSlot()
     def startStopAnimation(self):

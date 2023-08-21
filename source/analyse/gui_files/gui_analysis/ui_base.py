@@ -8,6 +8,7 @@ as the superclass which the main UI and UI tabs extend from.
 
 from abc import ABC, ABCMeta, abstractmethod
 from functools import wraps
+from shlex import split as shsplit
 from typing import Callable
 import re
 import subprocess
@@ -223,8 +224,15 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         'ls', '-A', '/home/'. The keyword input is the a string to feed to
         stdin after the command execution.
         '''
+        # change from tuple to list
+        args = list(args)
         if self.window().no_command.isChecked():
+            # don't do anything if user has set no command mode
             return None
+        if self.window().allow_add_flags.isChecked():
+            # add additional flags set by the user
+            args.extend(shsplit(self.window().add_flags.text()))
+
         try:
             p = subprocess.run(args, universal_newlines=True, input=input,
                                cwd=self.window().cwd, check=True,

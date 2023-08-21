@@ -19,7 +19,7 @@ class CustomTextWidget(QtWidgets.QPlainTextEdit):
     def __init__(self, *args, **kwargs):
         '''
         Constructor method.
-        
+
         For the widget to work, requires the following to be present in
         self.window():
             - QLineEdit self.window().dir_edit (and self.window().cwd)
