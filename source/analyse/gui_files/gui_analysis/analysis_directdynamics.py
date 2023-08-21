@@ -23,7 +23,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analdd_push', layout_name='analdd_layout',
+        super()._activate(push_name='analdd_push', radio_box_name='analdd_radio',
                           options={
                               1: 'gwptraj_box', 2: 'ddpesgeo_box',
                               3: 'clean_box', 4: 'sql_box'

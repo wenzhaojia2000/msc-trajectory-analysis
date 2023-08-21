@@ -21,7 +21,7 @@ class AnalysisConvergence(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analconv_push', layout_name='analconv_layout',
+        super()._activate(push_name='analconv_push', radio_box_name='analconv_radio',
                           options={
                               0: 'ortho_box', 1: 'gpop_box', 2: 'natpop_box',
                               3: 'qdq_box'

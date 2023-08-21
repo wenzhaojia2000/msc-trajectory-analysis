@@ -23,7 +23,7 @@ class AnalysisSystem(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analsys_push', layout_name='analsys_layout',
+        super()._activate(push_name='analsys_push', radio_box_name='analsys_radio',
                           options={
                               0: 'den1d_box', 1: 'den2d_box', 3: 'showpes_box'
                           })

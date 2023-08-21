@@ -48,15 +48,14 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
     which is a child of the main window's toolbar. The tab should have the
     following:
 
-    - One QBoxLayout instance, containing at least one radio button
-          (Recommend QVBoxLayout)
+    - One QWidget instance, containing at least one radio button
     - One QPushButton instance (confirming radio button selection)
 
     Also consists of convenience functions which may aid with writing analysis
     functions.
     '''
 
-    def _activate(self, push_name:str, layout_name:str, options:dict={},
+    def _activate(self, push_name:str, radio_box_name:str, options:dict={},
                   *args, **kwargs):
         '''
         Activation method. This method is similar to __init__, but for promoted
@@ -65,8 +64,8 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         call when everything is loaded, ie. in the class for AnalysisMain to
         add functionality to the analysis tab.
 
-        Requires the object name of its QPushButton and QBoxLayout instances
-        as mentioned in the class docstring.
+        Requires the object name of its QPushButton (push_name) and QWidget
+        (radio_box_name) instances as mentioned in the class docstring.
 
         May optionally give an options dictionary, which allows the user to
         select further options when a radio button is selected. The dictionary
@@ -80,25 +79,25 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
                 raise ValueError(f'QGroupBox with name {box_name} was not found')
         self.options = options
 
-        self.findObjects(push_name, layout_name)
+        self.findObjects(push_name, radio_box_name)
         self.connectObjects()
         # should automatically hide the boxes that correspond to an option
         # that isn't selected
         self.optionSelected()
 
-    def findObjects(self, push_name:str, layout_name:str):
+    def findObjects(self, push_name:str, radio_box_name:str):
         '''
         A possibly incomplete implementation of the findObjects method. Any
         derived class can add further implementation to this method by using
-        `super().findObjects(push_name, box_name)`.
+        `super().findObjects(push_name, radio_box_name)`.
         '''
         self.push = self.findChild(QtWidgets.QPushButton, push_name)
         if self.push is None:
             raise ValueError(f'QPushButton with name {push_name} was not found')
-        layout = self.findChild(QtWidgets.QBoxLayout, layout_name)
-        if layout is None:
-            raise ValueError(f'QBoxLayout with name {layout_name} was not found')
-        self.radio = [layout.itemAt(i).widget() for i in range(layout.count())]
+        radio_box = self.findChild(QtWidgets.QWidget, radio_box_name)
+        if radio_box is None:
+            raise ValueError(f'QWidget with name {radio_box_name} was not found')
+        self.radio = radio_box.findChildren(QtWidgets.QRadioButton)
 
     def connectObjects(self):
         '''

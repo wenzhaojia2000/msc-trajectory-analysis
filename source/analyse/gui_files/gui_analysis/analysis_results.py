@@ -20,7 +20,7 @@ class AnalysisResults(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analres_push', layout_name='analres_layout',
+        super()._activate(push_name='analres_push', radio_box_name='analres_radio',
                           options={
                               1: 'autocol_box'
                           })

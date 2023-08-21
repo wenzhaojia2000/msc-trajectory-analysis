@@ -67,64 +67,66 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QVBoxLayout" name="analconv_layout" stretch="0,0,0,0,0">
-          <item>
-           <widget class="QRadioButton" name="analconv_1">
-            <property name="statusTip">
-             <string>Executes ortho and plots SPF (SPDO) orthonormalities.</string>
-            </property>
-            <property name="text">
-             <string>Check orthonormality of SPFs</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analconv_2">
-            <property name="statusTip">
-             <string>Executes rdgpop and plots grid populations.</string>
-            </property>
-            <property name="text">
-             <string>Plot populations of grid edges</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analconv_3">
-            <property name="statusTip">
-             <string>Executes rdcheck natpop and plots natural populations.</string>
-            </property>
-            <property name="text">
-             <string>Plot populations of natural orbitals</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analconv_4">
-            <property name="statusTip">
-             <string>Executes rdcheck qdq and plots ⟨q⟩ and ⟨dq⟩.</string>
-            </property>
-            <property name="text">
-             <string>Plot coordinate expectation values</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analconv_5">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="statusTip">
-             <string>[Currently unavailable until norm is fixed.]</string>
-            </property>
-            <property name="text">
-             <string>Plot time-evolution of norm of wavefunction</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QWidget" name="analconv_radio" native="true">
+          <layout class="QVBoxLayout" name="analconv_layout" stretch="0,0,0,0,0">
+           <item>
+            <widget class="QRadioButton" name="analconv_1">
+             <property name="statusTip">
+              <string>Executes ortho and plots SPF (SPDO) orthonormalities.</string>
+             </property>
+             <property name="text">
+              <string>Check orthonormality of SPFs</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analconv_2">
+             <property name="statusTip">
+              <string>Executes rdgpop and plots grid populations.</string>
+             </property>
+             <property name="text">
+              <string>Plot populations of grid edges</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analconv_3">
+             <property name="statusTip">
+              <string>Executes rdcheck natpop and plots natural populations.</string>
+             </property>
+             <property name="text">
+              <string>Plot populations of natural orbitals</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analconv_4">
+             <property name="statusTip">
+              <string>Executes rdcheck qdq and plots ⟨q⟩ and ⟨dq⟩.</string>
+             </property>
+             <property name="text">
+              <string>Plot coordinate expectation values</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analconv_5">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="statusTip">
+              <string>[Currently unavailable until norm is fixed.]</string>
+             </property>
+             <property name="text">
+              <string>Plot time-evolution of norm of wavefunction</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item>
          <spacer name="analconv_vspacer">
@@ -314,64 +316,66 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <layout class="QVBoxLayout" name="analint_layout" stretch="0,0,0,0,0">
-          <item>
-           <widget class="QRadioButton" name="analint_1">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="statusTip">
-             <string>[Currently unavailable until rdsteps is fixed.]</string>
-            </property>
-            <property name="text">
-             <string>Analyse step size</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analint_2">
-            <property name="statusTip">
-             <string>Reads ./timing and plots a bar chart of various subroutine calls.</string>
-            </property>
-            <property name="text">
-             <string>Look at timing file</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analint_3">
-            <property name="statusTip">
-             <string>Reads ./speed and plots the CPU and real time between each output.</string>
-            </property>
-            <property name="text">
-             <string>Plot speed file</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analint_4">
-            <property name="statusTip">
-             <string>Executes rdupdate and plots the step size.</string>
-            </property>
-            <property name="text">
-             <string>Plot update file step size</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analint_5">
-            <property name="statusTip">
-             <string>Executes rdupdate and plots the error.</string>
-            </property>
-            <property name="text">
-             <string>Plot update file errors</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QWidget" name="analint_radio" native="true">
+          <layout class="QVBoxLayout" name="analint_layout" stretch="0,0,0,0,0">
+           <item>
+            <widget class="QRadioButton" name="analint_1">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="statusTip">
+              <string>[Currently unavailable until rdsteps is fixed.]</string>
+             </property>
+             <property name="text">
+              <string>Analyse step size</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analint_2">
+             <property name="statusTip">
+              <string>Reads ./timing and plots a bar chart of various subroutine calls.</string>
+             </property>
+             <property name="text">
+              <string>Look at timing file</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analint_3">
+             <property name="statusTip">
+              <string>Reads ./speed and plots the CPU and real time between each output.</string>
+             </property>
+             <property name="text">
+              <string>Plot speed file</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analint_4">
+             <property name="statusTip">
+              <string>Executes rdupdate and plots the step size.</string>
+             </property>
+             <property name="text">
+              <string>Plot update file step size</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analint_5">
+             <property name="statusTip">
+              <string>Executes rdupdate and plots the error.</string>
+             </property>
+             <property name="text">
+              <string>Plot update file errors</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item>
          <spacer name="analint_vspacer">
@@ -465,38 +469,40 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <layout class="QVBoxLayout" name="analres_layout" stretch="0,0,0">
-          <item>
-           <widget class="QRadioButton" name="analres_1">
-            <property name="statusTip">
-             <string>Reads ./auto and plots the autocorrelation function.</string>
-            </property>
-            <property name="text">
-             <string>Plot autocorrelation function</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analres_2">
-            <property name="statusTip">
-             <string>Executes autospec and plots the spectrum.</string>
-            </property>
-            <property name="text">
-             <string>Plot spectrum from autocorrelation function</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analres_3">
-            <property name="text">
-             <string>Plot eigenvalues from matrix diagonalisation</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QWidget" name="analres_radio" native="true">
+          <layout class="QVBoxLayout" name="analres_layout" stretch="0,0,0">
+           <item>
+            <widget class="QRadioButton" name="analres_1">
+             <property name="statusTip">
+              <string>Reads ./auto and plots the autocorrelation function.</string>
+             </property>
+             <property name="text">
+              <string>Plot autocorrelation function</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analres_2">
+             <property name="statusTip">
+              <string>Executes autospec and plots the spectrum.</string>
+             </property>
+             <property name="text">
+              <string>Plot spectrum from autocorrelation function</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analres_3">
+             <property name="text">
+              <string>Plot eigenvalues from matrix diagonalisation</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item>
          <spacer name="analres_vspacer">
@@ -783,51 +789,53 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <layout class="QVBoxLayout" name="analsys_layout" stretch="0,0,0,0">
-          <item>
-           <widget class="QRadioButton" name="analsys_1">
-            <property name="statusTip">
-             <string>Executes showd1d and plots an animated density evolution.</string>
-            </property>
-            <property name="text">
-             <string>Plot 1D density evolution</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analsys_2">
-            <property name="statusTip">
-             <string>Executes showsys -nopes and plots an animated 2D density evolution.</string>
-            </property>
-            <property name="text">
-             <string>Plot 2D density evolution</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analsys_3">
-            <property name="statusTip">
-             <string>Executes statepop and plots populations for each state.</string>
-            </property>
-            <property name="text">
-             <string>Plot diabatic state population</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analsys_4">
-            <property name="statusTip">
-             <string>Executes showsys -pes and plots a line/contour plot for the PES along the specified coordinates.</string>
-            </property>
-            <property name="text">
-             <string>Plot potential energy surface</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QWidget" name="analsys_radio" native="true">
+          <layout class="QVBoxLayout" name="analsys_layout" stretch="0,0,0,0">
+           <item>
+            <widget class="QRadioButton" name="analsys_1">
+             <property name="statusTip">
+              <string>Executes showd1d and plots an animated density evolution.</string>
+             </property>
+             <property name="text">
+              <string>Plot 1D density evolution</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analsys_2">
+             <property name="statusTip">
+              <string>Executes showsys -nopes and plots an animated 2D density evolution.</string>
+             </property>
+             <property name="text">
+              <string>Plot 2D density evolution</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analsys_3">
+             <property name="statusTip">
+              <string>Executes statepop and plots populations for each state.</string>
+             </property>
+             <property name="text">
+              <string>Plot diabatic state population</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analsys_4">
+             <property name="statusTip">
+              <string>Executes showsys -pes and plots a line/contour plot for the PES along the specified coordinates.</string>
+             </property>
+             <property name="text">
+              <string>Plot potential energy surface</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item>
          <spacer name="analsys_vspacer">
@@ -1041,61 +1049,63 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
-         <layout class="QVBoxLayout" name="analdd_layout">
-          <item>
-           <widget class="QRadioButton" name="analdd_1">
-            <property name="statusTip">
-             <string>Reads ./log and plots the number of direct dynamics calculations per timestep.</string>
-            </property>
-            <property name="text">
-             <string>Plot DD calculation rate from log</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analdd_2">
-            <property name="statusTip">
-             <string>Executes gwptraj and plots GWP basis function trajectories.</string>
-            </property>
-            <property name="text">
-             <string>Plot wavepacket basis function trajectories</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analdd_3">
-            <property name="statusTip">
-             <string>Finds entries in the pes or apes and geo table in database which satisfy a certain criterion.</string>
-            </property>
-            <property name="text">
-             <string>Inspect PES/Geometry in database</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analdd_4">
-            <property name="statusTip">
-             <string>Executes checkdb.</string>
-            </property>
-            <property name="text">
-             <string>Check or clean database</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="analdd_5">
-            <property name="statusTip">
-             <string>Query database using an SQL command.</string>
-            </property>
-            <property name="text">
-             <string>Query database</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QWidget" name="analdd_radio" native="true">
+          <layout class="QVBoxLayout" name="analdd_layout">
+           <item>
+            <widget class="QRadioButton" name="analdd_1">
+             <property name="statusTip">
+              <string>Reads ./log and plots the number of direct dynamics calculations per timestep.</string>
+             </property>
+             <property name="text">
+              <string>Plot DD calculation rate from log</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analdd_2">
+             <property name="statusTip">
+              <string>Executes gwptraj and plots GWP basis function trajectories.</string>
+             </property>
+             <property name="text">
+              <string>Plot wavepacket basis function trajectories</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analdd_3">
+             <property name="statusTip">
+              <string>Finds entries in the pes or apes and geo table in database which satisfy a certain criterion.</string>
+             </property>
+             <property name="text">
+              <string>Inspect PES/Geometry in database</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analdd_4">
+             <property name="statusTip">
+              <string>Executes checkdb.</string>
+             </property>
+             <property name="text">
+              <string>Check or clean database</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="analdd_5">
+             <property name="statusTip">
+              <string>Query database using an SQL command.</string>
+             </property>
+             <property name="text">
+              <string>Query database</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item>
          <spacer name="analdd_vspacer">
