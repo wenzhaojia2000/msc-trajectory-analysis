@@ -8,7 +8,7 @@ included in the main UI class.
 '''
 
 import re
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from pyqtgraph import BarGraphItem
 from .ui_base import AnalysisTab
 
@@ -22,6 +22,13 @@ class AnalysisIntegrator(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
+        methods = {
+            0: self.rdsteps,                   # analyse step size
+            1: self.rdtiming,                  # look at timing file
+            2: self.rdspeed,                   # plot speed file
+            3: (lambda: self.rdupdate(False)), # plot update file step size
+            4: (lambda: self.rdupdate(True))   # plot update file errors
+        }
         options = {
             1: 'timing_box'
         }
@@ -31,7 +38,7 @@ class AnalysisIntegrator(AnalysisTab):
         }
         super()._activate(
             push_name='analint_push', radio_box_name='analint_radio',
-            options=options, required_files=required_files
+            methods=methods, options=options, required_files=required_files
         )
 
     def findObjects(self, push_name:str, box_name:str):
@@ -43,31 +50,12 @@ class AnalysisIntegrator(AnalysisTab):
         # group box 'timing file options'
         self.timing_sort = self.findChild(QtWidgets.QComboBox, 'timing_sort')
 
-    @QtCore.pyqtSlot()
-    @AnalysisTab.freezeContinue
-    def continuePushed(self):
+    def rdsteps(self):
         '''
-        Action to perform when the tab's 'Continue' button is pushed.
+        Not implemented as the corresponding quantics analysis program is
+        currently broken.
         '''
-        # get objectName() of checked radio button (there should only be 1)
-        radio_name = [radio.objectName() for radio in self.radio
-                      if radio.isChecked()][0]
-        try:
-            match radio_name:
-                case 'analint_1': # analyse step size
-                    raise NotImplementedError
-                case 'analint_2': # look at timing file
-                    self.rdtiming()
-                case 'analint_3': # plot speed file
-                    self.rdspeed()
-                case 'analint_4': # plot update file step size
-                    self.rdupdate(plot_error=False)
-                case 'analint_5': # plot update file errors
-                    self.rdupdate(plot_error=True)
-        except Exception as e:
-            # switch to text tab to see if there are any other explanatory errors
-            self.window().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
+        raise NotImplementedError
 
     def rdtiming(self):
         '''

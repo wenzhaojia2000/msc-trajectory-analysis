@@ -23,6 +23,13 @@ class AnalysisDirectDynamics(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
+        methods = {
+            0: self.calcrate, # plot dd calculation rate in log
+            1: self.gwptraj,  # plot wavepacket basis function trajectories
+            2: self.ddpesgeo, # inspect PES/APES in database
+            3: self.checkdb,  # check or clean database
+            4: self.querydb   # query database
+        }
         options = {
             1: 'gwptraj_box', 2: 'ddpesgeo_box', 3: 'clean_box', 4: 'sql_box'
         }
@@ -32,7 +39,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         }
         super()._activate(
             push_name='analdd_push', radio_box_name='analdd_radio',
-            options=options, required_files=required_files
+            methods=methods, options=options, required_files=required_files
         )
         # one of the boxes inside ddpesgeo should be hidden
         self.ddpesgeoOptionChanged()
@@ -118,32 +125,6 @@ class AnalysisDirectDynamics(AnalysisTab):
         # hand-picked arbitary constants that magically work
         adj_height = 8 + 15 * self.sql_query.document().size().height()
         self.sql_query.setMinimumHeight(int(adj_height))
-
-    @QtCore.pyqtSlot()
-    @AnalysisTab.freezeContinue
-    def continuePushed(self):
-        '''
-        Action to perform when the tab's 'Continue' button is pushed.
-        '''
-        # get objectName() of checked radio button (there should only be 1)
-        radio_name = [radio.objectName() for radio in self.radio
-                      if radio.isChecked()][0]
-        try:
-            match radio_name:
-                case 'analdd_1': # plot dd calculation rate in log
-                    self.calcrate()
-                case 'analdd_2': # plot wavepacket basis function trajectories
-                    self.gwptraj()
-                case 'analdd_3': # inspect PES/APES in database
-                    self.ddpesgeo()
-                case 'analdd_4': # check or clean database
-                    self.checkdb()
-                case 'analdd_5': # query database
-                    self.querydb()
-        except Exception as e:
-            # switch to text tab to see if there are any other explanatory errors
-            self.window().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
 
     def calcrate(self):
         '''

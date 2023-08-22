@@ -21,6 +21,13 @@ class AnalysisConvergence(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
+        methods = {
+            0: self.ortho,  # check orthonormality of spfs
+            1: self.rdgpop, # plot populations of grid edges
+            2: self.natpop, # plot populations of natural orbitals
+            3: self.qdq,    # plot coordinate expectation values
+            4: self.norm    # plot time-evolution of norm of wavefunction
+        }
         options = {
             0: 'ortho_box', 1: 'gpop_box', 2: 'natpop_box', 3: 'qdq_box'
         }
@@ -28,9 +35,10 @@ class AnalysisConvergence(AnalysisTab):
             0: ['psi'], 1: ['gridpop'],  2: ['check'], 3: ['check'],
             4: ['psi']
         }
+
         super()._activate(
             push_name='analconv_push', radio_box_name='analconv_radio',
-            options=options, required_files=required_files
+            methods=methods, options=options, required_files=required_files
         )
 
     def findObjects(self, push_name:str, box_name:str):
@@ -50,32 +58,6 @@ class AnalysisConvergence(AnalysisTab):
         # group box 'coordinate expectation options'
         self.qdq_dof = self.findChild(QtWidgets.QSpinBox, 'qdq_dof')
         self.qdq_state = self.findChild(QtWidgets.QSpinBox, 'qdq_state')
-
-    @QtCore.pyqtSlot()
-    @AnalysisTab.freezeContinue
-    def continuePushed(self):
-        '''
-        Action to perform when the tab's 'Continue' button is pushed.
-        '''
-        # get objectName() of checked radio button (there should only be 1)
-        radio_name = [radio.objectName() for radio in self.radio
-                      if radio.isChecked()][0]
-        try:
-            match radio_name:
-                case 'analconv_1': # check orthonormality of spfs
-                    self.ortho()
-                case 'analconv_2': # plot populations of grid edges
-                    self.rdgpop()
-                case 'analconv_3': # plot populations of natural orbitals
-                    self.natpop()
-                case 'analconv_4': # plot coordinate expectation values
-                    self.qdq()
-                case 'analconv_5': # plot time-evolution of norm of wavefunction
-                    raise NotImplementedError
-        except Exception as e:
-            # switch to text tab to see if there are any other explanatory errors
-            self.window().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
 
     def ortho(self):
         '''
@@ -241,3 +223,10 @@ class AnalysisConvergence(AnalysisTab):
                                  name='q', pen='r')
         self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
                                  name='dq', pen='b')
+
+    def norm(self):
+        '''
+        Not implemented as the corresponding quantics analysis program is
+        currently broken.
+        '''
+        raise NotImplementedError

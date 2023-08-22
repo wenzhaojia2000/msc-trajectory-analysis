@@ -7,11 +7,11 @@ as the superclass which the main UI and UI tabs extend from.
 '''
 
 from abc import ABC, ABCMeta, abstractmethod
-from functools import wraps
 from shlex import split as shsplit
-from typing import Callable
 import re
 import subprocess
+import sys
+import traceback
 import numpy as np
 
 from PyQt5 import QtWidgets, QtCore
@@ -55,8 +55,8 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
     functions.
     '''
 
-    def _activate(self, push_name:str, radio_box_name:str, options:dict={},
-                  required_files={}, *args, **kwargs):
+    def _activate(self, push_name:str, radio_box_name:str, methods:dict,
+                  options:dict={}, required_files:dict={}):
         '''
         Activation method. This method is similar to __init__, but for promoted
         widgets, the initialiser is called before any of its children are
@@ -66,22 +66,24 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
 
         Requires the object name of its QPushButton (push_name) and QWidget
         (radio_box_name) instances as mentioned in the class docstring.
-
-        May optionally give an options dictionary, which allows the user to
-        select further options when a radio button is selected. The dictionary
-        has key: radio button index (int) and value: name of the QGroupBox to
-        show when that button is selected.
-
-        May optionally give a required_files dictionary, which disables the
-        continue button from being clicked if the filename(s) associated with
-        the radio button is not found. The dictionary has key: radio button
-        index (int) and value: list of filenames to find.
+        
+        The dictionary parameters all have the radio button index (int) as the
+        key, **in the order shown in Qt Designer**. For the value:
+            - methods (manadatory) has the method name to call when the
+              corresponding radio button is selected and continue is pushed.
+            - options (optional) has the name of the QGroupBox to show which
+              allows the user to select further options when a radio button
+              is selected.
+            - required_files (optional) has a *list* of filenames that are
+              required for the method. If they are not found, the continue
+              button is disabled (with text giving the missing file(s)).
         '''
         # for speed, turn box names into the objects themselves
         for index, box_name in options.items():
             options[index] = self.findChild(QtWidgets.QGroupBox, box_name)
             if options[index] is None:
                 raise ValueError(f'QGroupBox with name {box_name} was not found')
+        self.methods = methods
         self.options = options
         self.required_files = required_files
 
@@ -140,43 +142,40 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             elif index in self.options:
                 self.options[index].hide()
 
-    @abstractmethod
     @QtCore.pyqtSlot()
     def continuePushed(self):
         '''
-        Action to perform when the tab's push button is pushed.
+        Action to perform when the tab's push button is pushed, which is to
+        call the associated method given in self.methods. You should not need
+        to override this function.
         '''
-
-    @staticmethod
-    def freezeContinue(func:Callable) -> Callable:
-        '''
-        Freezes the tab's push button given until func is executed. Can be used
-        as a decorator using @AnalysisTab.freezeContinue or as a function using
-        AnalysisTab.freezeContinue(func)(self, *args, **kwargs).
-
-        Note: If func raises an exception, continue will not be restored. You
-        should ensure func does not crash by eg. wrapping it in a try-except
-        block.
-        '''
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            '''
-            Modification of the original function func.
-            '''
-            # set cursor to wait cursor
-            QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-            self.push.setEnabled(False)
-            self.push.setText('Busy')
-            # force pyqt to update button immediately (otherwise pyqt leaves
-            # this until the end and nothing happens)
-            self.push.repaint()
-            value = func(self, *args, **kwargs)
-            # func executed, now can unfreeze
-            QtWidgets.QApplication.restoreOverrideCursor()
-            self.push.setEnabled(True)
-            self.push.setText('Continue')
-            return value
-        return wrapper
+        # get index of checked radio button (there should only be 1)
+        radio_index = [index for index, radio in enumerate(self.radio)
+                       if radio.isChecked()][0]
+        # set cursor to wait cursor
+        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+        # freeze push button until method is executed
+        self.push.setEnabled(False)
+        self.push.setText('Busy')
+        # force pyqt to update button immediately (otherwise pyqt leaves
+        # this until the next event loop and nothing happens)
+        self.push.repaint()
+        try:
+            # call method associated with index
+            self.methods[radio_index]()
+        except Exception as e:
+            # any exceptions raised by the method would not allow continue to
+            # be restored, softlocking the program -- need to catch all
+            # exceptions. print the full traceback to stderr for developer,
+            # show an error message for the user
+            print(traceback.format_exc(), file=sys.stderr)
+            # switch to text tab to see if there are any other explanatory errors
+            self.window().tab_widget.setCurrentIndex(0)
+            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
+        # method executed, now can unfreeze
+        QtWidgets.QApplication.restoreOverrideCursor()
+        self.push.setEnabled(True)
+        self.push.setText('Continue')
 
     @staticmethod
     def readFloats(iterable:list, floats_per_line:int=None,
@@ -229,7 +228,7 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
                              'output to see what went wrong?')
         return np.array(data)
 
-    def checkFileExists(self, index):
+    def checkFileExists(self, index:int):
         '''
         Disables the Continue button from being clicked if the filename
         associated with the analysis command (self.required_files) is not found.

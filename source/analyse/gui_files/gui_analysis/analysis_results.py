@@ -20,6 +20,11 @@ class AnalysisResults(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
+        methods = {
+            0: self.rdauto,   # plot autocorrelation function
+            1: self.autospec, # plot spectrum from autocorrelation function
+            2: self.rdeigval  # plot eigenvalues from matrix diagonalisation
+        }
         options = {
             1: 'autocol_box'
         }
@@ -28,7 +33,7 @@ class AnalysisResults(AnalysisTab):
         }
         super()._activate(
             push_name='analres_push', radio_box_name='analres_radio',
-            options=options, required_files=required_files
+            methods=methods, options=options, required_files=required_files
         )
 
     def findObjects(self, push_name:str, box_name:str):
@@ -53,28 +58,6 @@ class AnalysisResults(AnalysisTab):
         super().connectObjects()
         # in autocorrelation box, allow damping order to change if tau nonzero
         self.autocol_tau.valueChanged.connect(self.autocolOptionChanged)
-
-    @QtCore.pyqtSlot()
-    @AnalysisTab.freezeContinue
-    def continuePushed(self):
-        '''
-        Action to perform when the tab's 'Continue' button is pushed.
-        '''
-        # get objectName() of checked radio button (there should only be 1)
-        radio_name = [radio.objectName() for radio in self.radio
-                      if radio.isChecked()][0]
-        try:
-            match radio_name:
-                case 'analres_1': # plot autocorrelation function
-                    self.rdauto()
-                case 'analres_2': # plot spectrum from autocorrelation function
-                    self.autospec()
-                case 'analres_3': # plot eigenvalues from matrix diagonalisation
-                    self.runCmd('rdeigval')
-        except Exception as e:
-            # switch to text tab to see if there are any other explanatory errors
-            self.window().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
     def autocolOptionChanged(self):
@@ -172,3 +155,8 @@ class AnalysisResults(AnalysisTab):
         self.window().graph.plot(self.window().data[:, 0],
                                  self.window().data[:, self.autocol_func.currentIndex()%3+1],
                                  name='Autocorrelation spectrum', pen='r')
+
+    def rdeigval():
+        '''
+        '''
+        raise NotImplementedError

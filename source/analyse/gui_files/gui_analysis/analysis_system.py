@@ -23,6 +23,12 @@ class AnalysisSystem(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
+        methods = {
+            0: self.showd1d,  # plot 1d density evolution
+            1: self.showd2d,  # plot 2d density evolution
+            2: self.statepop, # plot diabatic state population
+            3: self.showpes,  # plot potential energy surface
+        }
         options = {
             0: 'den1d_box', 1: 'den2d_box', 3: 'showpes_box'
         }
@@ -32,7 +38,7 @@ class AnalysisSystem(AnalysisTab):
         }
         super()._activate(
             push_name='analsys_push', radio_box_name='analsys_radio',
-            options=options, required_files=required_files
+            methods=methods, options=options, required_files=required_files
         )
 
     def findObjects(self, push_name:str, box_name:str):
@@ -72,30 +78,6 @@ class AnalysisSystem(AnalysisTab):
             self.showpes_coord_box.setFixedHeight(
                 2 + min(self.showpes_coord.height(), 130)
             )
-
-    @QtCore.pyqtSlot()
-    @AnalysisTab.freezeContinue
-    def continuePushed(self):
-        '''
-        Action to perform when the tab's 'Continue' button is pushed.
-        '''
-        # get objectName() of checked radio button (there should only be 1)
-        radio_name = [radio.objectName() for radio in self.radio
-                      if radio.isChecked()][0]
-        try:
-            match radio_name:
-                case 'analsys_1': # plot 1d density evolution
-                    self.showd1d()
-                case 'analsys_2': # plot 2d density evolution
-                    self.showd2d()
-                case 'analsys_3': # plot diabatic state population
-                    self.statepop()
-                case 'analsys_4': # plot potential energy surface
-                    self.showpes()
-        except Exception as e:
-            # switch to text tab to see if there are any other explanatory errors
-            self.window().tab_widget.setCurrentIndex(0)
-            QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
 
     def showd1d(self):
         '''
