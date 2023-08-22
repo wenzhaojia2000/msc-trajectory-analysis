@@ -20,10 +20,16 @@ class AnalysisResults(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analres_push', radio_box_name='analres_radio',
-                          options={
-                              1: 'autocol_box'
-                          })
+        options = {
+            1: 'autocol_box'
+        }
+        required_files = {
+            0: ['auto'], 1: ['auto'], 2: ['eigval']
+        }
+        super()._activate(
+            push_name='analres_push', radio_box_name='analres_radio',
+            options=options, required_files=required_files
+        )
 
     def findObjects(self, push_name:str, box_name:str):
         '''
@@ -96,8 +102,6 @@ class AnalysisResults(AnalysisTab):
         file anyway.
         '''
         filepath = self.window().cwd/'auto'
-        if filepath.is_file() is False:
-            raise FileNotFoundError('Cannot find auto file in directory')
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().text.setPlainText(f.read())

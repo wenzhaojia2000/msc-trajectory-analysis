@@ -59,7 +59,7 @@
          <x>0</x>
          <y>0</y>
          <width>335</width>
-         <height>557</height>
+         <height>577</height>
         </rect>
        </property>
        <attribute name="label">
@@ -329,6 +329,9 @@
              <property name="text">
               <string>Analyse step size</string>
              </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -340,7 +343,7 @@
               <string>Look at timing file</string>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -460,8 +463,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
-         <height>383</height>
+         <width>330</width>
+         <height>403</height>
         </rect>
        </property>
        <attribute name="label">
@@ -780,8 +783,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
-         <height>666</height>
+         <width>277</width>
+         <height>686</height>
         </rect>
        </property>
        <attribute name="label">
@@ -936,8 +939,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>287</width>
-                <height>85</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
              </widget>
@@ -1016,8 +1019,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>287</width>
-                <height>85</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
              </widget>
@@ -1040,8 +1043,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
-         <height>877</height>
+         <width>322</width>
+         <height>897</height>
         </rect>
        </property>
        <attribute name="label">

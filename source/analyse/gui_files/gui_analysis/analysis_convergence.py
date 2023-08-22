@@ -21,11 +21,17 @@ class AnalysisConvergence(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analconv_push', radio_box_name='analconv_radio',
-                          options={
-                              0: 'ortho_box', 1: 'gpop_box', 2: 'natpop_box',
-                              3: 'qdq_box'
-                          })
+        options = {
+            0: 'ortho_box', 1: 'gpop_box', 2: 'natpop_box', 3: 'qdq_box'
+        }
+        required_files = {
+            0: ['psi'], 1: ['gridpop'],  2: ['check'], 3: ['check'],
+            4: ['psi']
+        }
+        super()._activate(
+            push_name='analconv_push', radio_box_name='analconv_radio',
+            options=options, required_files=required_files
+        )
 
     def findObjects(self, push_name:str, box_name:str):
         '''

@@ -22,10 +22,17 @@ class AnalysisIntegrator(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analint_push', radio_box_name='analint_radio',
-                          options={
-                              1: 'timing_box'
-                          })
+        options = {
+            1: 'timing_box'
+        }
+        required_files = {
+            0: ['steps'], 1: ['timing'], 2: ['speed'], 3: ['update'],
+            4: ['update']
+        }
+        super()._activate(
+            push_name='analint_push', radio_box_name='analint_radio',
+            options=options, required_files=required_files
+        )
 
     def findObjects(self, push_name:str, box_name:str):
         '''
@@ -83,8 +90,6 @@ class AnalysisIntegrator(AnalysisTab):
         the timing file sorted by the selected column in the text tab.
         '''
         filepath = self.window().cwd/'timing'
-        if filepath.is_file() is False:
-            raise FileNotFoundError('Cannot find timing file in directory')
         with open(filepath, mode='r', encoding='utf-8') as f:
             txt = f.read()
         # split after 'Clock' and before 'Total' (see docstring), so we have
@@ -164,8 +169,6 @@ class AnalysisIntegrator(AnalysisTab):
         re-calculated using a dy/dx transform in the context menu in pyqtgraph).
         '''
         filepath = self.window().cwd/'speed'
-        if filepath.is_file() is False:
-            raise FileNotFoundError('Cannot find speed file in directory')
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             txt = f.read()

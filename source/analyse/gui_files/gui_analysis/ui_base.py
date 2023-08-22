@@ -56,7 +56,7 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
     '''
 
     def _activate(self, push_name:str, radio_box_name:str, options:dict={},
-                  *args, **kwargs):
+                  required_files={}, *args, **kwargs):
         '''
         Activation method. This method is similar to __init__, but for promoted
         widgets, the initialiser is called before any of its children are
@@ -71,6 +71,11 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         select further options when a radio button is selected. The dictionary
         has key: radio button index (int) and value: name of the QGroupBox to
         show when that button is selected.
+
+        May optionally give a required_files dictionary, which disables the
+        continue button from being clicked if the filename(s) associated with
+        the radio button is not found. The dictionary has key: radio button
+        index (int) and value: list of filenames to find.
         '''
         # for speed, turn box names into the objects themselves
         for index, box_name in options.items():
@@ -78,12 +83,15 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             if options[index] is None:
                 raise ValueError(f'QGroupBox with name {box_name} was not found')
         self.options = options
+        self.required_files = required_files
 
         self.findObjects(push_name, radio_box_name)
         self.connectObjects()
         # should automatically hide the boxes that correspond to an option
         # that isn't selected
         self.optionSelected()
+        # check the file exists for the initially checked radio box (index 0)
+        self.checkFileExists(0)
 
     def findObjects(self, push_name:str, radio_box_name:str):
         '''
@@ -109,8 +117,10 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         # show the update options box when certain result is selected
         for radio in self.radio:
             radio.clicked.connect(self.optionSelected)
-        # refresh options if directory has changed
+        # refresh options if directory/options menu item has changed
         self.window().dir_edit.textChanged.connect(self.optionSelected)
+        self.window().allow_add_flags.triggered.connect(self.optionSelected)
+        self.window().no_command.triggered.connect(self.optionSelected)
 
     @QtCore.pyqtSlot()
     def optionSelected(self):
@@ -119,11 +129,16 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         with the options dictionary given in __init__. Can be overriden if
         certain options are generated on-demand, using `super().optionSelected()`.
         '''
-        for index, box in self.options.items():
-            if self.radio[index].isChecked():
-                box.show()
-            else:
-                box.hide()
+        # need to iterate over all radio boxes rather than just the one selected
+        # since options box needs to be hidden for radio boxes NOT selected
+        for index, radio in enumerate(self.radio):
+            if radio.isChecked():
+                # check file associated with radio button exists
+                self.checkFileExists(index)
+                if index in self.options:
+                    self.options[index].show()
+            elif index in self.options:
+                self.options[index].hide()
 
     @abstractmethod
     @QtCore.pyqtSlot()
@@ -151,7 +166,7 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             # set cursor to wait cursor
             QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
             self.push.setEnabled(False)
-            self.push.setText("Busy")
+            self.push.setText('Busy')
             # force pyqt to update button immediately (otherwise pyqt leaves
             # this until the end and nothing happens)
             self.push.repaint()
@@ -159,7 +174,7 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             # func executed, now can unfreeze
             QtWidgets.QApplication.restoreOverrideCursor()
             self.push.setEnabled(True)
-            self.push.setText("Continue")
+            self.push.setText('Continue')
             return value
         return wrapper
 
@@ -213,6 +228,36 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             raise ValueError('No floats found in iterable. Check console '
                              'output to see what went wrong?')
         return np.array(data)
+
+    def checkFileExists(self, index):
+        '''
+        Disables the Continue button from being clicked if the filename
+        associated with the analysis command (self.required_files) is not found.
+
+        This functionality is disabled if the user has checked the 'Allow
+        additional flags' or the 'No command mode' options.
+        '''
+        ignore = (self.window().allow_add_flags.isChecked() or
+                  self.window().no_command.isChecked() or
+                  index not in self.required_files)
+        # enable push button if additional flags are enabled, no command mode
+        # is one or no specified required files for this index
+        if ignore:
+            self.push.setEnabled(True)
+            self.push.setText('Continue')
+            return None
+
+        # need to generate path objects every time this is called rather than
+        # only once in self._activate since self.window().cwd is not fixed
+        filenames = [self.window().cwd/file for file in self.required_files[index]]
+        missing_files = [file.name for file in filenames if not file.is_file()]
+        if missing_files:
+            self.push.setEnabled(False)
+            self.push.setText('Missing: ' + ', '.join(missing_files))
+        else:
+            self.push.setEnabled(True)
+            self.push.setText('Continue')
+        return None
 
     def runCmd(self, *args, input:str=None) -> str:
         '''

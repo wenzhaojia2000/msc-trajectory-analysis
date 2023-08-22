@@ -23,11 +23,17 @@ class AnalysisDirectDynamics(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analdd_push', radio_box_name='analdd_radio',
-                          options={
-                              1: 'gwptraj_box', 2: 'ddpesgeo_box',
-                              3: 'clean_box', 4: 'sql_box'
-                          })
+        options = {
+            1: 'gwptraj_box', 2: 'ddpesgeo_box', 3: 'clean_box', 4: 'sql_box'
+        }
+        required_files = {
+            0: ['log'], 1: ['psi'], 2: ['database.sql'], 3: ['database.sql'],
+            4: ['database.sql']
+        }
+        super()._activate(
+            push_name='analdd_push', radio_box_name='analdd_radio',
+            options=options, required_files=required_files
+        )
         # one of the boxes inside ddpesgeo should be hidden
         self.ddpesgeoOptionChanged()
 
@@ -153,8 +159,6 @@ class AnalysisDirectDynamics(AnalysisTab):
         and plots the number of calculations per timestep against time.
         '''
         filepath = self.window().cwd/'log'
-        if filepath.is_file() is False:
-            raise FileNotFoundError('Cannot find log file in directory')
         times = []
         n_calcs = []
         self.window().text.clear()
@@ -290,8 +294,6 @@ class AnalysisDirectDynamics(AnalysisTab):
         ... repeat for more states
         '''
         filepath = self.window().cwd/'database.sql'
-        if filepath.is_file() is False:
-            raise FileNotFoundError('Cannot find database.sql file in directory')
         con = sqlite3.connect(f'file:{filepath}?mode=ro', uri=True,
                               timeout=self.window().timeout_spinbox.value())
         cur = con.cursor()
@@ -440,8 +442,6 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         query = self.sql_query.toPlainText()
         filepath = self.window().cwd/'database.sql'
-        if filepath.is_file() is False:
-            raise FileNotFoundError('Cannot find database.sql file in directory')
         if self.sql_allowwrite.isChecked():
             mode = 'rw'
         else:

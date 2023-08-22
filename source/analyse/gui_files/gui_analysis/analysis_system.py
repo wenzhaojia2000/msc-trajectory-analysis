@@ -23,10 +23,17 @@ class AnalysisSystem(AnalysisTab):
         Activation method. See the documentation in AnalysisTab for more
         information.
         '''
-        super()._activate(push_name='analsys_push', radio_box_name='analsys_radio',
-                          options={
-                              0: 'den1d_box', 1: 'den2d_box', 3: 'showpes_box'
-                          })
+        options = {
+            0: 'den1d_box', 1: 'den2d_box', 3: 'showpes_box'
+        }
+        required_files = {
+            0: ['dvr', 'gridpop'], 1: ['dvr', 'psi'], 2: ['check'],
+            3: ['dvr', 'oper']
+        }
+        super()._activate(
+            push_name='analsys_push', radio_box_name='analsys_radio',
+            options=options, required_files=required_files
+        )
 
     def findObjects(self, push_name:str, box_name:str):
         '''
