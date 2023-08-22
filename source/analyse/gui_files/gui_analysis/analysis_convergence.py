@@ -157,12 +157,12 @@ class AnalysisConvergence(AnalysisTab):
         Reads the file output of using rdcheck natpop, which is expected to be
         in the format, where each cell is a float,
 
-        t.1    x.1
-        t.2    x.2
-        ...    ...
-        t.m    x.m
+        t.1    s1.1    s2.1    ...    sn.1
+        t.2    s1.2    s2.2    ...    sn.2
+        ...    ...     ...     ...    ...
+        t.m    s1.m    s2.m    ...    sn.m
 
-        where t is time and x is the natural population.
+        where t is time and sn is the natural population for SPF n.
 
         Plots the populations of natural orbitals against time.
         '''
@@ -177,14 +177,16 @@ class AnalysisConvergence(AnalysisTab):
         filepath = self.window().cwd/f'natpop_{"_".join(natpop_options)}.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
-            self.window().data = self.readFloats(f, 2)
+            self.window().data = self.readFloats(f)
 
         # start plotting
         self.window().graph.reset(switch_to_plot=True)
         self.window().graph.setLabels(title='Natural population',
                                       bottom='Time (fs)', left='Weight')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
-                                 name='Population', pen='r')
+        n_spfs = self.window().data.shape[1] - 1 # minus time column
+        for i in range(1, n_spfs + 1):
+            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, i],
+                                     name=f'SPF {i}', pen=(i-1, n_spfs))
 
     def qdq(self):
         '''

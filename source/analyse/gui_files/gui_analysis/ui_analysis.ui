@@ -70,7 +70,7 @@
          <widget class="QWidget" name="analconv_radio" native="true">
           <layout class="QVBoxLayout" name="analconv_layout" stretch="0,0,0,0,0">
            <item>
-            <widget class="QRadioButton" name="analconv_1">
+            <widget class="QRadioButton" name="analconv_0">
              <property name="statusTip">
               <string>Executes ortho and plots SPF (SPDO) orthonormalities.</string>
              </property>
@@ -83,7 +83,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analconv_2">
+            <widget class="QRadioButton" name="analconv_1">
              <property name="statusTip">
               <string>Executes rdgpop and plots grid populations.</string>
              </property>
@@ -93,7 +93,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analconv_3">
+            <widget class="QRadioButton" name="analconv_2">
              <property name="statusTip">
               <string>Executes rdcheck natpop and plots natural populations.</string>
              </property>
@@ -103,7 +103,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analconv_4">
+            <widget class="QRadioButton" name="analconv_3">
              <property name="statusTip">
               <string>Executes rdcheck qdq and plots ⟨q⟩ and ⟨dq⟩.</string>
              </property>
@@ -113,7 +113,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analconv_5">
+            <widget class="QRadioButton" name="analconv_4">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -319,7 +319,7 @@
          <widget class="QWidget" name="analint_radio" native="true">
           <layout class="QVBoxLayout" name="analint_layout" stretch="0,0,0,0,0">
            <item>
-            <widget class="QRadioButton" name="analint_1">
+            <widget class="QRadioButton" name="analint_0">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -335,7 +335,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analint_2">
+            <widget class="QRadioButton" name="analint_1">
              <property name="statusTip">
               <string>Reads ./timing and plots a bar chart of various subroutine calls.</string>
              </property>
@@ -348,7 +348,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analint_3">
+            <widget class="QRadioButton" name="analint_2">
              <property name="statusTip">
               <string>Reads ./speed and plots the CPU and real time between each output.</string>
              </property>
@@ -358,7 +358,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analint_4">
+            <widget class="QRadioButton" name="analint_3">
              <property name="statusTip">
               <string>Executes rdupdate and plots the step size.</string>
              </property>
@@ -368,7 +368,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analint_5">
+            <widget class="QRadioButton" name="analint_4">
              <property name="statusTip">
               <string>Executes rdupdate and plots the error.</string>
              </property>
@@ -463,7 +463,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>330</width>
+         <width>335</width>
          <height>403</height>
         </rect>
        </property>
@@ -475,7 +475,7 @@
          <widget class="QWidget" name="analres_radio" native="true">
           <layout class="QVBoxLayout" name="analres_layout" stretch="0,0,0">
            <item>
-            <widget class="QRadioButton" name="analres_1">
+            <widget class="QRadioButton" name="analres_0">
              <property name="statusTip">
               <string>Reads ./auto and plots the autocorrelation function.</string>
              </property>
@@ -488,7 +488,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analres_2">
+            <widget class="QRadioButton" name="analres_1">
              <property name="statusTip">
               <string>Executes autospec and plots the spectrum.</string>
              </property>
@@ -498,7 +498,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analres_3">
+            <widget class="QRadioButton" name="analres_2">
              <property name="text">
               <string>Plot eigenvalues from matrix diagonalisation</string>
              </property>
@@ -783,7 +783,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>277</width>
+         <width>335</width>
          <height>686</height>
         </rect>
        </property>
@@ -795,7 +795,7 @@
          <widget class="QWidget" name="analsys_radio" native="true">
           <layout class="QVBoxLayout" name="analsys_layout" stretch="0,0,0,0">
            <item>
-            <widget class="QRadioButton" name="analsys_1">
+            <widget class="QRadioButton" name="analsys_0">
              <property name="statusTip">
               <string>Executes showd1d and plots an animated density evolution.</string>
              </property>
@@ -808,7 +808,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analsys_2">
+            <widget class="QRadioButton" name="analsys_1">
              <property name="statusTip">
               <string>Executes showsys -nopes and plots an animated 2D density evolution.</string>
              </property>
@@ -818,7 +818,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analsys_3">
+            <widget class="QRadioButton" name="analsys_2">
              <property name="statusTip">
               <string>Executes statepop and plots populations for each state.</string>
              </property>
@@ -828,7 +828,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analsys_4">
+            <widget class="QRadioButton" name="analsys_3">
              <property name="statusTip">
               <string>Executes showsys -pes and plots a line/contour plot for the PES along the specified coordinates.</string>
              </property>
@@ -939,8 +939,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>98</width>
-                <height>28</height>
+                <width>287</width>
+                <height>85</height>
                </rect>
               </property>
              </widget>
@@ -1019,8 +1019,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>98</width>
-                <height>28</height>
+                <width>287</width>
+                <height>85</height>
                </rect>
               </property>
              </widget>
@@ -1043,7 +1043,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>322</width>
+         <width>335</width>
          <height>897</height>
         </rect>
        </property>
@@ -1055,7 +1055,7 @@
          <widget class="QWidget" name="analdd_radio" native="true">
           <layout class="QVBoxLayout" name="analdd_layout">
            <item>
-            <widget class="QRadioButton" name="analdd_1">
+            <widget class="QRadioButton" name="analdd_0">
              <property name="statusTip">
               <string>Reads ./log and plots the number of direct dynamics calculations per timestep.</string>
              </property>
@@ -1068,7 +1068,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analdd_2">
+            <widget class="QRadioButton" name="analdd_1">
              <property name="statusTip">
               <string>Executes gwptraj and plots GWP basis function trajectories.</string>
              </property>
@@ -1078,7 +1078,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analdd_3">
+            <widget class="QRadioButton" name="analdd_2">
              <property name="statusTip">
               <string>Finds entries in the pes or apes and geo table in database which satisfy a certain criterion.</string>
              </property>
@@ -1088,7 +1088,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analdd_4">
+            <widget class="QRadioButton" name="analdd_3">
              <property name="statusTip">
               <string>Executes checkdb.</string>
              </property>
@@ -1098,7 +1098,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="analdd_5">
+            <widget class="QRadioButton" name="analdd_4">
              <property name="statusTip">
               <string>Query database using an SQL command.</string>
              </property>
@@ -1827,28 +1827,28 @@
   <tabstop>media_ffend</tabstop>
   <tabstop>media_scrubber</tabstop>
   <tabstop>media_speed</tabstop>
-  <tabstop>analconv_1</tabstop>
+  <tabstop>analconv_0</tabstop>
   <tabstop>ortho_state</tabstop>
-  <tabstop>analconv_2</tabstop>
+  <tabstop>analconv_1</tabstop>
   <tabstop>gpop_nz</tabstop>
   <tabstop>gpop_dof</tabstop>
-  <tabstop>analconv_3</tabstop>
+  <tabstop>analconv_2</tabstop>
   <tabstop>natpop_mode</tabstop>
   <tabstop>natpop_state</tabstop>
-  <tabstop>analconv_4</tabstop>
+  <tabstop>analconv_3</tabstop>
   <tabstop>qdq_dof</tabstop>
   <tabstop>qdq_state</tabstop>
-  <tabstop>analconv_5</tabstop>
+  <tabstop>analconv_4</tabstop>
   <tabstop>analconv_push</tabstop>
+  <tabstop>analint_0</tabstop>
   <tabstop>analint_1</tabstop>
-  <tabstop>analint_2</tabstop>
   <tabstop>timing_sort</tabstop>
+  <tabstop>analint_2</tabstop>
   <tabstop>analint_3</tabstop>
   <tabstop>analint_4</tabstop>
-  <tabstop>analint_5</tabstop>
   <tabstop>analint_push</tabstop>
+  <tabstop>analres_0</tabstop>
   <tabstop>analres_1</tabstop>
-  <tabstop>analres_2</tabstop>
   <tabstop>autocol_prefac</tabstop>
   <tabstop>autocol_emin</tabstop>
   <tabstop>autocol_emax</tabstop>
@@ -1856,25 +1856,25 @@
   <tabstop>autocol_tau</tabstop>
   <tabstop>autocol_iexp</tabstop>
   <tabstop>autocol_filfunc</tabstop>
-  <tabstop>analres_3</tabstop>
+  <tabstop>analres_2</tabstop>
   <tabstop>analres_push</tabstop>
-  <tabstop>analsys_1</tabstop>
+  <tabstop>analsys_0</tabstop>
   <tabstop>den1d_dof</tabstop>
   <tabstop>den1d_state</tabstop>
-  <tabstop>analsys_2</tabstop>
+  <tabstop>analsys_1</tabstop>
   <tabstop>den2d_state</tabstop>
   <tabstop>den2d_coord_box</tabstop>
+  <tabstop>analsys_2</tabstop>
   <tabstop>analsys_3</tabstop>
-  <tabstop>analsys_4</tabstop>
   <tabstop>showpes_type</tabstop>
   <tabstop>showpes_state</tabstop>
   <tabstop>showpes_coord_box</tabstop>
   <tabstop>analsys_push</tabstop>
+  <tabstop>analdd_0</tabstop>
   <tabstop>analdd_1</tabstop>
-  <tabstop>analdd_2</tabstop>
   <tabstop>gwptraj_task</tabstop>
   <tabstop>gwptraj_mode</tabstop>
-  <tabstop>analdd_3</tabstop>
+  <tabstop>analdd_2</tabstop>
   <tabstop>ddpesgeo_type</tabstop>
   <tabstop>ddpesgeo_int</tabstop>
   <tabstop>ddpesgeo_mat</tabstop>
@@ -1882,13 +1882,13 @@
   <tabstop>ddpesgeo_emax</tabstop>
   <tabstop>ddpesgeo_state</tabstop>
   <tabstop>ddpesgeo_tol</tabstop>
-  <tabstop>analdd_4</tabstop>
+  <tabstop>analdd_3</tabstop>
   <tabstop>clean_testint</tabstop>
   <tabstop>clean_rmdup</tabstop>
   <tabstop>clean_mindb</tabstop>
   <tabstop>clean_rmfail</tabstop>
   <tabstop>clean_rminterp</tabstop>
-  <tabstop>analdd_5</tabstop>
+  <tabstop>analdd_4</tabstop>
   <tabstop>sql_allowwrite</tabstop>
   <tabstop>sql_query</tabstop>
   <tabstop>analdd_push</tabstop>
