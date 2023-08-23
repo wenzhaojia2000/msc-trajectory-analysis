@@ -7,6 +7,7 @@ window, including menus and the directory edit.
 '''
 
 from pathlib import Path
+import subprocess
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
 
 from .ui_base import AnalysisBase, AnalysisMeta
@@ -70,11 +71,12 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         self.graph = self.findChild(CustomPlotWidget, 'output_plot')
         # menu items
         self.timeout_menu = self.findChild(QtWidgets.QMenu, 'timeout_menu')
-        self.exit = self.findChild(QtWidgets.QAction, 'action_exit')
         self.menu_dir = self.findChild(QtWidgets.QAction, 'menu_dir')
+        self.exit = self.findChild(QtWidgets.QAction, 'action_exit')
         self.cleanup = self.findChild(QtWidgets.QAction, 'cleanup')
         self.allow_add_flags = self.findChild(QtWidgets.QAction, 'allow_add_flags')
         self.no_command = self.findChild(QtWidgets.QAction, 'no_command')
+        self.open_guide = self.findChild(QtWidgets.QAction, 'open_guide')
         # animated plot items
         self.media_box = self.findChild(QtWidgets.QWidget, 'output_media_box')
         self.scrubber = self.findChild(QtWidgets.QSlider, 'media_scrubber')
@@ -97,12 +99,16 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         '''
         Connects objects so they do stuff when interacted with.
         '''
+        # ui items
         self.dir_edit.editingFinished.connect(self.directoryChanged)
         self.dir_edit_dialog.clicked.connect(self.chooseDirectory)
+        # menu items
         self.menu_dir.triggered.connect(self.chooseDirectory)
+        self.exit.triggered.connect(lambda: self.close())
         self.cleanup.triggered.connect(self.cleanupDirectory)
         self.allow_add_flags.triggered.connect(self.showAddFlags)
-        self.exit.triggered.connect(lambda: self.close())
+        self.open_guide.triggered.connect(self.openUserGuide)
+        # animated plot items
         self.ffstart.clicked.connect(lambda: self.scrubber.setValue(self.scrubber.minimum()))
         self.ffend.clicked.connect(lambda: self.scrubber.setValue(self.scrubber.maximum()))
         self.speed_button.clicked.connect(self.changeSpeed)
@@ -235,6 +241,29 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
             self.add_flags_box.show()
         else:
             self.add_flags_box.hide()
+
+    @QtCore.pyqtSlot()
+    def openUserGuide(self):
+        '''
+        Attempts to opens the User guide HTML file in the browser.
+        '''
+        url = Path(__file__).parents[4]/'doc/analyse/anal_gui/user_guide.html'
+        # for windows os.startfile(url) should work but quantics doesn't run
+        # on windows
+        try:
+            # mac and most native linux versions
+            subprocess.run(['open', str(url)])
+        except FileNotFoundError:
+            try:
+                # wsl: the best i can do is open windows explorer to the folder
+                # where the file is.
+                subprocess.run(['explorer.exe', '.'], cwd=url.parent)
+            except FileNotFoundError:
+                QtWidgets.QMessageBox.critical(
+                    self, 'Couldn\'t open browser',
+                    'Couldn\'t open the user guide. Try opening it yourself here\n' +\
+                    str(url)
+                )
 
     @QtCore.pyqtSlot()
     def startStopAnimation(self):

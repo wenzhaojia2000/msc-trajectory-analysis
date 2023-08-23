@@ -307,8 +307,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>356</width>
-         <height>291</height>
+         <width>248</width>
+         <height>283</height>
         </rect>
        </property>
        <attribute name="label">
@@ -463,7 +463,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
+         <width>330</width>
          <height>403</height>
         </rect>
        </property>
@@ -783,7 +783,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
+         <width>277</width>
          <height>686</height>
         </rect>
        </property>
@@ -939,8 +939,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>287</width>
-                <height>85</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
              </widget>
@@ -1019,8 +1019,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>287</width>
-                <height>85</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
              </widget>
@@ -1043,7 +1043,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
+         <width>322</width>
          <height>897</height>
         </rect>
        </property>
@@ -1574,6 +1574,24 @@
           <property name="readOnly">
            <bool>true</bool>
           </property>
+          <property name="plainText">
+           <string>*********************************************************************************
+                              QUANTICS ANALYSIS GUI
+                                   version 1.0
+*********************************************************************************
+
+The Quantics analysis GUI allows convenient analysis of quantics output files
+without the use of the CLI. Use the button in the top-right corner or Ctrl+O to
+open a folder with output files.
+
+Select an analysis command from the left toolbar, then press 'Continue' to see
+the analysis. Switch between the text and plot widgets at the bottom of the
+screen. When you are done with analysis, delete any leftover files by clicking
+Options -&gt; Cleanup directory.
+
+You can find additional options by right-clicking the text or plot widgets. For
+more information, see the user guide in the Help menu.</string>
+          </property>
           <property name="tabStopWidth">
            <number>20</number>
           </property>
@@ -1708,8 +1726,15 @@
     <addaction name="allow_add_flags"/>
     <addaction name="no_command"/>
    </widget>
+   <widget class="QMenu" name="menu_help">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="open_guide"/>
+   </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_options"/>
+   <addaction name="menu_help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="menu_dir">
@@ -1765,6 +1790,14 @@
    </property>
    <property name="statusTip">
     <string>Shows a box where you can add additional flags to quantics analysis programs.</string>
+   </property>
+  </action>
+  <action name="open_guide">
+   <property name="text">
+    <string>User guide</string>
+   </property>
+   <property name="statusTip">
+    <string>Opens the user guide in your browser window.</string>
    </property>
   </action>
  </widget>
