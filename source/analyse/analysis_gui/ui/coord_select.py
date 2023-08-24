@@ -171,6 +171,7 @@ class CoordinateSelector(QtWidgets.QWidget):
                 mode_layout = QtWidgets.QHBoxLayout(mode_widget)
                 mode_layout.setContentsMargins(QtCore.QMargins(0,0,0,0))
                 mode_widget.setLayout(mode_layout)
+                mode_widget.setFixedWidth(260)
                 # add components to widget: a label, (x, y, value) selector
                 # and a spinbox to choose the value if value is selected
                 label = QtWidgets.QLabel(mode)
