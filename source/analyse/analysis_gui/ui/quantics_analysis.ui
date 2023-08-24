@@ -1805,48 +1805,48 @@ more information, see the user guide in the Help menu.</string>
   <customwidget>
    <class>CustomPlotWidget</class>
    <extends>QWidget</extends>
-   <header>gui_analysis.ui_plot</header>
+   <header>analysis_gui.ui.custom_plot</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>AnalysisConvergence</class>
    <extends>QWidget</extends>
-   <header>gui_analysis.analysis_convergence</header>
+   <header>analysis_gui.analysis.convergence</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>AnalysisIntegrator</class>
    <extends>QWidget</extends>
-   <header>gui_analysis.analysis_integrator</header>
+   <header>analysis_gui.analysis.integrator</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>AnalysisResults</class>
    <extends>QWidget</extends>
-   <header>gui_analysis.analysis_results</header>
+   <header>analysis_gui.analysis.results</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>AnalysisSystem</class>
    <extends>QWidget</extends>
-   <header>gui_analysis.analysis_system</header>
+   <header>analysis_gui.analysis.system</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>AnalysisDirectDynamics</class>
    <extends>QWidget</extends>
-   <header>gui_analysis.analysis_directdynamics</header>
+   <header>analysis_gui.analysis.direct_dynamics</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>CustomTextWidget</class>
    <extends>QPlainTextEdit</extends>
-   <header>gui_analysis.ui_text</header>
+   <header>analysis_gui.ui.custom_text</header>
   </customwidget>
   <customwidget>
    <class>CoordinateSelector</class>
    <extends>QWidget</extends>
-   <header>gui_analysis.ui_coordselect</header>
+   <header>analysis_gui.ui.coord_select</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

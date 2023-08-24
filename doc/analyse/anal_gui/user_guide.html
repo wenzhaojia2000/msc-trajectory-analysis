@@ -11,12 +11,12 @@
       <p>The Quantics Analysis GUI is an alternative for using the existing quantics analysis commands on a command line interface. It serves as an easier and more user-friendly way to perfrom analysis on the output of a quantics simulation.</p>
 
       <h2 id="getting_started">Getting started</h2>
-      <p>The GUI requires python &geq; 3.10 and the packages <u>PyQt5</u> and <u>pyqtgraph</u> to function (installing pyqtgraph should also install numpy, which is also required). If you do not yet have python installed, it is recommended to use <a href="https://docs.conda.io/projects/conda/en/stable/user-guide/install/linux.html">conda</a>. A conda environment with the prerequisites is available by navigating to <code>%QUANTICS_DIR%/source/analyse/gui_files</code> and executing</p>
+      <p>The GUI requires python &geq; 3.10 and the packages <u>PyQt5</u> and <u>pyqtgraph</u> to function (installing pyqtgraph should also install numpy, which is also required). If you do not yet have python installed, it is recommended to use <a href="https://docs.conda.io/projects/conda/en/stable/user-guide/install/linux.html">conda</a>. A conda environment with the prerequisites is available by navigating to <code>%QUANTICS_DIR%/source/analyse/analysis_gui/</code> and executing</p>
       <pre>
 conda env update -f environment.yml</pre>
       <p>Open the GUI by using</p>
       <pre>
-python3 %QUANTICS_DIR%/source/analyse/gui_files/quantics_analysis_gui.py</pre>
+python3 %QUANTICS_DIR%/source/analyse/quantics_analysis_gui.py</pre>
       <p>If you do not wish to use conda, you can install the required packages directly using pip:</p>
       <pre>
 python3 -m pip install PyQt5 pyqtgraph</pre>

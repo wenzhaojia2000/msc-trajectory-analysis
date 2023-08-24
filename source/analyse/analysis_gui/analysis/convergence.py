@@ -9,7 +9,7 @@ included in the main UI class.
 
 import re
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisTab
+from ..ui.core import AnalysisTab
 
 class AnalysisConvergence(AnalysisTab):
     '''

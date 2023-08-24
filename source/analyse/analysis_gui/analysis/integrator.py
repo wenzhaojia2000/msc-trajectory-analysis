@@ -10,7 +10,7 @@ included in the main UI class.
 import re
 from PyQt5 import QtWidgets
 from pyqtgraph import BarGraphItem
-from .ui_base import AnalysisTab
+from ..ui.core import AnalysisTab
 
 class AnalysisIntegrator(AnalysisTab):
     '''

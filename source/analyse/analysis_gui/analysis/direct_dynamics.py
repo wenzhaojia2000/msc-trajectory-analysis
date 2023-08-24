@@ -11,7 +11,7 @@ import re
 import sqlite3
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisTab
+from ..ui.core import AnalysisTab
 
 class AnalysisDirectDynamics(AnalysisTab):
     '''

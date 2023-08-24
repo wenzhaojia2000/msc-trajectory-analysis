@@ -10,14 +10,14 @@ from pathlib import Path
 import subprocess
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
 
-from .ui_base import AnalysisBase, AnalysisMeta
-from .ui_plot import CustomPlotWidget
-from .ui_text import CustomTextWidget
-from .analysis_convergence import AnalysisConvergence
-from .analysis_integrator import AnalysisIntegrator
-from .analysis_results import AnalysisResults
-from .analysis_system import AnalysisSystem
-from .analysis_directdynamics import AnalysisDirectDynamics
+from .core import AnalysisBase, AnalysisMeta
+from .custom_plot import CustomPlotWidget
+from .custom_text import CustomTextWidget
+from ..analysis.convergence import AnalysisConvergence
+from ..analysis.integrator import AnalysisIntegrator
+from ..analysis.results import AnalysisResults
+from ..analysis.system import AnalysisSystem
+from ..analysis.direct_dynamics import AnalysisDirectDynamics
 
 class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
     '''
@@ -31,7 +31,7 @@ class AnalysisMain(AnalysisBase, QtWidgets.QMainWindow, metaclass=AnalysisMeta):
         super().__init__()
         # load the .ui file (from the folder this .py file is in rather than
         # wherever this is executed)
-        uic.loadUi(Path(__file__).parent/'ui_analysis.ui', self)
+        uic.loadUi(Path(__file__).parent/'quantics_analysis.ui', self)
         # activate analysis tabs. these classes dictate functionality for each
         # analysis tab
         for class_, object_name in zip(

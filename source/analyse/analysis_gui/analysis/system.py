@@ -10,8 +10,8 @@ the main UI class.
 import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
-from .ui_base import AnalysisTab
-from .ui_coordselect import CoordinateSelector
+from ..ui.core import AnalysisTab
+from ..ui.coord_select import CoordinateSelector
 
 class AnalysisSystem(AnalysisTab):
     '''
