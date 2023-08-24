@@ -262,5 +262,8 @@ class CustomPlotWidget(pg.PlotWidget):
             c = pg.IsocurveItem(data=z, level=levels[i], pen=colours[i])
             c.setTransform(tr)
             self.getPlotItem().addItem(c)
+        # automatically set axis limits may not be correct - set manually just
+        # in case
+        self.setRange(xRange=[x.min(), x.max()], yRange=[y.min(), y.max()], padding=0)
         self.colourbar.setLevels((levels[0], levels[-1]))
         self.colourbar.show()

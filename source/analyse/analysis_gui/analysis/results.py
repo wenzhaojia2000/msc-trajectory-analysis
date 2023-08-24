@@ -156,7 +156,7 @@ class AnalysisResults(AnalysisTab):
                                  self.window().data[:, self.autocol_func.currentIndex()%3+1],
                                  name='Autocorrelation spectrum', pen='r')
 
-    def rdeigval():
+    def rdeigval(self):
         '''
         '''
         raise NotImplementedError

@@ -23,6 +23,8 @@ class CoordinateSelector(QtWidgets.QWidget):
         - Not yet possible to select coordinate bounds (xmin, xmax, ymin, ymax)
         - Not yet possible to select x, y, z units
         - Not yet possible to retrieve mode labels from a ML-BASIS-SECTION.
+        - Not yet possible to retrieve mode labels from a database.
+        - Mode name may be wrong for el/elcont.
     '''
 
     def __init__(self, *args, **kwargs):
@@ -132,29 +134,32 @@ class CoordinateSelector(QtWidgets.QWidget):
         '''
         with open(self.window().cwd/'input', mode='r', encoding='utf-8') as f:
             txt = f.read()
-            # find modes in SPF-BASIS-SECTION
-            spf_section = re.findall(r'SPF-BASIS-SECTION\n(.*)\nend-spf-basis-section',
-                                     txt, re.DOTALL|re.IGNORECASE)
-            # if section does not exist, might be direct dynamics. find in
-            # nmode subsection in INITIAL-GEOMETRY-SECTION
-            ddmode_section = re.findall(r'nmode\n(.*)\nend-nmode',
-                                        txt, re.DOTALL|re.IGNORECASE)
-            if spf_section:
-                # a list of dofs are displayed before an = sign, with a list
-                # of digits after (maybe including id keyword). these may be on
-                # a single line. match the part before =, split by comma, then
-                # remove surrounding whitespace.
-                regex = r'(.+?)=(?:[ \d,]|id)*'
-                modes = [mode.strip() for line in re.findall(regex, spf_section[0])\
-                                      for mode in line.split(',')\
-                                      if mode.strip() not in ['packets', 'gwp_type']]
-            elif ddmode_section:
-                # a list of dofs are the first entry in each line (assuming
-                # mode names can't have whitespace in them).
-                modes = re.findall(r'^\s*\S+', ddmode_section[0], re.MULTILINE)
-            else:
-                modes = []
-        return modes
+        # find labels in SPF-BASIS-SECTION (may also be called SBASIS-SECTION)
+        spf_section = re.findall(
+            r'S(?:PF-)?BASIS-SECTION\s*\n(.*)\nend-s(?:pf-)?basis-section',
+            txt, re.DOTALL|re.IGNORECASE
+        )
+        if spf_section:
+            # a list of dofs are displayed before an = sign, with a list
+            # of digits after (maybe including id keyword). these may be on
+            # a single line. match the part before =, split by comma, then
+            # remove surrounding whitespace.
+            regex = r'(.+?)=(?:[ \d,]|id)*'
+            modes = [mode.strip() for line in re.findall(regex, spf_section[0])\
+                                  for mode in line.split(',')\
+                                  if mode.strip() not in ['packets', 'gwp_type']]
+            return modes
+        # if section does not exist, might be direct dynamics. check for labels
+        # in a nmode subsection in INITIAL-GEOMETRY-SECTION or DD-GB-SECTION
+        ddmode_section = re.findall(r'nmode\s*\n(.*)\nend-nmode', txt,
+                                    re.DOTALL|re.IGNORECASE)
+        if ddmode_section:
+            # a list of dofs are the first entry in each line (assuming
+            # mode names can't have whitespace in them).
+            modes = re.findall(r'^\s*\S+', ddmode_section[0], re.MULTILINE)
+            return modes
+        # can't find any labels...
+        return []
 
     def addModeLabels(self):
         '''
