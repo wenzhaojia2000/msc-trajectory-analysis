@@ -11,6 +11,7 @@ import re
 import sqlite3
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
+from pyqtgraph import intColor as colr
 from ..ui.core import AnalysisTab
 
 class AnalysisDirectDynamics(AnalysisTab):
@@ -248,7 +249,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         # nmode columns each time until we get to ngwp lines
         for i, col in enumerate(range(offset, offset+ngwp*nmode, nmode)):
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, col],
-                                     pen=(i, ngwp))
+                                     pen=colr(i, ngwp, maxValue=200))
 
     def ddpesgeo(self):
         '''

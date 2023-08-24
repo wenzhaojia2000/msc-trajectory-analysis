@@ -9,6 +9,7 @@ included in the main UI class.
 
 import re
 from PyQt5 import QtWidgets, QtCore
+from pyqtgraph import intColor as colr
 from ..ui.core import AnalysisTab
 
 class AnalysisConvergence(AnalysisTab):
@@ -84,7 +85,7 @@ class AnalysisConvergence(AnalysisTab):
         output = self.runCmd('ortho')
         # get the relevant data we want (between the two #, but skip first line
         # which is the header - see docstring)
-        match = re.findall(r'(?<=#).*?\n(.*)(?=#)', output, flags=re.DOTALL)
+        match = re.findall(r'#.*?\n(.*)#', output, flags=re.DOTALL)
         if len(match) != 1:
             raise ValueError('Invalid ortho output?')
         # assemble data matrix
@@ -106,8 +107,8 @@ class AnalysisConvergence(AnalysisTab):
                                       bottom='Time (fs)', left='Orthonormality error')
         self.window().graph.plot(arr[:, 0], arr[:, 2], name='Total', pen='k')
         for i in range(1, n_modes+1):
-            self.window().graph.plot(arr[:, 0], arr[:, 2+i],
-                                     name=f'Mode {i}', pen=(i-1, n_modes))
+            self.window().graph.plot(arr[:, 0], arr[:, 2+i], name=f'Mode {i}',
+                                     pen=colr(i-1, n_modes, maxValue=200))
 
     def rdgpop(self):
         '''
@@ -186,7 +187,7 @@ class AnalysisConvergence(AnalysisTab):
         n_spfs = self.window().data.shape[1] - 1 # minus time column
         for i in range(1, n_spfs + 1):
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, i],
-                                     name=f'SPF {i}', pen=(i-1, n_spfs))
+                                     name=f'SPF {i}', pen=colr(i-1, n_spfs, maxValue=200))
 
     def qdq(self):
         '''

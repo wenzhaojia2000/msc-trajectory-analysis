@@ -10,6 +10,7 @@ the main UI class.
 import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
+from pyqtgraph import intColor as colr
 from ..ui.core import AnalysisTab
 from ..ui.coord_select import CoordinateSelector
 
@@ -301,7 +302,7 @@ class AnalysisSystem(AnalysisTab):
         n_states = self.window().data.shape[1] - 1 # minus time column
         for i in range(1, n_states + 1):
             self.window().graph.plot(self.window().data[:, 0], self.window().data[:, i],
-                                     name=f'State {i}', pen=(i-1, n_states))
+                                     name=f'State {i}', pen=colr(i-1, n_states, maxValue=200))
 
     def showpes(self):
         '''
