@@ -1577,7 +1577,7 @@
           <property name="plainText">
            <string>*********************************************************************************
                               QUANTICS ANALYSIS GUI
-                                   version 1.0
+                                  version 1.0.1
 *********************************************************************************
 
 The Quantics analysis GUI allows convenient analysis of quantics output files

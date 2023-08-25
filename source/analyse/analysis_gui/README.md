@@ -1,7 +1,7 @@
 Quantics Analysis GUI package
 -----------------------------
 
-This package contains the code for the Quantics Analysis GUI.
+This package contains the code for the Quantics Analysis GUI. More information is available in the documentation at `%QUANTICS_DIR/doc/analyse/anal_gui`.
 
 Installing prerequisites
 ========================
@@ -40,6 +40,6 @@ Alternatively, you can open the GUI from anywhere as long as `%QUANTICS_DIR%/sou
 For developers
 ==============
 
-Developers of the progam will also need Qt Designer to modify the `./ui/quantics_analysis.ui` file. This is available as a standalone from a third party [here](https://build-system.fman.io/qt-designer-download), or from pip (`pyqt5-tools`)
+Developers of the progam will also need Qt Designer to modify the `./ui/quantics_analysis.ui` file. This is available as a standalone from a third party [here](https://build-system.fman.io/qt-designer-download), or from pip (`pyqt5-tools`).
 
-Qt Designer also comes with Qt's official editor, Qt Creator. This is not needed for this project!
+Qt's official editor, Qt Creator, is not needed for this project!

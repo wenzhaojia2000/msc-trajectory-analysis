@@ -160,7 +160,7 @@ code {
 	background-color: #f8f8f8;
 	border-radius: 3px;
 }
-kbd {
+span.button {
 	background-color: #e7e7e7;
 	background-image: -webkit-linear-gradient(#fefefe, #e7e7e7);
 	background-image: linear-gradient(#fefefe, #e7e7e7);
@@ -169,7 +169,7 @@ kbd {
 	color: #000;
 	padding: 0 5px;
 	font-family: Consolas, monospace;
-	font-size: 15px;
+	font-size: 16px;
 }
 sup {
 	font-size: 75%;
@@ -180,4 +180,9 @@ sub {
 	font-size: 75%;
 	vertical-align: sub;
 	line-height: 0;
+}
+video {
+	display: block;
+	margin: auto;
+	max-width: 100%;
 }
