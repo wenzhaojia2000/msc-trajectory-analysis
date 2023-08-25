@@ -26,7 +26,7 @@ class AnalysisResults(AnalysisTab):
             2: self.rdeigval  # plot eigenvalues from matrix diagonalisation
         }
         options = {
-            1: 'autocol_box'
+            1: 'autocol_box', 2: 'eigval_box'
         }
         required_files = {
             0: ['auto'], 1: ['auto'], 2: ['eigval']
@@ -50,6 +50,8 @@ class AnalysisResults(AnalysisTab):
         self.autocol_tau = self.findChild(QtWidgets.QDoubleSpinBox, 'autocol_tau')
         self.autocol_iexp = self.findChild(QtWidgets.QSpinBox, 'autocol_iexp')
         self.autocol_func = self.findChild(QtWidgets.QComboBox, 'autocol_filfunc')
+        # group box 'eigval options'
+        self.eigval_task = self.findChild(QtWidgets.QComboBox, 'eigval_task')
 
     def connectObjects(self):
         '''
@@ -72,12 +74,12 @@ class AnalysisResults(AnalysisTab):
         Reads the auto file, which is expected to be in the format, where each
         cell is a float,
 
-        t.1    y1.1    y2.1    y3.1
-        t.2    y1.2    y2.2    y3.2
+        t.1    re.1    im.1    abs.1
+        t.2    re.2    im.2    abs.2
         ...    ...     ...     ...
-        t.m    y1.m    y2.m    y3.m
+        t.m    re.m    im.m    abs.m
 
-        where x is time, and y1, y2, y3 are the real, imaginary, and absolute
+        where t is time, and re, im, abs are the real, imaginary, and absolute
         value of the autocorrelation function. Headers are ignored.
 
         Plots the autocorrelation function. Note that this function does not
@@ -158,5 +160,42 @@ class AnalysisResults(AnalysisTab):
 
     def rdeigval(self):
         '''
+        Reads the eigval file, which is expected to be in the format, where
+        each cell is a float,
+
+        n.1    l[eV].1    i.1    e[eV].1    l[cm-1].1   x[cm-1].1
+        n.2    l[eV].2    i.2    e[eV].2    l[cm-1].2   x[cm-1].2
+        ...    ...        ...    ...        ...         ...
+        n.m    l[eV].m    i.m    [eV].m     l[cm-1].m   x[cm-1].m
+
+        where n is number, l is the eigenvalue, i is the intensity, e is the
+        eigenerror, and x is the excitation.
+
+        Plots either the eigenvalue and eigenerror, intensity, or excitation.
+        Note that this function does not use the 'rdeigval' command.
         '''
-        raise NotImplementedError
+        filepath = self.window().cwd/'eigval'
+        # assemble data matrix
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            self.window().text.setPlainText(f.read())
+            f.seek(0)
+            try:
+                self.window().data = self.readFloats(f, 6)
+            except ValueError:
+                raise ValueError('Invalid eigval file') from None
+
+        # start plotting
+        self.window().graph.reset(switch_to_plot=True)
+        self.window().graph.setLabels(title='Eigval file', bottom='Eigenvalue (eV)')
+        if self.eigval_task.currentIndex() == 0:
+            self.window().graph.setLabels(left='Intensity')
+            self.window().graph.plot(self.window().data[:, 1], self.window().data[:, 2],
+                                     name='Intensities', pen='r')
+        elif self.eigval_task.currentIndex() == 1:
+            self.window().graph.setLabels(left='Eigenerror (eV)')
+            self.window().graph.plot(self.window().data[:, 1], self.window().data[:, 3],
+                                     name='Eigenerrors', pen='r')
+        else:
+            self.window().graph.setLabels(left='Excitations (cm\u207B\u00B9)')
+            self.window().graph.plot(self.window().data[:, 1], self.window().data[:, 5],
+                                     name='Excitation', pen='r')
