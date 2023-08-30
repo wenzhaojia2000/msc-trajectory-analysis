@@ -240,7 +240,7 @@ class AnalysisSystem(AnalysisTab):
                 if i == 0:
                     x = np.unique(interval[:, 0])
                     y = np.unique(interval[:, 1])
-                zt.append(np.array(interval[:, 2]).reshape(x.shape[0], y.shape[0]))
+                zt.append(np.array(interval[:, 2]).reshape(y.shape[0], x.shape[0]).T)
         self.window().data = np.array(zt)
 
         # set contents of showsys.log to text view
@@ -369,7 +369,7 @@ class AnalysisSystem(AnalysisTab):
             # convert from list xyz coordinate data to grid data
             x = np.unique(self.window().data[:, 0])
             y = np.unique(self.window().data[:, 1])
-            z = np.array(self.window().data[:, 2]).reshape(x.shape[0], y.shape[0])
+            z = np.array(self.window().data[:, 2]).reshape(y.shape[0], x.shape[0]).T
             self.window().graph.setLabels(title=self.showpes_type.currentText(),
                                           bottom=f'DOF {self.showpes_coord.xcoord} (au)',
                                           left=f'DOF {self.showpes_coord.ycoord} (au)')

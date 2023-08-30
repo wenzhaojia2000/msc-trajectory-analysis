@@ -463,7 +463,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
+         <width>330</width>
          <height>472</height>
         </rect>
        </property>
@@ -821,7 +821,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
+         <width>277</width>
          <height>686</height>
         </rect>
        </property>
@@ -977,8 +977,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>287</width>
-                <height>85</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
              </widget>
@@ -1057,8 +1057,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>287</width>
-                <height>85</height>
+                <width>98</width>
+                <height>28</height>
                </rect>
               </property>
              </widget>
@@ -1615,7 +1615,7 @@
           <property name="plainText">
            <string>*********************************************************************************
                               QUANTICS ANALYSIS GUI
-                                  version 1.0.2
+                                  version 1.0.3
 *********************************************************************************
 
 The Quantics analysis GUI allows convenient analysis of quantics output files
