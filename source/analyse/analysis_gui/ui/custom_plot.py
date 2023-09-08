@@ -119,7 +119,7 @@ class CustomPlotWidget(pg.PlotWidget):
             return None
         # obtain a savename for the file
         savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
-            "Save File", str(self.window().cwd / 'Untitled.npy'),
+            "Save File", str(self.window().dir.cwd / 'Untitled.npy'),
             "Numpy file (*.npy);;All files (*)"
         )
         if not ok:
@@ -149,7 +149,7 @@ class CustomPlotWidget(pg.PlotWidget):
             return None
         # obtain a savename for the file
         savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
-            "Save File", str(self.window().cwd / 'Untitled.mp4'),
+            "Save File", str(self.window().dir.cwd / 'Untitled.mp4'),
             "Video (*.mp4);;All files (*)"
         )
         if not ok:
