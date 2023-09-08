@@ -246,10 +246,13 @@ class AnalysisSystem(AnalysisTab):
             pass
         finally:
             self.window().media.scrubber.valueChanged.connect(self.showd2dChangePlot)
+        # start plotting
+        xlabel = 'x' if self.den2d_coord.xcoord is None else self.den2d_coord.xcoord
+        ylabel = 'y' if self.den2d_coord.ycoord is None else self.den2d_coord.ycoord
         self.window().plot.reset(switch_to_plot=True, animated=True)
         self.window().plot.setLabels(title='2D Density',
-                                     bottom=f'DOF {self.den2d_coord.xcoord} (au)',
-                                     left=f'DOF {self.den2d_coord.ycoord} (au)')
+                                     bottom=f'DOF {xlabel} (au)',
+                                     left=f'DOF {ylabel} (au)')
         levels = np.linspace(self.window().data.min(), self.window().data.max(), 21)
         self.window().plot.plotContours(x, y, self.window().data[0], levels)
 
@@ -350,6 +353,8 @@ class AnalysisSystem(AnalysisTab):
                 self.window().text.setPlainText(f'{"-"*80}\n{f.read()}')
 
         # start plotting
+        xlabel = 'x' if self.den2d_coord.xcoord is None else self.den2d_coord.xcoord
+        ylabel = 'y' if self.den2d_coord.ycoord is None else self.den2d_coord.ycoord
         self.window().plot.reset(switch_to_plot=True)
         if self.window().data.shape[1] == 3:
             # contour plot
@@ -358,13 +363,13 @@ class AnalysisSystem(AnalysisTab):
             y = np.unique(self.window().data[:, 1])
             z = np.array(self.window().data[:, 2]).reshape(y.shape[0], x.shape[0]).T
             self.window().plot.setLabels(title=self.showpes_type.currentText(),
-                                         bottom=f'DOF {self.showpes_coord.xcoord} (au)',
-                                         left=f'DOF {self.showpes_coord.ycoord} (au)')
+                                         bottom=f'DOF {xlabel} (au)',
+                                         left=f'DOF {ylabel} (au)')
             self.window().plot.plotContours(x, y, z, 21)
         else:
             # line plot
             self.window().plot.setLabels(title=self.showpes_type.currentText(),
-                                         bottom=f'DOF {self.showpes_coord.xcoord} (au)',
+                                         bottom=f'DOF {xlabel} (au)',
                                          left='PES')
             self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
                                     name='PES', pen='r')

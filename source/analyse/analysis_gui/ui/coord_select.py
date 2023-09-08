@@ -77,7 +77,8 @@ class CoordinateSelector(QtWidgets.QWidget):
         for i in range(self.layout().count()):
             label = self.layout().itemAt(i).widget().findChild(QtWidgets.QLabel)
             select = self.layout().itemAt(i).widget().findChild(QtWidgets.QComboBox)
-            if select.currentIndex() == 0:
+            # need to check that select is not None
+            if select and select.currentIndex() == 0:
                 return label.text()
         return None
 
@@ -90,7 +91,8 @@ class CoordinateSelector(QtWidgets.QWidget):
         for i in range(self.layout().count()):
             label = self.layout().itemAt(i).widget().findChild(QtWidgets.QLabel)
             select = self.layout().itemAt(i).widget().findChild(QtWidgets.QComboBox)
-            if select.currentIndex() == 1:
+            # need to check that select is not None
+            if select and select.currentIndex() == 1:
                 return label.text()
         return None
 

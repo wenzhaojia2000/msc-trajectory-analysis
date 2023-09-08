@@ -258,7 +258,7 @@ class AnalysisDirectDynamics(AnalysisTab):
             case 4:
                 self._ddpesgeoV4(con, cur)
             case x:
-                raise NotImplementedError('ddpesgeo not implemented for DB'
+                raise NotImplementedError('ddpesgeo not implemented for DB '
                                          f'version {x}')
 
     def _ddpesgeoV4(self, con:sqlite3.Connection, cur:sqlite3.Cursor):
