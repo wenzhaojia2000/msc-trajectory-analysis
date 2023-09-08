@@ -3,25 +3,31 @@
 @author: 19081417
 
 Consists of the single class that provides functionality for the 'Analyse
-Direct Dynamics' tab of the analysis GUI. A class instance of this should be
-included in the main UI class.
+Direct Dynamics' tab of the analysis GUI.
 '''
 
+from pathlib import Path
 import re
 import sqlite3
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from pyqtgraph import intColor as colr
-from ..ui.core import AnalysisTab
+from ..ui.analysis_tab import AnalysisTab
 
 class AnalysisDirectDynamics(AnalysisTab):
     '''
     Promoted widget that defines functionality for the 'Analyse Direct
     Dynamics' tab of the analysis GUI.
     '''
-    def _activate(self):
+    def __init__(self):
         '''
-        Activation method. See the documentation in AnalysisTab for more
+        Constructor method. Loads the UI file.
+        '''
+        super().__init__(Path(__file__).parent/'direct_dynamics.ui')
+
+    def activate(self):
+        '''
+        Activation method. See the documentation in AnalysisTab._activate for
         information.
         '''
         methods = {
@@ -32,55 +38,23 @@ class AnalysisDirectDynamics(AnalysisTab):
             4: self.querydb   # query database
         }
         options = {
-            1: 'gwptraj_box', 2: 'ddpesgeo_box', 3: 'clean_box', 4: 'sql_box'
+            1: self.gwptraj_box,
+            2: self.ddpesgeo_box,
+            3: self.clean_box,
+            4: self.sql_box
         }
         required_files = {
-            0: ['log'], 1: ['psi'], 2: ['database.sql'], 3: ['database.sql'],
+            0: ['log'],
+            1: ['psi'],
+            2: ['database.sql'],
+            3: ['database.sql'],
             4: ['database.sql']
         }
-        super()._activate(
-            push_name='analdd_push', radio_box_name='analdd_radio',
-            methods=methods, options=options, required_files=required_files
-        )
+        super().activate(methods, options, required_files)
+
+        self.ddpesgeo_task = [self.ddpesgeo_int, self.ddpesgeo_mat]
         # one of the boxes inside ddpesgeo should be hidden
         self.ddpesgeoOptionChanged()
-
-    def findObjects(self, push_name:str, box_name:str):
-        '''
-        Obtains UI elements as instance variables, and possibly some of their
-        properties.
-        '''
-        super().findObjects(push_name, box_name)
-        # group box 'gwp trajectory options'
-        self.gwptraj_task = self.findChild(QtWidgets.QComboBox, 'gwptraj_task')
-        self.gwptraj_mode = self.findChild(QtWidgets.QSpinBox, 'gwptraj_mode')
-        # group box 'pes/apes options'
-        self.ddpesgeo_type = self.findChild(QtWidgets.QComboBox, 'ddpesgeo_type')
-        self.ddpesgeo_task = [
-            self.findChild(QtWidgets.QRadioButton, 'ddpesgeo_int'),
-            self.findChild(QtWidgets.QRadioButton, 'ddpesgeo_mat')
-        ]
-        self.ddpesgeo_int_box = self.findChild(QtWidgets.QFrame, 'ddpesgeo_int_box')
-        self.ddpesgeo_mat_box = self.findChild(QtWidgets.QFrame, 'ddpesgeo_mat_box')
-        self.ddpesgeo_emin = self.findChild(QtWidgets.QDoubleSpinBox, 'ddpesgeo_emin')
-        self.ddpesgeo_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'ddpesgeo_emax')
-        self.ddpesgeo_state = self.findChild(QtWidgets.QSpinBox, 'ddpesgeo_state')
-        self.ddpesgeo_tol = self.findChild(QtWidgets.QDoubleSpinBox, 'ddpesgeo_tol')
-        # group box 'clean database options'
-        self.clean_testint = self.findChild(QtWidgets.QCheckBox, 'clean_testint')
-        self.clean_rmdup = self.findChild(QtWidgets.QCheckBox, 'clean_rmdup')
-        self.clean_mindb = self.findChild(QtWidgets.QDoubleSpinBox, 'clean_mindb')
-        self.clean_rmfail = self.findChild(QtWidgets.QCheckBox, 'clean_rmfail')
-        self.clean_rminterp = self.findChild(QtWidgets.QCheckBox, 'clean_rminterp')
-        # group box 'query'
-        self.sql_allowwrite = self.findChild(QtWidgets.QCheckBox, 'sql_allowwrite')
-        self.sql_query = self.findChild(QtWidgets.QPlainTextEdit, 'sql_query')
-
-    def connectObjects(self):
-        '''
-        Connects UI elements so they do stuff when interacted with.
-        '''
-        super().connectObjects()
         # in pes/apes box, show certain options only when checked
         for radio in self.ddpesgeo_task:
             radio.clicked.connect(self.ddpesgeoOptionChanged)
@@ -140,7 +114,7 @@ class AnalysisDirectDynamics(AnalysisTab):
 
         and plots the number of calculations per timestep against time.
         '''
-        filepath = self.window().cwd/'log'
+        filepath = self.window().dir.cwd/'log'
         times = []
         n_calcs = []
         self.window().text.clear()
@@ -153,14 +127,14 @@ class AnalysisDirectDynamics(AnalysisTab):
                         time = float(re.search(r'[+-]?\d+(?:\.\d*)?', line)[0])
                         times.append(time)
                         n_calcs.append(0)
-                    except:
+                    except ValueError:
                         pass
                 # find a line with No. QC calculations in it and get n_calc
                 if re.search(r'No\. QC calculations :', line):
                     try:
                         n_calc = int(re.search(r'\d+', line)[0])
                         n_calcs[-1] += n_calc
-                    except:
+                    except ValueError:
                         pass
         if len(times) == 0:
             # nothing found?
@@ -168,10 +142,10 @@ class AnalysisDirectDynamics(AnalysisTab):
         self.window().data = np.array([times, n_calcs])
 
         # start plotting, depending on options
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='Calculations per time step',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='Calculations per time step',
                                       bottom='Time (fs)', left='QC calculations')
-        self.window().graph.plot(self.window().data[0, :], self.window().data[1, :],
+        self.window().plot.plot(self.window().data[0, :], self.window().data[1, :],
                                  name='QC calculations', pen='r')
 
     def gwptraj(self):
@@ -193,20 +167,20 @@ class AnalysisDirectDynamics(AnalysisTab):
         '''
         # -trj outputs a trajectory file only
         self.runCmd('gwptraj', '-trj')
-        filepath = self.window().cwd/'trajectory'
+        filepath = self.window().dir.cwd/'trajectory'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().data = self.readFloats(f)
 
         # add contents of showd1d.log to text view
-        filepath = self.window().cwd/'gwptraj.log'
+        filepath = self.window().dir.cwd/'gwptraj.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
 
         # find ngwp from input. if input not found ask user for value
         try:
-            with open(self.window().cwd/'input', mode='r',
+            with open(self.window().dir.cwd/'input', mode='r',
                       encoding='utf-8') as f:
                 txt = f.read()
                 # IndexError raised when ngwp not found
@@ -231,24 +205,24 @@ class AnalysisDirectDynamics(AnalysisTab):
         if mode > nmode:
             raise ValueError(f'Mode {mode} is larger than number of modes {nmode}')
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
+        self.window().plot.reset(switch_to_plot=True)
         if self.gwptraj_task.currentIndex() == 0:
             # task is plot centre coordinates, which make up the first half of
             # the columns in trajectory file
             offset = mode
-            self.window().graph.setLabels(title='GWP function centre coordinates',
+            self.window().plot.setLabels(title='GWP function centre coordinates',
                                           bottom='Time (fs)', left='GWP Center (au)')
         else:
             # task is plot momentum, which make up the second half of the
             # columns in trajectory file
             offset = ncol//2 + mode
-            self.window().graph.setLabels(title='GWP function momentum',
+            self.window().plot.setLabels(title='GWP function momentum',
                                           bottom='Time (fs)', left='GWP Momentum (au)')
         # plot line for each gaussian. columns are written for each gaussian
         # with ascending mode. to pick the gaussians for one mode we skip
         # nmode columns each time until we get to ngwp lines
         for i, col in enumerate(range(offset, offset+ngwp*nmode, nmode)):
-            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, col],
+            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, col],
                                      pen=colr(i, ngwp, maxValue=200))
 
     def ddpesgeo(self):
@@ -275,9 +249,9 @@ class AnalysisDirectDynamics(AnalysisTab):
         }
         ... repeat for more states
         '''
-        filepath = self.window().cwd/'database.sql'
+        filepath = self.window().dir.cwd/'database.sql'
         con = sqlite3.connect(f'file:{filepath}?mode=ro', uri=True,
-                              timeout=self.window().timeout_spinbox.value())
+                              timeout=self.window().timeout.value())
         cur = con.cursor()
         version = cur.execute('SELECT dbversion FROM versions;').fetchone()[0]
         match version:
@@ -423,13 +397,13 @@ class AnalysisDirectDynamics(AnalysisTab):
         with nice formatting.
         '''
         query = self.sql_query.toPlainText()
-        filepath = self.window().cwd/'database.sql'
+        filepath = self.window().dir.cwd/'database.sql'
         if self.sql_allowwrite.isChecked():
             mode = 'rw'
         else:
             mode = 'ro'
         con = sqlite3.connect(f'file:{filepath}?mode={mode}', uri=True,
-                              timeout=float(self.window().timeout_spinbox.value()),
+                              timeout=float(self.window().timeout.value()),
                               isolation_level=None)
         cur = con.cursor()
         res = cur.execute(query).fetchall()

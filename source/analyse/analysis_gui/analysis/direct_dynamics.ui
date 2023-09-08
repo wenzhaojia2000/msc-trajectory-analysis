@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>analdd</class>
+ <widget class="AnalysisTab" name="analdd">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>360</width>
+    <height>897</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AnalyseDirectDynamics</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QWidget" name="list_widget" native="true">
+     <layout class="QVBoxLayout" name="analdd_layout">
+      <item>
+       <widget class="QRadioButton" name="button_0">
+        <property name="statusTip">
+         <string>Reads ./log and plots the number of direct dynamics calculations per timestep.</string>
+        </property>
+        <property name="text">
+         <string>Plot DD calculation rate from log</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="button_1">
+        <property name="statusTip">
+         <string>Executes gwptraj and plots GWP basis function trajectories.</string>
+        </property>
+        <property name="text">
+         <string>Plot wavepacket basis function trajectories</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="button_2">
+        <property name="statusTip">
+         <string>Finds entries in the pes or apes and geo table in database which satisfy a certain criterion.</string>
+        </property>
+        <property name="text">
+         <string>Inspect PES/Geometry in database</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="button_3">
+        <property name="statusTip">
+         <string>Executes checkdb.</string>
+        </property>
+        <property name="text">
+         <string>Check or clean database</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="button_4">
+        <property name="statusTip">
+         <string>Query database using an SQL command.</string>
+        </property>
+        <property name="text">
+         <string>Query database</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gwptraj_box">
+     <property name="title">
+      <string>GWP Trajectory Options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_11">
+      <item row="0" column="0">
+       <widget class="QLabel" name="gwptraj_task_label">
+        <property name="text">
+         <string>Task</string>
+        </property>
+        <property name="buddy">
+         <cstring>gwptraj_task</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" rowspan="2">
+       <widget class="QComboBox" name="gwptraj_task">
+        <item>
+         <property name="text">
+          <string>Plot GWP Center</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Plot GWP Momentum</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="2">
+       <widget class="QLabel" name="gwptraj_mode_label">
+        <property name="text">
+         <string>Mode</string>
+        </property>
+        <property name="buddy">
+         <cstring>gwptraj_mode</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="gwptraj_mode">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="ddpesgeo_box">
+     <property name="title">
+      <string>PES/Geo Options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_10">
+      <item row="0" column="0">
+       <widget class="QLabel" name="ddpesgeo_type_label">
+        <property name="text">
+         <string>Type</string>
+        </property>
+        <property name="buddy">
+         <cstring>ddpesgeo_type</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="ddpesgeo_type">
+        <item>
+         <property name="text">
+          <string>Diabatic PES</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Adiabatic PES</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QRadioButton" name="ddpesgeo_int">
+        <property name="text">
+         <string>Find energies between interval</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QRadioButton" name="ddpesgeo_mat">
+        <property name="text">
+         <string>Find matching energies in other states</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QFrame" name="ddpesgeo_int_box">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_8">
+         <item row="1" column="0">
+          <widget class="QLabel" name="ddpesgeo_emax_label">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;max&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="buddy">
+            <cstring>ddpesgeo_emax</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="ddpesgeo_emin_label">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;min&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="buddy">
+            <cstring>ddpesgeo_emin</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="ddpesgeo_emax">
+           <property name="decimals">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="ddpesgeo_emin">
+           <property name="decimals">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QFrame" name="ddpesgeo_mat_box">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_9">
+         <item row="0" column="0">
+          <widget class="QLabel" name="ddpesgeo_state_label">
+           <property name="text">
+            <string>State</string>
+           </property>
+           <property name="buddy">
+            <cstring>ddpesgeo_state</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="ddpesgeo_tol_label">
+           <property name="text">
+            <string>Tolerance</string>
+           </property>
+           <property name="buddy">
+            <cstring>ddpesgeo_tol</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="ddpesgeo_tol">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>10.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.001000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.001000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="ddpesgeo_state">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="clean_box">
+     <property name="title">
+      <string>Clean database options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="clean_testint">
+        <property name="text">
+         <string>Test integrity of database</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="clean_explain_label">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>Run with no options checked to see an overview</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="clean_rmdup">
+        <property name="text">
+         <string>Remove duplicate points</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="clean_mindb_label">
+        <property name="text">
+         <string>Duplicate removal tolerance</string>
+        </property>
+        <property name="buddy">
+         <cstring>clean_mindb</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="clean_mindb">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.200000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="clean_rmfail">
+        <property name="text">
+         <string>Remove failed points</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="clean_rminterp">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Remove interpolated points</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="sql_box">
+     <property name="title">
+      <string>Query</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QCheckBox" name="sql_allowwrite">
+        <property name="text">
+         <string>Allow write queries</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="sql_query">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>23</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Courier</family>
+         </font>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustToContents</enum>
+        </property>
+        <property name="tabStopWidth">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="analyse">
+     <property name="text">
+      <string>Analyse</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>AnalysisTab</class>
+   <extends>QWidget</extends>
+   <header>analysis_gui.ui.analysis_tab</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 @author: 19081417
 
 Consists of the single class that provides the functionality for the text
 widget.
-"""
+'''
 
 from math import isfinite
 from PyQt5 import QtWidgets, QtCore
@@ -14,15 +14,14 @@ class CustomTextWidget(QtWidgets.QPlainTextEdit):
     Extends the capabilities of PyQt's QPlainTextEdit, allowing the user to
     change the line wrapping, allowing them to save the text to a file, and
     automatically formatting a table to text.
+
+    This widget cannot function independently as it is tied to the
+    AnalysisMain class, referred to using self.window().
     '''
 
     def __init__(self, *args, **kwargs):
         '''
         Constructor method.
-
-        For the widget to work, requires the following to be present in
-        self.window():
-            - QLineEdit self.window().dir_edit (and self.window().cwd)
         '''
         super().__init__(*args, **kwargs)
         # menu actions
@@ -67,6 +66,7 @@ class CustomTextWidget(QtWidgets.QPlainTextEdit):
         QtWidgets.QMessageBox.information(
             self, 'Success', 'Save text successful.'
         )
+        return None
 
     @QtCore.pyqtSlot()
     def changeLineWrap(self):

@@ -3,21 +3,27 @@
 @author: 19081417
 
 Consists of the single class that provides functionality for the 'Analyse
-Results' tab of the analysis GUI. A class instance of this should be included
-in the main UI class.
+Results' tab of the analysis GUI.
 '''
 
-from PyQt5 import QtWidgets, QtCore
-from ..ui.core import AnalysisTab
+from pathlib import Path
+from PyQt5 import QtCore
+from ..ui.analysis_tab import AnalysisTab
 
 class AnalysisResults(AnalysisTab):
     '''
     Promoted widget that defines functionality for the "Analyse Results" tab of
     the analysis GUI.
     '''
-    def _activate(self):
+    def __init__(self):
         '''
-        Activation method. See the documentation in AnalysisTab for more
+        Constructor method. Loads the UI file.
+        '''
+        super().__init__(Path(__file__).parent/'results.ui')
+
+    def activate(self):
+        '''
+        Activation method. See the documentation in AnalysisTab._activate for
         information.
         '''
         methods = {
@@ -26,38 +32,15 @@ class AnalysisResults(AnalysisTab):
             2: self.rdeigval  # plot eigenvalues from matrix diagonalisation
         }
         options = {
-            1: 'autocol_box', 2: 'eigval_box'
+            1: self.autocol_box,
+            2: self.eigval_box
         }
         required_files = {
-            0: ['auto'], 1: ['auto'], 2: ['eigval']
+            0: ['auto'],
+            1: ['auto'],
+            2: ['eigval']
         }
-        super()._activate(
-            push_name='analres_push', radio_box_name='analres_radio',
-            methods=methods, options=options, required_files=required_files
-        )
-
-    def findObjects(self, push_name:str, box_name:str):
-        '''
-        Obtains UI elements as instance variables, and possibly some of their
-        properties.
-        '''
-        super().findObjects(push_name, box_name)
-        # group box 'autocorrelation options'
-        self.autocol_prefac = self.findChild(QtWidgets.QComboBox, 'autocol_prefac')
-        self.autocol_emin = self.findChild(QtWidgets.QDoubleSpinBox, 'autocol_emin')
-        self.autocol_emax = self.findChild(QtWidgets.QDoubleSpinBox, 'autocol_emax')
-        self.autocol_unit = self.findChild(QtWidgets.QComboBox, 'autocol_unit')
-        self.autocol_tau = self.findChild(QtWidgets.QDoubleSpinBox, 'autocol_tau')
-        self.autocol_iexp = self.findChild(QtWidgets.QSpinBox, 'autocol_iexp')
-        self.autocol_func = self.findChild(QtWidgets.QComboBox, 'autocol_filfunc')
-        # group box 'eigval options'
-        self.eigval_task = self.findChild(QtWidgets.QComboBox, 'eigval_task')
-
-    def connectObjects(self):
-        '''
-        Connects UI elements so they do stuff when interacted with.
-        '''
-        super().connectObjects()
+        super().activate(methods, options, required_files)
         # in autocorrelation box, allow damping order to change if tau nonzero
         self.autocol_tau.valueChanged.connect(self.autocolOptionChanged)
 
@@ -86,7 +69,7 @@ class AnalysisResults(AnalysisTab):
         use the 'rdauto' command, as it essentially just prints out the auto
         file anyway.
         '''
-        filepath = self.window().cwd/'auto'
+        filepath = self.window().dir.cwd/'auto'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().text.setPlainText(f.read())
@@ -97,14 +80,14 @@ class AnalysisResults(AnalysisTab):
                 raise ValueError('Invalid auto file') from None
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='Autocorrelation function',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='Autocorrelation function',
                                       bottom='Time (fs)', left='C(t)')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='Real autocorrelation', pen='r')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
                                  name='Imag. autocorrelation', pen='b')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 3],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
                                  name='Abs. autocorrelation', pen='g')
 
     def autospec(self):
@@ -144,17 +127,17 @@ class AnalysisResults(AnalysisTab):
             case 1:
                 self.runCmd('autospec', '-EP', *autocol_options)
 
-        filepath = self.window().cwd/'spectrum.pl'
+        filepath = self.window().dir.cwd/'spectrum.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().data = self.readFloats(f, 4, ignore_regex=r'^#')
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='Autocorrelation spectrum',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='Autocorrelation spectrum',
                                       bottom=f'Energy ({self.autocol_unit.currentText()})',
                                       left='Spectrum')
-        self.window().graph.plot(self.window().data[:, 0],
+        self.window().plot.plot(self.window().data[:, 0],
                                  self.window().data[:, self.autocol_func.currentIndex()%3+1],
                                  name='Autocorrelation spectrum', pen='r')
 
@@ -174,7 +157,7 @@ class AnalysisResults(AnalysisTab):
         Plots either the eigenvalue and eigenerror, intensity, or excitation.
         Note that this function does not use the 'rdeigval' command.
         '''
-        filepath = self.window().cwd/'eigval'
+        filepath = self.window().dir.cwd/'eigval'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().text.setPlainText(f.read())
@@ -185,17 +168,17 @@ class AnalysisResults(AnalysisTab):
                 raise ValueError('Invalid eigval file') from None
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='Eigval file', bottom='Eigenvalue (eV)')
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='Eigval file', bottom='Eigenvalue (eV)')
         if self.eigval_task.currentIndex() == 0:
-            self.window().graph.setLabels(left='Intensity')
-            self.window().graph.plot(self.window().data[:, 1], self.window().data[:, 2],
+            self.window().plot.setLabels(left='Intensity')
+            self.window().plot.plot(self.window().data[:, 1], self.window().data[:, 2],
                                      name='Intensities', pen='r')
         elif self.eigval_task.currentIndex() == 1:
-            self.window().graph.setLabels(left='Eigenerror (eV)')
-            self.window().graph.plot(self.window().data[:, 1], self.window().data[:, 3],
+            self.window().plot.setLabels(left='Eigenerror (eV)')
+            self.window().plot.plot(self.window().data[:, 1], self.window().data[:, 3],
                                      name='Eigenerrors', pen='r')
         else:
-            self.window().graph.setLabels(left='Excitations (cm\u207B\u00B9)')
-            self.window().graph.plot(self.window().data[:, 1], self.window().data[:, 5],
+            self.window().plot.setLabels(left='Excitations (cm\u207B\u00B9)')
+            self.window().plot.plot(self.window().data[:, 1], self.window().data[:, 5],
                                      name='Excitation', pen='r')

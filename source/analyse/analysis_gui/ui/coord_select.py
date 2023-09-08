@@ -25,15 +25,14 @@ class CoordinateSelector(QtWidgets.QWidget):
         - Not yet possible to retrieve mode labels from a ML-BASIS-SECTION.
         - Not yet possible to retrieve mode labels from a database.
         - Mode name may be wrong for el/elcont.
+
+    This widget cannot function independently as it is tied to the
+    AnalysisMain class, referred to using self.window().
     '''
 
     def __init__(self, *args, **kwargs):
         '''
         Constructor method.
-
-        For the widget to work, requires the following to be present in
-        self.window():
-            - QLineEdit self.window().dir_edit (and self.window().cwd)
         '''
         super().__init__(*args, **kwargs)
         # set a vertical box layout for this widget
@@ -80,6 +79,7 @@ class CoordinateSelector(QtWidgets.QWidget):
             select = self.layout().itemAt(i).widget().findChild(QtWidgets.QComboBox)
             if select.currentIndex() == 0:
                 return label.text()
+        return None
 
     @property
     def ycoord(self) -> str:
@@ -92,6 +92,7 @@ class CoordinateSelector(QtWidgets.QWidget):
             select = self.layout().itemAt(i).widget().findChild(QtWidgets.QComboBox)
             if select.currentIndex() == 1:
                 return label.text()
+        return None
 
     def refresh(self):
         '''
@@ -124,7 +125,7 @@ class CoordinateSelector(QtWidgets.QWidget):
         while self.layout().count():
             child = self.layout().takeAt(0)
             if child.widget():
-              child.widget().deleteLater()
+                child.widget().deleteLater()
 
     def findModeLabels(self) -> list:
         '''
@@ -132,7 +133,7 @@ class CoordinateSelector(QtWidgets.QWidget):
         current directory. This list will be empty if the function cannot find
         any mode labels.
         '''
-        with open(self.window().cwd/'input', mode='r', encoding='utf-8') as f:
+        with open(self.window().dir.cwd/'input', mode='r', encoding='utf-8') as f:
             txt = f.read()
         # find labels in SPF-BASIS-SECTION (may also be called SBASIS-SECTION)
         spf_section = re.findall(

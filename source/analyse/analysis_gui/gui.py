@@ -3,7 +3,7 @@
 @author: 19081417
 
 Contains the function that runs the GUI Analysis application. Note, due to how
-python treats packages, another file not in this directory or subdirectory
+python treats packages, another file not in this directory or subdirectories
 needs to import the openGui function from this file and execute it.
 '''
 

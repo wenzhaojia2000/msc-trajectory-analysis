@@ -3,23 +3,29 @@
 @author: 19081417
 
 Consists of the single class that provides functionality for the 'Analyse
-Convergence' tab of the analysis GUI. A class instance of this should be
-included in the main UI class.
+Convergence' tab of the analysis GUI.
 '''
 
+from pathlib import Path
 import re
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtCore
 from pyqtgraph import intColor as colr
-from ..ui.core import AnalysisTab
+from ..ui.analysis_tab import AnalysisTab
 
 class AnalysisConvergence(AnalysisTab):
     '''
     Promoted widget that defines functionality for the "Analyse Convergence"
     tab of the analysis GUI.
     '''
-    def _activate(self):
+    def __init__(self):
         '''
-        Activation method. See the documentation in AnalysisTab for more
+        Constructor method. Loads the UI file.
+        '''
+        super().__init__(Path(__file__).parent/'convergence.ui')
+
+    def activate(self):
+        '''
+        Activation method. See the documentation in AnalysisTab._activate for
         information.
         '''
         methods = {
@@ -30,35 +36,19 @@ class AnalysisConvergence(AnalysisTab):
             4: self.norm    # plot time-evolution of norm of wavefunction
         }
         options = {
-            0: 'ortho_box', 1: 'gpop_box', 2: 'natpop_box', 3: 'qdq_box'
+            0: self.ortho_box,
+            1: self.gpop_box,
+            2: self.natpop_box,
+            3: self.qdq_box
         }
         required_files = {
-            0: ['psi'], 1: ['gridpop'],  2: ['check'], 3: ['check'],
+            0: ['psi'],
+            1: ['gridpop'],
+            2: ['check'],
+            3: ['check'],
             4: ['psi']
         }
-
-        super()._activate(
-            push_name='analconv_push', radio_box_name='analconv_radio',
-            methods=methods, options=options, required_files=required_files
-        )
-
-    def findObjects(self, push_name:str, box_name:str):
-        '''
-        Obtains UI elements as instance variables, and possibly some of their
-        properties.
-        '''
-        super().findObjects(push_name, box_name)
-        # group box 'orthonormality options'
-        self.ortho_state = self.findChild(QtWidgets.QSpinBox, 'ortho_state')
-        # group box 'grid population options'
-        self.gpop_nz = self.findChild(QtWidgets.QSpinBox, 'gpop_nz')
-        self.gpop_dof = self.findChild(QtWidgets.QSpinBox, 'gpop_dof')
-        # group box 'natural population options'
-        self.natpop_mode = self.findChild(QtWidgets.QSpinBox, 'natpop_mode')
-        self.natpop_state = self.findChild(QtWidgets.QSpinBox, 'natpop_state')
-        # group box 'coordinate expectation options'
-        self.qdq_dof = self.findChild(QtWidgets.QSpinBox, 'qdq_dof')
-        self.qdq_state = self.findChild(QtWidgets.QSpinBox, 'qdq_state')
+        super().activate(methods, options, required_files)
 
     def ortho(self):
         '''
@@ -102,12 +92,12 @@ class AnalysisConvergence(AnalysisTab):
         # number of modes is number of columns minus time, state, total columns
         n_modes = self.window().data.shape[1] - 3
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='SPF Orthonormality',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='SPF Orthonormality',
                                       bottom='Time (fs)', left='Orthonormality error')
-        self.window().graph.plot(arr[:, 0], arr[:, 2], name='Total', pen='k')
+        self.window().plot.plot(arr[:, 0], arr[:, 2], name='Total', pen='k')
         for i in range(1, n_modes+1):
-            self.window().graph.plot(arr[:, 0], arr[:, 2+i], name=f'Mode {i}',
+            self.window().plot.plot(arr[:, 0], arr[:, 2+i], name=f'Mode {i}',
                                      pen=colr(i-1, n_modes, maxValue=200))
 
     def rdgpop(self):
@@ -133,23 +123,23 @@ class AnalysisConvergence(AnalysisTab):
         ]
         self.runCmd('rdgpop', '-w', *gpop_options)
 
-        filepath = self.window().cwd/'gpop.pl'
+        filepath = self.window().dir.cwd/'gpop.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().data = self.readFloats(f, 5, ignore_regex=r'^#')
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='Grid edge population',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='Grid edge population',
                                       bottom='Time (fs)', left='Population')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='Grid (begin)', pen='r')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
                                  name='Grid (end)',
                                  pen={'color': 'r', 'style': QtCore.Qt.DashLine})
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 3],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
                                  name='Basis (begin)', pen='b')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 4],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 4],
                                  name='Basis (end)',
                                  pen={'color': 'b', 'style': QtCore.Qt.DashLine})
 
@@ -175,18 +165,18 @@ class AnalysisConvergence(AnalysisTab):
         self.runCmd('rdcheck', 'natpop', *natpop_options)
 
         # find filename of command output
-        filepath = self.window().cwd/f'natpop_{"_".join(natpop_options)}.pl'
+        filepath = self.window().dir.cwd/f'natpop_{"_".join(natpop_options)}.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().data = self.readFloats(f)
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='Natural population',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='Natural population',
                                       bottom='Time (fs)', left='Weight')
         n_spfs = self.window().data.shape[1] - 1 # minus time column
         for i in range(1, n_spfs + 1):
-            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, i],
+            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, i],
                                      name=f'SPF {i}', pen=colr(i-1, n_spfs, maxValue=200))
 
     def qdq(self):
@@ -212,19 +202,19 @@ class AnalysisConvergence(AnalysisTab):
         self.runCmd('rdcheck', 'qdq', *qdq_options)
 
         # find filename of command output
-        filepath = self.window().cwd/f'qdq_{"_".join(qdq_options)}.pl'
+        filepath = self.window().dir.cwd/f'qdq_{"_".join(qdq_options)}.pl'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().data = self.readFloats(f, 3)
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='Coordinate expectation values',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='Coordinate expectation values',
                                       bottom='Time (fs)',
                                       left=f'DOF {self.qdq_dof.value()}')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='q', pen='r')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
                                  name='dq', pen='b')
 
     def norm(self):

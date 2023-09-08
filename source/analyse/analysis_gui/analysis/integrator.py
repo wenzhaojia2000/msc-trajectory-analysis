@@ -3,23 +3,28 @@
 @author: 19081417
 
 Consists of the single class that provides functionality for the 'Analyse
-Integrator' tab of the analysis GUI. A class instance of this should be
-included in the main UI class.
+Integrator' tab of the analysis GUI.
 '''
 
+from pathlib import Path
 import re
-from PyQt5 import QtWidgets
 from pyqtgraph import BarGraphItem
-from ..ui.core import AnalysisTab
+from ..ui.analysis_tab import AnalysisTab
 
 class AnalysisIntegrator(AnalysisTab):
     '''
     Promoted widget that defines functionality for the "Analyse Integrator" tab
     of the analysis GUI.
     '''
-    def _activate(self):
+    def __init__(self):
         '''
-        Activation method. See the documentation in AnalysisTab for more
+        Constructor method. Loads the UI file.
+        '''
+        super().__init__(Path(__file__).parent/'integrator.ui')
+
+    def activate(self):
+        '''
+        Activation method. See the documentation in AnalysisTab._activate for
         information.
         '''
         methods = {
@@ -30,25 +35,16 @@ class AnalysisIntegrator(AnalysisTab):
             4: (lambda: self.rdupdate(True))   # plot update file errors
         }
         options = {
-            1: 'timing_box'
+            1: self.timing_box
         }
         required_files = {
-            0: ['steps'], 1: ['timing'], 2: ['speed'], 3: ['update'],
+            0: ['steps'],
+            1: ['timing'],
+            2: ['speed'],
+            3: ['update'],
             4: ['update']
         }
-        super()._activate(
-            push_name='analint_push', radio_box_name='analint_radio',
-            methods=methods, options=options, required_files=required_files
-        )
-
-    def findObjects(self, push_name:str, box_name:str):
-        '''
-        Obtains UI elements as instance variables, and possibly some of their
-        properties.
-        '''
-        super().findObjects(push_name, box_name)
-        # group box 'timing file options'
-        self.timing_sort = self.findChild(QtWidgets.QComboBox, 'timing_sort')
+        super().activate(methods, options, required_files)
 
     def rdsteps(self):
         '''
@@ -77,7 +73,7 @@ class AnalysisIntegrator(AnalysisTab):
         Plots a bar graph of the column selected by the user, and also outputs
         the timing file sorted by the selected column in the text tab.
         '''
-        filepath = self.window().cwd/'timing'
+        filepath = self.window().dir.cwd/'timing'
         with open(filepath, mode='r', encoding='utf-8') as f:
             txt = f.read()
         # split after 'Clock' and before 'Total' (see docstring), so we have
@@ -116,28 +112,28 @@ class AnalysisIntegrator(AnalysisTab):
         # display sorted text
         txt = "\n".join([line[-1] for line in self.window().data])
         self.window().text.setPlainText(f'{pre}\n{txt}\n\n{post}')
-        self.window().graph.reset()
+        self.window().plot.reset()
 
         # start plotting
-        self.window().graph.setLabels(title='Subroutine timings', left='')
+        self.window().plot.setLabels(title='Subroutine timings', left='')
         # this is a horizontal bar chart so everything is spun 90 deg. can't
         # do a normal vertical one as pyqtgraph can't rotate tick names (yet)
         if self.timing_sort.currentIndex() == 0:
             # plot cpu if 'name' is selected (names don't have values)
             values = [row[3] for row in self.window().data]
-            self.window().graph.setLabels(bottom='CPU')
+            self.window().plot.setLabels(bottom='CPU')
         else:
             values = [row[self.timing_sort.currentIndex()] for row in self.window().data]
-            self.window().graph.setLabels(bottom=self.timing_sort.currentText())
+            self.window().plot.setLabels(bottom=self.timing_sort.currentText())
         names = [row[0] for row in self.window().data]
         positions = list(range(1, len(values)+1))
         bar = BarGraphItem(x0=0, y=positions, height=0.6, width=values)
-        self.window().graph.addItem(bar)
+        self.window().plot.addItem(bar)
         # sort out bar chart ticks https://stackoverflow.com/questions/72002352
         ticks = []
         for i, label in enumerate(names):
             ticks.append((positions[i], label))
-        self.window().graph.getAxis('left').setTicks([ticks])
+        self.window().plot.getAxis('left').setTicks([ticks])
 
     def rdspeed(self):
         '''
@@ -156,7 +152,7 @@ class AnalysisIntegrator(AnalysisTab):
         Plots the CPU time and real time against propagation time (d can be
         re-calculated using a dy/dx transform in the context menu in pyqtgraph).
         '''
-        filepath = self.window().cwd/'speed'
+        filepath = self.window().dir.cwd/'speed'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             txt = f.read()
@@ -171,12 +167,12 @@ class AnalysisIntegrator(AnalysisTab):
                 raise ValueError('Invalid speed file') from None
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='Speed file',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='Speed file',
                                       bottom='Propagation time (fs)', left='Time (s)')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
                                  name='CPU time', pen='r')
-        self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 3],
+        self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
                                  name='Real time', pen='b')
 
     def rdupdate(self, plot_error:bool=False):
@@ -199,16 +195,16 @@ class AnalysisIntegrator(AnalysisTab):
         self.window().data = self.readFloats(output.split('\n'), 4)
 
         # start plotting, depending on options
-        self.window().graph.reset(switch_to_plot=True)
+        self.window().plot.reset(switch_to_plot=True)
         if plot_error:
-            self.window().graph.setLabels(title='Update file errors',
+            self.window().plot.setLabels(title='Update file errors',
                                           bottom='Time (fs)', left='Error')
-            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 2],
+            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
                                      name='Error of A-vector', pen='r')
-            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 3],
+            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
                                      name='Error of SPFs', pen='b')
         else:
-            self.window().graph.setLabels(title='Update file step size',
+            self.window().plot.setLabels(title='Update file step size',
                                           bottom='Time (fs)', left='Step size (fs)')
-            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
+            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
                                      name='Step size', pen='r')

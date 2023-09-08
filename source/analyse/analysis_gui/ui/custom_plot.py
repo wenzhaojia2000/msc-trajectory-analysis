@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 @author: 19081417
 
 Consists of the single class that provides the functionality for the plot
 widget.
-"""
+'''
 
 from pathlib import Path
 import shutil
@@ -20,19 +20,14 @@ class CustomPlotWidget(pg.PlotWidget):
     Extends the capabilities of pyqtgraph's PlotWidget, allowing the user to
     customise the title, toggle the legend, save an animated plot, and plot
     a contour graph.
+
+    This widget cannot function independently as it is tied to the
+    AnalysisMain class, referred to using self.window().
     '''
 
     def __init__(self, *args, **kwargs):
         '''
         Constructor method.
-
-        For the widget to work, requires the following to be present in
-        self.window():
-            - self.window().data
-            - self.window().speed
-            - QSlider self.window().scrubber
-            - QLineEdit self.window().dir_edit (and self.window().cwd)
-            - QTabWidget self.window().tab_widget
         '''
         super().__init__(*args, **kwargs)
         # the title of the graph if title is set to 'automatic'. set using
@@ -212,10 +207,10 @@ class CustomPlotWidget(pg.PlotWidget):
         self.colourbar.hide()
         self.toggleLegend()
         if animated:
-            self.window().media_box.show()
+            self.window().media.show()
             self.save_video.setVisible(True)
         else:
-            self.window().media_box.hide()
+            self.window().media.hide()
             self.save_video.setVisible(False)
         if switch_to_plot:
             self.window().tab_widget.setCurrentIndex(1)

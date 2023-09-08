@@ -2,133 +2,94 @@
 '''
 @author: 19081417
 
-Consists of the abstract class for the analysis tabs in the main UI, as well
-as the superclass which the main UI and UI tabs extend from.
+Consists of the abstract class for the analysis tabs in the main UI.
 '''
 
-from abc import ABC, ABCMeta, abstractmethod
 from shlex import split as shsplit
 import re
 import subprocess
 import sys
 import traceback
+
 import numpy as np
+from PyQt5 import QtWidgets, QtCore, uic
 
-from PyQt5 import QtWidgets, QtCore
-
-class AnalysisMeta(type(QtCore.QObject), ABCMeta):
-    '''
-    Allows the AnalysisBase class to extend from ABC's metaclass so multiple
-    inheritance from a Qt object and an abstract class doesn't cause metaclass
-    conflict.
-    '''
-
-class AnalysisBase(ABC):
-    '''
-    Abstract class of an analysis GUI, of some kind.
-    '''
-    @abstractmethod
-    def findObjects(self):
-        '''
-        Obtains UI elements as instance variables, and possibly some of their
-        properties.
-        '''
-        # abstractmethod will automatically raise an error if method is not
-        # implemented so seperate raise NotImplementedError is redundant
-
-    @abstractmethod
-    def connectObjects(self):
-        '''
-        Connects UI elements so they do stuff when interacted with.
-        '''
-
-class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
+class AnalysisTab(QtWidgets.QWidget):
     '''
     Abstract class of an analysis tab. The tab should be a promoted QWidget
     which is a child of the main window's toolbar. The tab should have the
-    following:
+    following widgets in its .ui file:
 
-    - One QWidget instance, containing at least one radio button
-    - One QPushButton instance (confirming radio button selection)
+    - One QWidget container named 'list_widget', containing at least one radio
+      button. This represents a list of analysis choices.
+    - One QPushButton named 'analyse' that when pushed calls a method of choice
+      depending on the what radio button is selected.
 
-    Also consists of convenience functions which may aid with writing analysis
-    functions.
+    Also consists of a couple convenience functions which may aid with writing
+    analysis functions.
     '''
 
-    def _activate(self, push_name:str, radio_box_name:str, methods:dict,
-                  options:dict={}, required_files:dict={}):
+    def __init__(self, ui_file:str, *args, **kwargs):
         '''
-        Activation method. This method is similar to __init__, but for promoted
-        widgets, the initialiser is called before any of its children are
-        added, and as such, self.findChild fails to find anything. Instead,
-        call when everything is loaded, ie. in the class for AnalysisMain to
-        add functionality to the analysis tab.
+        Constructor method that loads the UI file. Also see self._activate,
+        which is similar to __init__ but is delayed until manually called.
+        '''
+        super().__init__(*args, **kwargs)
+        uic.loadUi(ui_file, self)
 
-        Requires the object name of its QPushButton (push_name) and QWidget
-        (radio_box_name) instances as mentioned in the class docstring.
-        
+    def activate(self, methods:dict, options:dict, required_files:dict):
+        '''
+        Automatically sets up the low level functionality of the Analysis
+        widget, including what method to call depending on what radio button
+        is selected, etc.
+
+        The functionality requires a pointer to the AnalysisMain window using
+        self.window(). This is not available after everything else has loaded,
+        so this can't be called in self.__init__(). Instead, call this at the
+        end of AnalysisMain.__init__().
+
         The dictionary parameters all have the radio button index (int) as the
         key, **in the order shown in Qt Designer**. For the value:
-            - methods (manadatory) has the method name to call when the
-              corresponding radio button is selected and continue is pushed.
-            - options (optional) has the name of the QGroupBox to show which
-              allows the user to select further options when a radio button
-              is selected.
-            - required_files (optional) has a *list* of filenames that are
-              required for the method. If they are not found, the continue
-              button is disabled (with text giving the missing file(s)).
+            - methods has the method to call when the corresponding radio
+              button is selected and 'Analyse' is pushed. There must be one
+              method for each radio button.
+            - `options` has the name of the QGroupBox to show which allow
+              the user to select further options when a radio button is
+              selected.
+            - `required_files` has a *list* of filenames that are required
+              for the method. If they are not found, the 'Analyse' button is
+              disabled (with text giving the missing file(s)).
         '''
-        # for speed, turn box names into the objects themselves
-        for index, box_name in options.items():
-            options[index] = self.findChild(QtWidgets.QGroupBox, box_name)
-            if options[index] is None:
-                raise ValueError(f'QGroupBox with name {box_name} was not found')
         self.methods = methods
         self.options = options
         self.required_files = required_files
+        # list of the radio buttons inside the list widget
+        self.radio = self.list_widget.findChildren(QtWidgets.QRadioButton)
+        if len(self.radio) != len(self.methods):
+            raise ValueError('There must be a corresponding method for each '
+                             'radio button.')
 
-        self.findObjects(push_name, radio_box_name)
-        self.connectObjects()
+        # connect objects
+        self.analyse.clicked.connect(self.analysePushed)
+        # show the update options box when certain result is selected
+        for radio in self.radio:
+            radio.clicked.connect(self.optionSelected)
+        # refresh options if directory/options menu item has changed
+        self.window().dir.edit.textChanged.connect(self.optionSelected)
+        self.window().allow_add_flags.triggered.connect(self.optionSelected)
+        self.window().no_command.triggered.connect(self.optionSelected)
+
         # should automatically hide the boxes that correspond to an option
         # that isn't selected
         self.optionSelected()
         # check the file exists for the initially checked radio box (index 0)
         self.checkFileExists(0)
 
-    def findObjects(self, push_name:str, radio_box_name:str):
-        '''
-        A possibly incomplete implementation of the findObjects method. Any
-        derived class can add further implementation to this method by using
-        `super().findObjects(push_name, radio_box_name)`.
-        '''
-        self.push = self.findChild(QtWidgets.QPushButton, push_name)
-        if self.push is None:
-            raise ValueError(f'QPushButton with name {push_name} was not found')
-        radio_box = self.findChild(QtWidgets.QWidget, radio_box_name)
-        if radio_box is None:
-            raise ValueError(f'QWidget with name {radio_box_name} was not found')
-        self.radio = radio_box.findChildren(QtWidgets.QRadioButton)
-
-    def connectObjects(self):
-        '''
-        A possibly incomplete implementation of the connectObjects method. Any
-        derived class can add further implementation to this method by using
-        `super().connectObjects()`.
-        '''
-        self.push.clicked.connect(self.continuePushed)
-        # show the update options box when certain result is selected
-        for radio in self.radio:
-            radio.clicked.connect(self.optionSelected)
-        # refresh options if directory/options menu item has changed
-        self.window().dir_edit.textChanged.connect(self.optionSelected)
-        self.window().allow_add_flags.triggered.connect(self.optionSelected)
-        self.window().no_command.triggered.connect(self.optionSelected)
-
     @QtCore.pyqtSlot()
     def optionSelected(self):
         '''
         Shows per-analysis options in a QGroupBox if a valid option is checked,
-        with the options dictionary given in __init__. Can be overriden if
+        with the options dictionary given in self.activate. Can be overriden if
         certain options are generated on-demand, using `super().optionSelected()`.
         '''
         # need to iterate over all radio boxes rather than just the one selected
@@ -143,11 +104,10 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
                 self.options[index].hide()
 
     @QtCore.pyqtSlot()
-    def continuePushed(self):
+    def analysePushed(self):
         '''
-        Action to perform when the tab's push button is pushed, which is to
-        call the associated method given in self.methods. You should not need
-        to override this function.
+        Action to perform when the tab's analyse button is pushed, which is to
+        call the associated method given in self.methods.
         '''
         # get index of checked radio button (there should only be 1)
         radio_index = [index for index, radio in enumerate(self.radio)
@@ -155,11 +115,11 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
         # set cursor to wait cursor
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         # freeze push button until method is executed
-        self.push.setEnabled(False)
-        self.push.setText('Busy')
+        self.analyse.setEnabled(False)
+        self.analyse.setText('Busy')
         # force pyqt to update button immediately (otherwise pyqt leaves
         # this until the next event loop and nothing happens)
-        self.push.repaint()
+        self.analyse.repaint()
         try:
             # call method associated with index
             self.methods[radio_index]()
@@ -174,8 +134,40 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
             QtWidgets.QMessageBox.critical(self.window(), 'Error', f'{type(e).__name__}: {e}')
         # method executed, now can unfreeze
         QtWidgets.QApplication.restoreOverrideCursor()
-        self.push.setEnabled(True)
-        self.push.setText('Continue')
+        self.analyse.setEnabled(True)
+        self.analyse.setText('Analyse')
+
+    def checkFileExists(self, index:int):
+        '''
+        Disables the 'Analyse' button from being clicked if the filename
+        associated with the analysis command (self.required_files) is not found.
+
+        This functionality is disabled if the user has checked the 'Allow
+        additional flags' or the 'No command mode' options.
+        '''
+        ignore = (self.window().allow_add_flags.isChecked() or
+                  self.window().no_command.isChecked() or
+                  index not in self.required_files)
+        # enable push button if additional flags are enabled, no command mode
+        # is one or no specified required files for this index
+        if ignore:
+            self.analyse.setEnabled(True)
+            self.analyse.setText('Analyse')
+            return None
+
+        # need to generate path objects every time this is called rather than
+        # only once in self._activate since self.window().dir.cwd is not fixed
+        filenames = [self.window().dir.cwd/file for file in self.required_files[index]]
+        missing_files = [file.name for file in filenames if not file.is_file()]
+        if missing_files:
+            self.analyse.setEnabled(False)
+            self.analyse.setText('Missing: ' + ', '.join(missing_files))
+        else:
+            self.analyse.setEnabled(True)
+            self.analyse.setText('Analyse')
+        return None
+
+    ##### convenience functions #####
 
     @staticmethod
     def readFloats(iterable:list, floats_per_line:int=None,
@@ -228,36 +220,6 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
                              'output to see what went wrong?')
         return np.array(data)
 
-    def checkFileExists(self, index:int):
-        '''
-        Disables the Continue button from being clicked if the filename
-        associated with the analysis command (self.required_files) is not found.
-
-        This functionality is disabled if the user has checked the 'Allow
-        additional flags' or the 'No command mode' options.
-        '''
-        ignore = (self.window().allow_add_flags.isChecked() or
-                  self.window().no_command.isChecked() or
-                  index not in self.required_files)
-        # enable push button if additional flags are enabled, no command mode
-        # is one or no specified required files for this index
-        if ignore:
-            self.push.setEnabled(True)
-            self.push.setText('Continue')
-            return None
-
-        # need to generate path objects every time this is called rather than
-        # only once in self._activate since self.window().cwd is not fixed
-        filenames = [self.window().cwd/file for file in self.required_files[index]]
-        missing_files = [file.name for file in filenames if not file.is_file()]
-        if missing_files:
-            self.push.setEnabled(False)
-            self.push.setText('Missing: ' + ', '.join(missing_files))
-        else:
-            self.push.setEnabled(True)
-            self.push.setText('Continue')
-        return None
-
     def runCmd(self, *args, input:str=None) -> str:
         '''
         Execute the shell command sent by args. Returns and shows the result in
@@ -285,8 +247,8 @@ class AnalysisTab(AnalysisBase, QtWidgets.QWidget, metaclass=AnalysisMeta):
 
         try:
             p = subprocess.run(args, universal_newlines=True, input=input,
-                               cwd=self.window().cwd, check=True,
-                               timeout=self.window().timeout_spinbox.value(),
+                               cwd=self.window().dir.cwd, check=True,
+                               timeout=self.window().timeout.value(),
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             self.window().text.setPlainText(p.stdout)
             return p.stdout

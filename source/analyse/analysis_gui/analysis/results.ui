@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>analres</class>
+ <widget class="AnalysisTab" name="analres">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>360</width>
+    <height>472</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AnalyseResults</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QWidget" name="list_widget" native="true">
+     <layout class="QVBoxLayout" name="analres_layout" stretch="0,0,0">
+      <item>
+       <widget class="QRadioButton" name="button_0">
+        <property name="statusTip">
+         <string>Reads ./auto and plots the autocorrelation function.</string>
+        </property>
+        <property name="text">
+         <string>Plot autocorrelation function</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="button_1">
+        <property name="statusTip">
+         <string>Executes autospec and plots the spectrum.</string>
+        </property>
+        <property name="text">
+         <string>Plot spectrum from autocorrelation function</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="button_2">
+        <property name="statusTip">
+         <string>Reads ./eigval and plots the intensity, eigenerror, or excitation.</string>
+        </property>
+        <property name="text">
+         <string>Plot eigenvalues from matrix diagonalisation</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>13</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="autocol_box">
+     <property name="title">
+      <string>Autocorrelation options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="autocol_prefac_label">
+        <property name="text">
+         <string>Prefactor</string>
+        </property>
+        <property name="buddy">
+         <cstring>autocol_prefac</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="autocol_prefac">
+        <item>
+         <property name="text">
+          <string>None (Fourier Transform)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Energy prefactor</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="autocol_emax">
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="minimum">
+         <double>-inf</double>
+        </property>
+        <property name="maximum">
+         <double>inf</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="autocol_emin">
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="minimum">
+         <double>-inf</double>
+        </property>
+        <property name="maximum">
+         <double>inf</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="autocol_emax_label">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;max&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="buddy">
+         <cstring>autocol_emax</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="autocol_emin_label">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;E&lt;/span&gt;&lt;span style=&quot; font-size:10pt; vertical-align:sub;&quot;&gt;min&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="buddy">
+         <cstring>autocol_emin</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="autocol_iexp_label">
+        <property name="text">
+         <string>Damping order</string>
+        </property>
+        <property name="buddy">
+         <cstring>autocol_iexp</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="autocol_tau">
+        <property name="specialValueText">
+         <string>No damping</string>
+        </property>
+        <property name="suffix">
+         <string> fs</string>
+        </property>
+        <property name="maximum">
+         <double>inf</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="autocol_unit">
+        <property name="currentText">
+         <string>eV</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>eV</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>au</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>nm wavelength</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>cm⁻¹</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>kcal mol⁻¹</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>kJ mol⁻¹</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>eV⁻¹</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>K</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Debye</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>meV</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>mHa</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>aJ</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="autocol_tau_label">
+        <property name="text">
+         <string>Damping time (τ)</string>
+        </property>
+        <property name="buddy">
+         <cstring>autocol_tau</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="autocol_unit_label">
+        <property name="text">
+         <string>Energy unit</string>
+        </property>
+        <property name="buddy">
+         <cstring>autocol_unit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QSpinBox" name="autocol_iexp">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="autocol_func_label">
+        <property name="text">
+         <string>Filter function</string>
+        </property>
+        <property name="buddy">
+         <cstring>autocol_func</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QComboBox" name="autocol_func">
+        <item>
+         <property name="text">
+          <string>g0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>g1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>g2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>g3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>g4 (g'0)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>g5 (g'1)</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="eigval_box">
+     <property name="title">
+      <string>Eigval options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_16">
+      <item row="0" column="0">
+       <widget class="QLabel" name="eigval_task_label">
+        <property name="text">
+         <string>Plot</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="eigval_task">
+        <item>
+         <property name="text">
+          <string>Intensities</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Eigenerrors</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Excitations</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="analyse">
+     <property name="text">
+      <string>Analyse</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>AnalysisTab</class>
+   <extends>QWidget</extends>
+   <header>analysis_gui.ui.analysis_tab</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

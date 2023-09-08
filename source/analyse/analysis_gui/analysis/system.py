@@ -3,25 +3,30 @@
 @author: 19081417
 
 Consists of the single class that provides functionality for the 'Analyse
-System' tab of the analysis GUI. A class instance of this should be included in
-the main UI class.
+System' tab of the analysis GUI.
 '''
 
+from pathlib import Path
 import re
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from pyqtgraph import intColor as colr
-from ..ui.core import AnalysisTab
-from ..ui.coord_select import CoordinateSelector
+from ..ui.analysis_tab import AnalysisTab
 
 class AnalysisSystem(AnalysisTab):
     '''
     Promoted widget that defines functionality for the 'Analyse System' tab of
     the analysis GUI.
     '''
-    def _activate(self):
+    def __init__(self):
         '''
-        Activation method. See the documentation in AnalysisTab for more
+        Constructor method. Loads the UI file.
+        '''
+        super().__init__(Path(__file__).parent/'system.ui')
+
+    def activate(self):
+        '''
+        Activation method. See the documentation in AnalysisTab._activate for
         information.
         '''
         methods = {
@@ -31,35 +36,17 @@ class AnalysisSystem(AnalysisTab):
             3: self.showpes,  # plot potential energy surface
         }
         options = {
-            0: 'den1d_box', 1: 'den2d_box', 3: 'showpes_box'
+            0: self.den1d_box,
+            1: self.den2d_box,
+            3: self.showpes_box
         }
         required_files = {
-            0: ['dvr', 'gridpop'], 1: ['dvr', 'psi'], 2: ['check'],
+            0: ['dvr', 'gridpop'],
+            1: ['dvr', 'psi'],
+            2: ['check'],
             3: ['dvr', 'oper']
         }
-        super()._activate(
-            push_name='analsys_push', radio_box_name='analsys_radio',
-            methods=methods, options=options, required_files=required_files
-        )
-
-    def findObjects(self, push_name:str, box_name:str):
-        '''
-        Obtains UI elements as instance variables, and possibly some of their
-        properties.
-        '''
-        super().findObjects(push_name, box_name)
-        # group box '1d density options'
-        self.den1d_dof = self.findChild(QtWidgets.QSpinBox, 'den1d_dof')
-        self.den1d_state = self.findChild(QtWidgets.QSpinBox, 'den1d_state')
-        # group box '2d density options'
-        self.den2d_state = self.findChild(QtWidgets.QSpinBox, 'den2d_state')
-        self.den2d_coord_box = self.findChild(QtWidgets.QScrollArea, 'den2d_coord_box')
-        self.den2d_coord = self.findChild(CoordinateSelector, 'den2d_coord')
-        # group box 'pes options'
-        self.showpes_type = self.findChild(QtWidgets.QComboBox, 'showpes_type')
-        self.showpes_state = self.findChild(QtWidgets.QSpinBox, 'showpes_state')
-        self.showpes_coord_box = self.findChild(QtWidgets.QScrollArea, 'showpes_coord_box')
-        self.showpes_coord = self.findChild(CoordinateSelector, 'showpes_coord')
+        super().activate(methods, options, required_files)
 
     @QtCore.pyqtSlot()
     def optionSelected(self):
@@ -112,9 +99,9 @@ class AnalysisSystem(AnalysisTab):
 
         # find filename of command output
         if self.den1d_state.value() == 1:
-            filepath = self.window().cwd/f'den1d_{den1d_options[0]}'
+            filepath = self.window().dir.cwd/f'den1d_{den1d_options[0]}'
         else:
-            filepath = self.window().cwd/f'den1d_{"_".join(den1d_options)}'
+            filepath = self.window().dir.cwd/f'den1d_{"_".join(den1d_options)}'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().data = self.readFloats(f, 4, ignore_regex=r'^plot|^set')
@@ -123,30 +110,30 @@ class AnalysisSystem(AnalysisTab):
             self.window().data = np.split(self.window().data, n_interval)
 
         # add contents of showd1d.log to text view
-        filepath = self.window().cwd/'showd1d.log'
+        filepath = self.window().dir.cwd/'showd1d.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.appendPlainText(f'{"-"*80}\n{f.read()}')
 
         # adjust scrubber properties, connect to showd1dChangePlot slot
-        self.window().scrubber.setMaximum(len(self.window().data)-1)
-        self.window().scrubber.setSliderPosition(0)
+        self.window().media.scrubber.setMaximum(len(self.window().data)-1)
+        self.window().media.scrubber.setSliderPosition(0)
         try:
-            self.window().scrubber.valueChanged.disconnect()
+            self.window().media.scrubber.valueChanged.disconnect()
         except TypeError:
             # happens if scrubber has no connections
             pass
         finally:
-            self.window().scrubber.valueChanged.connect(self.showd1dChangePlot)
+            self.window().media.scrubber.valueChanged.connect(self.showd1dChangePlot)
         # start plotting
-        self.window().graph.reset(switch_to_plot=True, animated=True)
-        self.window().graph.setLabels(title='1D density evolution',
+        self.window().plot.reset(switch_to_plot=True, animated=True)
+        self.window().plot.setLabels(title='1D density evolution',
                                       bottom=f'DOF {den1d_options[0]} (au)',
                                       left='Density',
                                       top=f't={self.window().data[0][0][1]}')
-        self.window().graph.plot(self.window().data[0][:, 0], self.window().data[0][:, 2],
+        self.window().plot.plot(self.window().data[0][:, 0], self.window().data[0][:, 2],
                                  name='Re(phi)', pen='r')
-        self.window().graph.plot(self.window().data[0][:, 0], self.window().data[0][:, 3],
+        self.window().plot.plot(self.window().data[0][:, 0], self.window().data[0][:, 3],
                                  name='Im(phi)', pen='b')
 
     @QtCore.pyqtSlot()
@@ -155,9 +142,9 @@ class AnalysisSystem(AnalysisTab):
         Allows the user to move the scrubber to control time when using the
         showd1d analysis.
         '''
-        re, im = self.window().graph.listDataItems()
-        scrubber_pos = int(self.window().scrubber.value())
-        self.window().graph.setLabels(
+        re, im = self.window().plot.listDataItems()
+        scrubber_pos = int(self.window().media.scrubber.value())
+        self.window().plot.setLabels(
             top=f't={self.window().data[scrubber_pos][0][1]} fs'
         )
         re.setData(self.window().data[scrubber_pos][:, 0],
@@ -194,7 +181,7 @@ class AnalysisSystem(AnalysisTab):
         '''
         # if a plot file already exists, this won't work as we can't type
         # the option to overwrite.
-        filepath = self.window().cwd/'den2d.xyz'
+        filepath = self.window().dir.cwd/'den2d.xyz'
         filepath.unlink(missing_ok=True)
 
         coords = str(self.den2d_coord)
@@ -244,27 +231,27 @@ class AnalysisSystem(AnalysisTab):
         self.window().data = np.array(zt)
 
         # set contents of showsys.log to text view
-        filepath = self.window().cwd/'showsys.log'
+        filepath = self.window().dir.cwd/'showsys.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.setPlainText(f'{"-"*80}\n{f.read()}')
 
         # adjust scrubber properties, connect to showd2dChangePlot slot
-        self.window().scrubber.setMaximum(len(self.window().data)-1)
-        self.window().scrubber.setSliderPosition(0)
+        self.window().media.scrubber.setMaximum(len(self.window().data)-1)
+        self.window().media.scrubber.setSliderPosition(0)
         try:
-            self.window().scrubber.valueChanged.disconnect()
+            self.window().media.scrubber.valueChanged.disconnect()
         except TypeError:
             # happens if scrubber has no connections
             pass
         finally:
-            self.window().scrubber.valueChanged.connect(self.showd2dChangePlot)
-        self.window().graph.reset(switch_to_plot=True, animated=True)
-        self.window().graph.setLabels(title='2D Density',
-                                      bottom=f'DOF {self.den2d_coord.xcoord} (au)',
-                                      left=f'DOF {self.den2d_coord.ycoord} (au)')
+            self.window().media.scrubber.valueChanged.connect(self.showd2dChangePlot)
+        self.window().plot.reset(switch_to_plot=True, animated=True)
+        self.window().plot.setLabels(title='2D Density',
+                                     bottom=f'DOF {self.den2d_coord.xcoord} (au)',
+                                     left=f'DOF {self.den2d_coord.ycoord} (au)')
         levels = np.linspace(self.window().data.min(), self.window().data.max(), 21)
-        self.window().graph.plotContours(x, y, self.window().data[0], levels)
+        self.window().plot.plotContours(x, y, self.window().data[0], levels)
 
     @QtCore.pyqtSlot()
     def showd2dChangePlot(self):
@@ -272,8 +259,8 @@ class AnalysisSystem(AnalysisTab):
         Allows the user to move the scrubber to control time when using the
         showd2d analysis.
         '''
-        scrubber_pos = int(self.window().scrubber.value())
-        for isocurve in self.window().graph.getPlotItem().items:
+        scrubber_pos = int(self.window().media.scrubber.value())
+        for isocurve in self.window().plot.getPlotItem().items:
             isocurve.setData(self.window().data[scrubber_pos])
 
     def statepop(self):
@@ -290,19 +277,19 @@ class AnalysisSystem(AnalysisTab):
         state n. Plots time and population for each state.
         '''
         self.runCmd('statepop', '-w')
-        filepath = self.window().cwd/'spops'
+        filepath = self.window().dir.cwd/'spops'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().data = self.readFloats(f, ignore_regex=r'^#')
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
-        self.window().graph.setLabels(title='State population',
+        self.window().plot.reset(switch_to_plot=True)
+        self.window().plot.setLabels(title='State population',
                                       bottom='Time (fs)', left='Population')
         n_states = self.window().data.shape[1] - 1 # minus time column
         for i in range(1, n_states + 1):
-            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, i],
-                                     name=f'State {i}', pen=colr(i-1, n_states, maxValue=200))
+            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, i],
+                                    name=f'State {i}', pen=colr(i-1, n_states, maxValue=200))
 
     def showpes(self):
         '''
@@ -327,7 +314,7 @@ class AnalysisSystem(AnalysisTab):
         '''
         # if a plot file already exists, this won't work as we can't type
         # the option to overwrite.
-        filepath = self.window().cwd/'pes.xyz'
+        filepath = self.window().dir.cwd/'pes.xyz'
         filepath.unlink(missing_ok=True)
 
         coords = str(self.showpes_coord)
@@ -357,27 +344,27 @@ class AnalysisSystem(AnalysisTab):
         with open(filepath, mode='r', encoding='utf-8') as f:
             self.window().data = self.readFloats(f)
         # set contents of showsys.log to text view
-        filepath = self.window().cwd/'showsys.log'
+        filepath = self.window().dir.cwd/'showsys.log'
         if filepath.is_file():
             with open(filepath, mode='r', encoding='utf-8') as f:
                 self.window().text.setPlainText(f'{"-"*80}\n{f.read()}')
 
         # start plotting
-        self.window().graph.reset(switch_to_plot=True)
+        self.window().plot.reset(switch_to_plot=True)
         if self.window().data.shape[1] == 3:
             # contour plot
             # convert from list xyz coordinate data to grid data
             x = np.unique(self.window().data[:, 0])
             y = np.unique(self.window().data[:, 1])
             z = np.array(self.window().data[:, 2]).reshape(y.shape[0], x.shape[0]).T
-            self.window().graph.setLabels(title=self.showpes_type.currentText(),
-                                          bottom=f'DOF {self.showpes_coord.xcoord} (au)',
-                                          left=f'DOF {self.showpes_coord.ycoord} (au)')
-            self.window().graph.plotContours(x, y, z, 21)
+            self.window().plot.setLabels(title=self.showpes_type.currentText(),
+                                         bottom=f'DOF {self.showpes_coord.xcoord} (au)',
+                                         left=f'DOF {self.showpes_coord.ycoord} (au)')
+            self.window().plot.plotContours(x, y, z, 21)
         else:
             # line plot
-            self.window().graph.setLabels(title=self.showpes_type.currentText(),
-                                          bottom=f'DOF {self.showpes_coord.xcoord} (au)',
-                                          left='PES')
-            self.window().graph.plot(self.window().data[:, 0], self.window().data[:, 1],
-                                     name='PES', pen='r')
+            self.window().plot.setLabels(title=self.showpes_type.currentText(),
+                                         bottom=f'DOF {self.showpes_coord.xcoord} (au)',
+                                         left='PES')
+            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
+                                    name='PES', pen='r')
