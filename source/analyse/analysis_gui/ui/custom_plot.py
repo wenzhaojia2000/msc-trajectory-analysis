@@ -201,7 +201,7 @@ class CustomPlotWidget(pg.PlotWidget):
         '''
         self.clear()
         self.getPlotItem().enableAutoRange()
-        self.setLabels(top='', bottom='', left='')
+        self.setLabels(top='', bottom='', left='', right='', colourbar='')
         self.getAxis('bottom').setTicks(None)
         self.getAxis('left').setTicks(None)
         self.colourbar.hide()
@@ -217,8 +217,9 @@ class CustomPlotWidget(pg.PlotWidget):
 
     def setLabels(self, **kwargs):
         '''
-        Sets the default plot title using the title=... keyword and axis labels
-        using left=..., right=..., top=...
+        Sets the default plot title using the title=... keyword, axis labels
+        using left=..., right=..., top=..., bottom=..., and colourbar using
+        colourbar=...
 
         Overrides the existing self.setLabels to still allow the user to
         customise the plot title (by calling self.changePlotTitle instead of
@@ -228,6 +229,8 @@ class CustomPlotWidget(pg.PlotWidget):
             if key == 'title':
                 self.default_title = value
                 self.changePlotTitle()
+            elif key == 'colourbar':
+                self.colourbar.getAxis('left').setLabel(value)
             else:
                 if isinstance(value, str):
                     value = (value,)

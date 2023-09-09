@@ -252,7 +252,8 @@ class AnalysisSystem(AnalysisTab):
         self.window().plot.reset(switch_to_plot=True, animated=True)
         self.window().plot.setLabels(title='2D Density',
                                      bottom=f'DOF {xlabel} (au)',
-                                     left=f'DOF {ylabel} (au)')
+                                     left=f'DOF {ylabel} (au)',
+                                     colourbar='Density')
         levels = np.linspace(self.window().data.min(), self.window().data.max(), 21)
         self.window().plot.plotContours(x, y, self.window().data[0], levels)
 
@@ -364,7 +365,8 @@ class AnalysisSystem(AnalysisTab):
             z = np.array(self.window().data[:, 2]).reshape(y.shape[0], x.shape[0]).T
             self.window().plot.setLabels(title=self.showpes_type.currentText(),
                                          bottom=f'DOF {xlabel} (au)',
-                                         left=f'DOF {ylabel} (au)')
+                                         left=f'DOF {ylabel} (au)',
+                                         colourbar='PES')
             self.window().plot.plotContours(x, y, z, 21)
         else:
             # line plot
