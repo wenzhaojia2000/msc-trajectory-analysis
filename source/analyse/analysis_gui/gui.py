@@ -4,7 +4,8 @@
 
 Contains the function that runs the GUI Analysis application. Note, due to how
 python treats packages, another file not in this directory or subdirectories
-needs to import the openGui function from this file and execute it.
+needs to import the openGui function from this file and execute it. See
+../quantics_analysis_gui.py for more details.
 '''
 
 import sys

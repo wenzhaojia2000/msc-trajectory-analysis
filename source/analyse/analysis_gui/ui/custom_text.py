@@ -55,7 +55,7 @@ class CustomTextWidget(QtWidgets.QPlainTextEdit):
         '''
         # obtain a savename for the file
         savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
-            "Save File", str(self.window().cwd / 'Untitled.txt'),
+            "Save File", str(self.window().dir.cwd / 'Untitled.txt'),
             "Text (*.txt);;All files (*)"
         )
         if not ok:
