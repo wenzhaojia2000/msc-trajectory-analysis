@@ -34,39 +34,51 @@ class DirectoryWidget(QtWidgets.QWidget):
     @property
     def cwd(self):
         '''
-        Returns the Path object of the current directory.
+        Getter for cwd attribute. Returns the Path object of the current
+        directory.
         '''
         return Path(self.edit.text())
+
+    @cwd.setter
+    def cwd(self, dirname:str|Path):
+        '''
+        Setter for cwd attribute. Sets/changes the current directory. dirname
+        must be a directory, otherwise raises an exception.
+        '''
+        # if path is valid, resolve it (change to absolute path without ./
+        # or ../, etc)
+        if self.cwd.is_dir():
+            self.edit.setText(str(Path(dirname).resolve()))
+        else:
+            raise NotADirectoryError('Directory does not exist or is invalid')
 
     @QtCore.pyqtSlot()
     def directoryChanged(self):
         '''
-        Action to perform when the user edits the directory textbox. The
-        entered value must be a directory, otherwise raises an error.
+        Action to perform when the user edits the directory textbox.
         '''
-        # set to cwd when the program is opened or everything is deleted
+        # set to cwd when the program is opened
         if self.edit.text() == '':
-            self.edit.setText(str(Path.cwd()))
+            self.cwd = Path.cwd()
         # if the path is invalid, change to last acceptable path and open
         # error popup
-        elif self.cwd.is_dir() is False:
-            self.edit.undo()
-            QtWidgets.QMessageBox.critical(self, 'Error',
-                'NotADirectoryError: Directory does not exist or is invalid')
-        # if path is valid, resolve it (change to absolute path without ./
-        # or ../, etc)
-        elif self.cwd.is_dir():
-            self.edit.setText(str(self.cwd.resolve()))
+        else:
+            try:
+                self.cwd = self.edit.text()
+            except NotADirectoryError as e:
+                self.edit.undo()
+                QtWidgets.QMessageBox.critical(self, 'Error',
+                                               f'{type(e).__name__}: {e}')
 
     @QtCore.pyqtSlot()
     def chooseDirectory(self):
         '''
-        Allows user to choose a directory using a menu. Sets self.edit
-        (and thus self.cwd) when finished.
+        Allows user to choose a directory using a menu. Sets self.cwd when
+        finished.
         '''
         dirname = QtWidgets.QFileDialog.getExistingDirectory(self,
             'Open directory', self.edit.text(),
             options=QtWidgets.QFileDialog.Options()
         )
         if dirname:
-            self.edit.setText(dirname)
+            self.cwd = dirname

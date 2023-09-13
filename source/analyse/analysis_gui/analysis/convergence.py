@@ -94,11 +94,11 @@ class AnalysisConvergence(AnalysisTab):
         # start plotting
         self.window().plot.reset(switch_to_plot=True)
         self.window().plot.setLabels(title='SPF Orthonormality',
-                                      bottom='Time (fs)', left='Orthonormality error')
+                                     bottom='Time (fs)', left='Orthonormality error')
         self.window().plot.plot(arr[:, 0], arr[:, 2], name='Total', pen='k')
         for i in range(1, n_modes+1):
             self.window().plot.plot(arr[:, 0], arr[:, 2+i], name=f'Mode {i}',
-                                     pen=colr(i-1, n_modes, maxValue=200))
+                                    pen=colr(i-1, n_modes, maxValue=200))
 
     def rdgpop(self):
         '''
@@ -131,17 +131,17 @@ class AnalysisConvergence(AnalysisTab):
         # start plotting
         self.window().plot.reset(switch_to_plot=True)
         self.window().plot.setLabels(title='Grid edge population',
-                                      bottom='Time (fs)', left='Population')
+                                     bottom='Time (fs)', left='Population')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
-                                 name='Grid (begin)', pen='r')
+                                name='Grid (begin)', pen='r')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
-                                 name='Grid (end)',
-                                 pen={'color': 'r', 'style': QtCore.Qt.DashLine})
+                                name='Grid (end)',
+                                pen={'color': 'r', 'style': QtCore.Qt.DashLine})
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
-                                 name='Basis (begin)', pen='b')
+                                name='Basis (begin)', pen='b')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 4],
-                                 name='Basis (end)',
-                                 pen={'color': 'b', 'style': QtCore.Qt.DashLine})
+                                name='Basis (end)',
+                                pen={'color': 'b', 'style': QtCore.Qt.DashLine})
 
     def natpop(self):
         '''
@@ -173,11 +173,11 @@ class AnalysisConvergence(AnalysisTab):
         # start plotting
         self.window().plot.reset(switch_to_plot=True)
         self.window().plot.setLabels(title='Natural population',
-                                      bottom='Time (fs)', left='Weight')
+                                     bottom='Time (fs)', left='Weight')
         n_spfs = self.window().data.shape[1] - 1 # minus time column
         for i in range(1, n_spfs + 1):
             self.window().plot.plot(self.window().data[:, 0], self.window().data[:, i],
-                                     name=f'SPF {i}', pen=colr(i-1, n_spfs, maxValue=200))
+                                    name=f'SPF {i}', pen=colr(i-1, n_spfs, maxValue=200))
 
     def qdq(self):
         '''
@@ -210,12 +210,12 @@ class AnalysisConvergence(AnalysisTab):
         # start plotting
         self.window().plot.reset(switch_to_plot=True)
         self.window().plot.setLabels(title='Coordinate expectation values',
-                                      bottom='Time (fs)',
-                                      left=f'DOF {self.qdq_dof.value()}')
+                                     bottom='Time (fs)',
+                                     left=f'DOF {self.qdq_dof.value()}')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
-                                 name='q', pen='r')
+                                name='q', pen='r')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
-                                 name='dq', pen='b')
+                                name='dq', pen='b')
 
     def norm(self):
         '''

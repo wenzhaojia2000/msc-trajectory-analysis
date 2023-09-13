@@ -169,11 +169,11 @@ class AnalysisIntegrator(AnalysisTab):
         # start plotting
         self.window().plot.reset(switch_to_plot=True)
         self.window().plot.setLabels(title='Speed file',
-                                      bottom='Propagation time (fs)', left='Time (s)')
+                                     bottom='Propagation time (fs)', left='Time (s)')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
-                                 name='CPU time', pen='r')
+                                name='CPU time', pen='r')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
-                                 name='Real time', pen='b')
+                                name='Real time', pen='b')
 
     def rdupdate(self, plot_error:bool=False):
         '''
@@ -198,13 +198,13 @@ class AnalysisIntegrator(AnalysisTab):
         self.window().plot.reset(switch_to_plot=True)
         if plot_error:
             self.window().plot.setLabels(title='Update file errors',
-                                          bottom='Time (fs)', left='Error')
+                                         bottom='Time (fs)', left='Error')
             self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
-                                     name='Error of A-vector', pen='r')
+                                    name='Error of A-vector', pen='r')
             self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
-                                     name='Error of SPFs', pen='b')
+                                    name='Error of SPFs', pen='b')
         else:
             self.window().plot.setLabels(title='Update file step size',
-                                          bottom='Time (fs)', left='Step size (fs)')
+                                         bottom='Time (fs)', left='Step size (fs)')
             self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
-                                     name='Step size', pen='r')
+                                    name='Step size', pen='r')

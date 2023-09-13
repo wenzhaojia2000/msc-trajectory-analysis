@@ -31,7 +31,7 @@ class AnalysisTab(QtWidgets.QWidget):
 
     def __init__(self, ui_file:str, *args, **kwargs):
         '''
-        Constructor method that loads the UI file. Also see self._activate,
+        Constructor method that loads the UI file. Also see self.activate,
         which is similar to __init__ but is delayed until manually called.
         '''
         super().__init__(*args, **kwargs)
@@ -50,7 +50,7 @@ class AnalysisTab(QtWidgets.QWidget):
 
         The dictionary parameters all have the radio button index (int) as the
         key, **in the order shown in Qt Designer**. For the value:
-            - methods has the method to call when the corresponding radio
+            - `methods` has the method to call when the corresponding radio
               button is selected and 'Analyse' is pushed. There must be one
               method for each radio button.
             - `options` has the name of the QGroupBox to show which allow
@@ -156,7 +156,7 @@ class AnalysisTab(QtWidgets.QWidget):
             return None
 
         # need to generate path objects every time this is called rather than
-        # only once in self._activate since self.window().dir.cwd is not fixed
+        # only once in self.activate since self.window().dir.cwd is not fixed
         filenames = [self.window().dir.cwd/file for file in self.required_files[index]]
         missing_files = [file.name for file in filenames if not file.is_file()]
         if missing_files:

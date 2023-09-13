@@ -60,7 +60,7 @@ class CustomPlotWidget(pg.PlotWidget):
         self.title_edit = QtWidgets.QLineEdit(self)
         self.title_edit.setPlaceholderText('Automatic')
         self.title_edit.setMinimumWidth(180)
-        self.title_edit.editingFinished.connect(self.changePlotTitle)
+        self.title_edit.textChanged.connect(self.changePlotTitle)
         title_action = QtWidgets.QWidgetAction(self)
         title_action.setDefaultWidget(self.title_edit)
         title_menu.addAction(title_action)
@@ -201,7 +201,7 @@ class CustomPlotWidget(pg.PlotWidget):
         '''
         self.clear()
         self.getPlotItem().enableAutoRange()
-        self.setLabels(top='', bottom='', left='', right='', colourbar='')
+        self.setLabels(top='', bottom='', left='', colourbar='')
         self.getAxis('bottom').setTicks(None)
         self.getAxis('left').setTicks(None)
         self.colourbar.hide()

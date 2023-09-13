@@ -289,7 +289,7 @@ class AnalysisSystem(AnalysisTab):
         # start plotting
         self.window().plot.reset(switch_to_plot=True)
         self.window().plot.setLabels(title='State population',
-                                      bottom='Time (fs)', left='Population')
+                                     bottom='Time (fs)', left='Population')
         n_states = self.window().data.shape[1] - 1 # minus time column
         for i in range(1, n_states + 1):
             self.window().plot.plot(self.window().data[:, 0], self.window().data[:, i],

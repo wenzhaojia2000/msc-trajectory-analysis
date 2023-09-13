@@ -82,13 +82,13 @@ class AnalysisResults(AnalysisTab):
         # start plotting
         self.window().plot.reset(switch_to_plot=True)
         self.window().plot.setLabels(title='Autocorrelation function',
-                                      bottom='Time (fs)', left='C(t)')
+                                     bottom='Time (fs)', left='C(t)')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
-                                 name='Real autocorrelation', pen='r')
+                                name='Real autocorrelation', pen='r')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
-                                 name='Imag. autocorrelation', pen='b')
+                                name='Imag. autocorrelation', pen='b')
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
-                                 name='Abs. autocorrelation', pen='g')
+                                name='Abs. autocorrelation', pen='g')
 
     def autospec(self):
         '''
@@ -173,12 +173,12 @@ class AnalysisResults(AnalysisTab):
         if self.eigval_task.currentIndex() == 0:
             self.window().plot.setLabels(left='Intensity')
             self.window().plot.plot(self.window().data[:, 1], self.window().data[:, 2],
-                                     name='Intensities', pen='r')
+                                    name='Intensities', pen='r')
         elif self.eigval_task.currentIndex() == 1:
             self.window().plot.setLabels(left='Eigenerror (eV)')
             self.window().plot.plot(self.window().data[:, 1], self.window().data[:, 3],
-                                     name='Eigenerrors', pen='r')
+                                    name='Eigenerrors', pen='r')
         else:
             self.window().plot.setLabels(left='Excitations (cm\u207B\u00B9)')
             self.window().plot.plot(self.window().data[:, 1], self.window().data[:, 5],
-                                     name='Excitation', pen='r')
+                                    name='Excitation', pen='r')
