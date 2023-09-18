@@ -72,7 +72,7 @@ class AnalysisConvergence(AnalysisTab):
 
         Plots the orthonormality error for each mode for a given state.
         '''
-        output = self.runCmd('ortho')
+        output = self.runCmd(['ortho'])
         # get the relevant data we want (between the two #, but skip first line
         # which is the header - see docstring)
         match = re.findall(r'#.*?\n(.*)#', output, flags=re.DOTALL)
@@ -121,7 +121,7 @@ class AnalysisConvergence(AnalysisTab):
             str(self.gpop_nz.value()),
             str(self.gpop_dof.value())
         ]
-        self.runCmd('rdgpop', '-w', *gpop_options)
+        self.runCmd(['rdgpop', '-w'] + gpop_options)
 
         filepath = self.window().dir.cwd/'gpop.pl'
         # assemble data matrix
@@ -162,7 +162,7 @@ class AnalysisConvergence(AnalysisTab):
             str(self.natpop_mode.value()),
             str(self.natpop_state.value())
         ]
-        self.runCmd('rdcheck', 'natpop', *natpop_options)
+        self.runCmd(['rdcheck', 'natpop'] + natpop_options)
 
         # find filename of command output
         filepath = self.window().dir.cwd/f'natpop_{"_".join(natpop_options)}.pl'
@@ -199,7 +199,7 @@ class AnalysisConvergence(AnalysisTab):
             str(self.qdq_dof.value()),
             str(self.qdq_state.value())
         ]
-        self.runCmd('rdcheck', 'qdq', *qdq_options)
+        self.runCmd(['rdcheck', 'qdq'] + qdq_options)
 
         # find filename of command output
         filepath = self.window().dir.cwd/f'qdq_{"_".join(qdq_options)}.pl'

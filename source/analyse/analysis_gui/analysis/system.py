@@ -95,7 +95,7 @@ class AnalysisSystem(AnalysisTab):
             'f' + str(self.den1d_dof.value()),
             's' + str(self.den1d_state.value())
         ]
-        self.runCmd('showd1d', '-T', '-w', *den1d_options)
+        self.runCmd(['showd1d', '-T', '-w'] + den1d_options)
 
         # find filename of command output
         if self.den1d_state.value() == 1:
@@ -207,7 +207,7 @@ class AnalysisSystem(AnalysisTab):
         # save data to xyz file (5), enter name, then exit (0)
         inp += '5\nden2d.xyz\n0'
         # run the command
-        self.runCmd('showsys', '-nopes', input=inp)
+        self.runCmd(['showsys', '-nopes'], input=inp)
 
         with open(filepath, mode='r', encoding='utf-8') as f:
             # this file essentially has xyz data for each time interval. there
@@ -280,7 +280,7 @@ class AnalysisSystem(AnalysisTab):
         where t is time and s1 ... sn are the populations for that time for
         state n. Plots time and population for each state.
         '''
-        self.runCmd('statepop', '-w')
+        self.runCmd(['statepop', '-w'])
         filepath = self.window().dir.cwd/'spops'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
@@ -342,7 +342,7 @@ class AnalysisSystem(AnalysisTab):
         # save data to xyz file (5), enter name, then exit (0)
         inp += '5\npes.xyz\n0'
         # run the command
-        self.runCmd('showsys', '-pes', input=inp)
+        self.runCmd(['showsys', '-pes'], input=inp)
 
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:

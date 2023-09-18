@@ -220,17 +220,16 @@ class AnalysisTab(QtWidgets.QWidget):
                              'output to see what went wrong?')
         return np.array(data)
 
-    def runCmd(self, *args, input:str=None) -> str:
+    def runCmd(self, args:list, input:str=None) -> str:
         '''
         Execute the shell command sent by args. Returns and shows the result in
         the main window's output's text tab.
 
-        args should be a series of strings with commas representing spaces, eg.
-        'ls', '-A', '/home/'. The keyword input is the a string to feed to
+        args should be a list of strings with individual items representing
+        arguments that would normally be spaced using spaces, eg. ls -A home/
+        is ['ls', '-A', '/home/']. The keyword input is the a string to feed to
         stdin after the command execution.
         '''
-        # change from tuple to list
-        args = list(args)
         if self.window().no_command.isChecked():
             # don't do anything if user has set no command mode
             return None

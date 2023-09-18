@@ -166,7 +166,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         output.
         '''
         # -trj outputs a trajectory file only
-        self.runCmd('gwptraj', '-trj')
+        self.runCmd(['gwptraj', '-trj'])
         filepath = self.window().dir.cwd/'trajectory'
         # assemble data matrix
         with open(filepath, mode='r', encoding='utf-8') as f:
@@ -389,7 +389,7 @@ class AnalysisDirectDynamics(AnalysisTab):
             clean_options.append('-c')
         # switch to text view to see output
         self.window().tab_widget.setCurrentIndex(0)
-        self.runCmd('checkdb', *clean_options)
+        self.runCmd(['checkdb'] + clean_options)
 
     def querydb(self):
         '''

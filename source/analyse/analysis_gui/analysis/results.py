@@ -123,9 +123,9 @@ class AnalysisResults(AnalysisTab):
         # choose prefactor
         match self.autocol_prefac.currentIndex():
             case 0:
-                self.runCmd('autospec', '-FT', *autocol_options)
+                self.runCmd(['autospec', '-FT'] + autocol_options)
             case 1:
-                self.runCmd('autospec', '-EP', *autocol_options)
+                self.runCmd(['autospec', '-EP'] + autocol_options)
 
         filepath = self.window().dir.cwd/'spectrum.pl'
         # assemble data matrix
