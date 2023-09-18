@@ -246,10 +246,10 @@ class AnalysisTab(QtWidgets.QWidget):
             args[1:1] = shsplit(self.window().add_flags.text())
 
         try:
-            p = subprocess.run(args, universal_newlines=True, input=input,
-                               cwd=self.window().dir.cwd, check=True,
+            p = subprocess.run(args, input=input, cwd=self.window().dir.cwd,
                                timeout=self.window().timeout.value(),
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                               check=True, text=True, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
             self.window().text.setPlainText(p.stdout)
             return p.stdout
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:

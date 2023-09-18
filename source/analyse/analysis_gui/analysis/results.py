@@ -75,7 +75,7 @@ class AnalysisResults(AnalysisTab):
             self.window().text.setPlainText(f.read())
             f.seek(0)
             try:
-                self.window().data = self.readFloats(f, 4)
+                self.window().data = self.readFloats(f, 4, ignore_regex=r'^#')
             except ValueError:
                 raise ValueError('Invalid auto file') from None
 

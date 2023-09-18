@@ -48,15 +48,15 @@ class CustomPlotWidget(pg.PlotWidget):
         plot_menu = self.getPlotItem().ctrlMenu
 
         # save .npy file
-        self.save_npy = context_menu.addAction("Save .npy data")
+        self.save_npy = context_menu.addAction('Save .npy data')
         self.save_npy.triggered.connect(self.saveData)
         # save video action (off by default)
-        self.save_video = context_menu.addAction("Save video")
+        self.save_video = context_menu.addAction('Save video')
         self.save_video.triggered.connect(self.saveVideo)
         self.save_video.setVisible(False)
         # custom title action
         plot_menu.addSeparator()
-        title_menu = plot_menu.addMenu("Custom title")
+        title_menu = plot_menu.addMenu('Custom title')
         self.title_edit = QtWidgets.QLineEdit(self)
         self.title_edit.setPlaceholderText('Automatic')
         self.title_edit.setMinimumWidth(180)
@@ -65,7 +65,7 @@ class CustomPlotWidget(pg.PlotWidget):
         title_action.setDefaultWidget(self.title_edit)
         title_menu.addAction(title_action)
         # show legend action
-        self.legend_checkbox = plot_menu.addAction("Show Legend")
+        self.legend_checkbox = plot_menu.addAction('Show Legend')
         self.legend_checkbox.setCheckable(True)
         self.legend_checkbox.setChecked(True)
         self.legend_checkbox.triggered.connect(self.toggleLegend)
@@ -119,8 +119,8 @@ class CustomPlotWidget(pg.PlotWidget):
             return None
         # obtain a savename for the file
         savename, ok = QtWidgets.QFileDialog.getSaveFileName(self,
-            "Save File", str(self.window().dir.cwd / 'Untitled.npy'),
-            "Numpy file (*.npy);;All files (*)"
+            'Save File', str(self.window().dir.cwd / 'Untitled.npy'),
+            'Numpy file (*.npy);;All files (*)'
         )
         if not ok:
             # user cancels operation

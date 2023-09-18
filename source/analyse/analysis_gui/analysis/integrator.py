@@ -28,21 +28,20 @@ class AnalysisIntegrator(AnalysisTab):
         information.
         '''
         methods = {
-            0: self.rdsteps,                   # analyse step size
-            1: self.rdtiming,                  # look at timing file
-            2: self.rdspeed,                   # plot speed file
-            3: (lambda: self.rdupdate(False)), # plot update file step size
-            4: (lambda: self.rdupdate(True))   # plot update file errors
+            0: self.rdsteps,  # analyse step size
+            1: self.rdtiming, # look at timing file
+            2: self.rdspeed,  # plot speed file
+            3: self.rdupdate, # plot update file
         }
         options = {
-            1: self.timing_box
+            1: self.timing_box,
+            3: self.update_box
         }
         required_files = {
             0: ['steps'],
             1: ['timing'],
             2: ['speed'],
-            3: ['update'],
-            4: ['update']
+            3: ['update']
         }
         super().activate(methods, options, required_files)
 
@@ -175,36 +174,45 @@ class AnalysisIntegrator(AnalysisTab):
         self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
                                 name='Real time', pen='b')
 
-    def rdupdate(self, plot_error:bool=False):
+    def rdupdate(self):
         '''
-        Reads the command output of using rdupdate, which is expected to be in
-        the format, where each cell is a float,
+        Reads the update file, which is expected to be in the format, where
+        each cell is a float,
 
-        t.1    y1.1    y2.1    y3.1
-        t.2    y1.2    y2.2    y3.2
-        ...    ...     ...     ...
-        t.m    y1.m    y2.m    y3.m
+        n.1    y1.1    y2.1    y3.1    t.1
+        n.2    y1.2    y2.2    y3.2    t.2
+        ...    ...     ...     ...     ...
+        n.m    y1.m    y2.m    y3.m    t.m
 
-        where t is time, y1 is step size, y2 is error of A, y3 is error of phi.
+        where n is the update step number (ignored), y1 is step size, y2 is
+        error of the coefficients (A), y3 is error of the SPFs (phi), and t
+        is time.
 
-        Plots the step size is plot_error is false, otherwise plots the errors,
-        chosen by the self.update_plot combobox.
+        Plots the step or the errors against time, depending on the task chosen.
+        Incomplete lines (failed steps) are not included. Note that this
+        function does not use the 'rdupdate' command.
         '''
-        output = self.runCmd('rdupdate')
+        filepath = self.window().dir.cwd/'update'
         # assemble data matrix
-        self.window().data = self.readFloats(output.split('\n'), 4)
+        with open(filepath, mode='r', encoding='utf-8') as f:
+            self.window().text.setPlainText(f.read())
+            f.seek(0)
+            try:
+                self.window().data = self.readFloats(f, 5, ignore_regex=r'^#')
+            except ValueError:
+                raise ValueError('Invalid update file') from None
 
         # start plotting, depending on options
         self.window().plot.reset(switch_to_plot=True)
-        if plot_error:
+        if self.update_task.currentIndex() == 0:
             self.window().plot.setLabels(title='Update file errors',
                                          bottom='Time (fs)', left='Error')
-            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 2],
+            self.window().plot.plot(self.window().data[:, 4], self.window().data[:, 2],
                                     name='Error of A-vector', pen='r')
-            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 3],
+            self.window().plot.plot(self.window().data[:, 4], self.window().data[:, 3],
                                     name='Error of SPFs', pen='b')
         else:
             self.window().plot.setLabels(title='Update file step size',
                                          bottom='Time (fs)', left='Step size (fs)')
-            self.window().plot.plot(self.window().data[:, 0], self.window().data[:, 1],
+            self.window().plot.plot(self.window().data[:, 4], self.window().data[:, 1],
                                     name='Step size', pen='r')

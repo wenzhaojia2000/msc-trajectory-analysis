@@ -45,7 +45,7 @@ conda env create -f environment.yml</pre>
 conda activate quantics_gui</pre>
       <p>Open the GUI by using</p>
       <pre>
-python3 %QUANTICS_DIR%/source/analyse/quantics_analysis_gui.py</pre>
+python3 $QUANTICS_DIR/source/analyse/quantics_analysis_gui.py</pre>
       <p>If you do not wish to use conda, you can install the required packages directly using pip:</p>
       <pre>
 python3 -m pip install PyQt5 pyqtgraph</pre>
@@ -70,7 +70,7 @@ python3 -m pip install PyQt5 pyqtgraph</pre>
       <p>You can hover over one of the analysis radio buttons to get an overview of what it does. If the message is in the form &lsquo;Executes [command]&rsquo;, the GUI will internally call the quantics command. You can then look up information for that command in the <a href="../analyse.html">original analysis documentation</a>.</p>
 
       <h3 id="plot_widget">The plot widget</h3>
-      <p>You can move the data in the plot by holding left-click and dragging around. To zoom in, right-click and drag horizontally to zoom the x-axis, vertically to zoom the y-axis, or diagonally for a combination. You may also use the middle mouse buttom for this purpose.</p>
+      <p>You can move the data in the plot by holding left-click and dragging around. To zoom in, right-click and drag horizontally to zoom the x-axis, vertically to zoom the y-axis, or diagonally for a combination. You may also use the middle mouse button for this purpose.</p>
 
       <p>Alternatively, right-click and click <span class="button">Mouse mode</span> &rightarrow; <span class="button">1 button</span>, which replaces the left-click with a zoom option; simply drag a box around the part of the graph you want to zoom into. To return to automatic sizing, right click and click <span class="button">View all</span> or click the <span class="button">A</span> in the bottom left of the widget.</p>
 
