@@ -38,7 +38,6 @@ class CoordinateSelector(QtWidgets.QWidget):
         # set a vertical box layout for this widget
         self.setLayout(QtWidgets.QVBoxLayout())
         self.mode_labels = None
-        self.addModeLabels()
 
     def __str__(self) -> str:
         '''
@@ -230,5 +229,6 @@ class CoordinateSelector(QtWidgets.QWidget):
                 select = self.layout().itemAt(i).widget().findChild(QtWidgets.QComboBox)
                 value = self.layout().itemAt(i).widget().findChild(QtWidgets.QDoubleSpinBox)
                 if select.currentIndex() == index_changed:
+                    # will automatically enable value as the following will
+                    # trigger slot again
                     select.setCurrentIndex(2)
-                    value.setEnabled(True)

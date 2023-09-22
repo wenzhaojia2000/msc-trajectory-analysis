@@ -130,7 +130,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                     except ValueError:
                         pass
                 # find a line with No. QC calculations in it and get n_calc
-                if re.search(r'No\. QC calculations :', line):
+                if re.search(r'No\. QC calculations', line):
                     try:
                         n_calc = int(re.search(r'\d+', line)[0])
                         n_calcs[-1] += n_calc
@@ -201,7 +201,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         # the number of columns is 2*number of gaussians*number of modes. the
         # 2 is from the momenta being written after the gwp centers
         ncol = self.window().data.shape[1]
-        nmode = ncol//(2*ngwp)
+        nmode = (ncol-1)//(2*ngwp)
         if mode > nmode:
             raise ValueError(f'Mode {mode} is larger than number of modes {nmode}')
         # start plotting
@@ -215,7 +215,7 @@ class AnalysisDirectDynamics(AnalysisTab):
         else:
             # task is plot momentum, which make up the second half of the
             # columns in trajectory file
-            offset = ncol//2 + mode
+            offset = (ncol-1)//2 + mode
             self.window().plot.setLabels(title='GWP function momentum',
                                           bottom='Time (fs)', left='GWP Momentum (au)')
         # plot line for each gaussian. columns are written for each gaussian
