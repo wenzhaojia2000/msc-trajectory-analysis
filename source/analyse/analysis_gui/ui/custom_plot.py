@@ -165,16 +165,17 @@ class CustomPlotWidget(pg.PlotWidget):
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         # export image for each frame, into the temporary directory
         exporter = pg.exporters.ImageExporter(self.plotItem)
-        for i in range(self.window().scrubber.minimum(), self.window().scrubber.maximum()+1):
-            self.window().scrubber.setSliderPosition(i)
+        for i in range(self.window().media.scrubber.minimum(),
+                       self.window().media.scrubber.maximum()+1):
+            self.window().media.scrubber.setSliderPosition(i)
             exporter.export(str(temp_directory/f'{i:05}.png'))
             # force pyqt to update slider immediately, so user can see progress
-            self.window().scrubber.repaint()
+            self.window().media.scrubber.repaint()
         QtWidgets.QApplication.restoreOverrideCursor()
 
         # run ffmpeg to generate video https://stackoverflow.com/questions/24961127
         # no error if height not divisible by 2 https://stackoverflow.com/questions/20847674/
-        args = ['ffmpeg', '-y', '-framerate', str(self.window().speed),
+        args = ['ffmpeg', '-y', '-framerate', str(self.window().media.speed),
                 '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264',
                 '-pix_fmt', 'yuv420p', '-vf',
                 'pad=ceil(iw/2)*2:ceil(ih/2)*2:color=white', str(savename)]
