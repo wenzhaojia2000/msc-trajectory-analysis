@@ -285,11 +285,11 @@ class AnalysisDirectDynamics(AnalysisTab):
 
         if self.ddpesgeo_type.currentIndex() == 0:
             table = 'pes'
-            # dictionary mapping states to column names
-            state_name = {s: f'eng_{s}_{s}' for s in range(1, nroot+1)}
+            # lambda mapping states to column names
+            state_name = lambda s: f'eng_{s}_{s}'
         else:
             table = 'apes'
-            state_name = {s: f'eng_{s}' for s in range(1, nroot+1)}
+            state_name = lambda s: f'eng_{s}'
 
         if self.ddpesgeo_task[0].isChecked():
             # task is find energies between interval
@@ -300,7 +300,7 @@ class AnalysisDirectDynamics(AnalysisTab):
             # retrieve matching id + energies
             for s in range(1, nroot+1):
                 query = (f'SELECT * FROM {table} LEFT JOIN geo USING(id) '
-                         f'WHERE {state_name[s]} BETWEEN {emin} AND {emax};')
+                         f'WHERE {state_name(s)} BETWEEN {emin} AND {emax};')
                 res = cur.execute(query).fetchall()
                 # add id, energies, geo. split geo into geo_length subarrays
                 # so there are 3 columns
@@ -322,7 +322,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                     continue
                 else:
                     query = (f'SELECT * FROM {table} LEFT JOIN geo USING(id)'
-                             f'WHERE ABS({state_name[s2]} - {state_name[s1]}) <= {tol};')
+                             f'WHERE ABS({state_name(s2)} - {state_name(s1)}) <= {tol};')
                 res = cur.execute(query).fetchall()
                 # add id, energies, geo. split geo into geo_length subarrays
                 # so there are 3 columns
@@ -348,7 +348,7 @@ class AnalysisDirectDynamics(AnalysisTab):
                 # format col_names and energies into a table
                 # if relevant state, make energy header and value bold
                 for i, name in enumerate(col_names):
-                    if name in [state_name[state] for state in states]:
+                    if name in [state_name(state) for state in states]:
                         header.append(f'<b>{name:>15}</b>')
                         values.append('<b>' + '{: .8e}'.format(energies[i]) + '</b>')
                     else:
