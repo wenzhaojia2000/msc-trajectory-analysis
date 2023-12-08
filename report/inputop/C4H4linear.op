@@ -1,0 +1,100 @@
+OP_DEFINE-SECTION
+title
+Butatriene linear model with 5 modes
+see: Cattarius et al. JCP 115, 2088-2100 (2001)
+end-title
+end-op_define-section
+
+PARAMETER-SECTION
+# frequencies
+omega_1       =   0.02500 , ev
+omega_2       =   0.02640 , ev
+omega_3       =   0.02960 , ev
+omega_4       =   0.06060 , ev
+omega_5       =   0.09120 , ev
+omega_6       =   0.09970 , ev
+omega_7       =   0.10000 , ev
+omega_8       =   0.10890 , ev
+omega_9       =   0.12580 , ev
+omega_10      =   0.13020 , ev
+omega_11      =   0.17740 , ev
+omega_12      =   0.17730 , ev
+omega_13      =   0.20540 , ev
+omega_14      =   0.25780 , ev
+omega_15      =   0.37130 , ev
+omega_16      =   0.39860 , ev
+omega_17      =   0.41190 , ev
+omega_18      =   0.41190 , ev
+# energies
+E1            =   8.90140 , ev
+E2            =   9.44550 , ev
+# linear coupling constants (kappa)
+kappa1_8      =   0.05310 , ev
+kappa2_8      =   0.05940 , ev
+kappa1_12     =   0.01150 , ev
+kappa2_12     =   0.01000 , ev
+kappa1_14     =   0.16280 , ev
+kappa2_14     =  -0.34220 , ev
+kappa1_15     =   0.04030 , ev
+kappa2_15     =  -0.03210 , ev
+# off-diagonal vibronic coupling constants (lambda)
+lambda_5      =   0.28800 , ev
+end-parameter-section
+
+HAMILTONIAN-SECTION
+modes   |  el   |  Q_1  |  Q_2  |  Q_3  |  Q_4
+modes   |  Q_5  |  Q_6  |  Q_7  |  Q_8  |  Q_9
+modes   |  Q_10 |  Q_11 |  Q_12 |  Q_13 |  Q_14
+modes   |  Q_15 |  Q_16 |  Q_17 |  Q_18
+omega_1            |2   KE
+0.5*omega_1        |2   q^2
+omega_2            |3   KE
+0.5*omega_2        |3   q^2
+omega_3            |4   KE
+0.5*omega_3        |4   q^2
+omega_4            |5   KE
+0.5*omega_4        |5   q^2
+omega_5            |6   KE
+0.5*omega_5        |6   q^2
+omega_6            |7   KE
+0.5*omega_6        |7   q^2
+omega_7            |8   KE
+0.5*omega_7        |8   q^2
+omega_8            |9   KE
+0.5*omega_8        |9   q^2
+omega_9            |10  KE
+0.5*omega_9        |10  q^2
+omega_10           |11  KE
+0.5*omega_10       |11  q^2
+omega_11           |12  KE
+0.5*omega_11       |12  q^2
+omega_12           |13  KE
+0.5*omega_12       |13  q^2
+omega_13           |14  KE
+0.5*omega_13       |14  q^2
+omega_14           |15  KE
+0.5*omega_14       |15  q^2
+omega_15           |16  KE
+0.5*omega_15       |16  q^2
+omega_16           |17  KE
+0.5*omega_16       |17  q^2
+omega_17           |18  KE
+0.5*omega_17       |18  q^2
+omega_18           |19  KE
+0.5*omega_18       |19  q^2
+E1                 |1   S1&1
+E2                 |1   S2&2
+
+lambda_5           |1 S1&2            |6   q
+
+kappa1_8           |1 S1&1            |9   q
+kappa2_8           |1 S2&2            |9   q
+kappa1_12          |1 S1&1            |13  q
+kappa2_12          |1 S2&2            |13  q
+kappa1_14          |1 S1&1            |15  q
+kappa2_14          |1 S2&2            |15  q
+kappa1_15          |1 S1&1            |16  q
+kappa2_15          |1 S2&2            |16  q
+END-HAMILTONIAN-SECTION
+
+END-OPERATOR

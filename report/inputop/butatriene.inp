@@ -1,0 +1,74 @@
+RUN-SECTION
+name = butatriene
+
+propagation
+genoper
+tfinal = 100.0   tout = 1.00
+title  = Butatriene, linear coupling
+auto=twice  gridpop  psi
+end-run-section
+
+OPERATOR-SECTION
+opname = C4H4linear
+end-operator-section
+
+SPF-BASIS-SECTION
+multi-set
+     Q_5,Q_14     = 8,8
+     Q_12,Q_15    = 7,6
+     Q_8          = 6,6
+end-spf-basis-section
+
+PRIMITIVE-BASIS-SECTION
+     el    el      2
+     Q_1    HO     10   0.0     1.0    1.0
+     Q_2    HO     10   0.0     1.0    1.0
+     Q_3    HO     10   0.0     1.0    1.0
+     Q_4    HO     10   0.0     1.0    1.0
+     Q_5    HO     35   0.0     1.0    1.0
+     Q_6    HO     10   0.0     1.0    1.0
+     Q_7    HO     10   0.0     1.0    1.0
+     Q_8    HO     15   0.0     1.0    1.0
+     Q_9    HO     10   0.0     1.0    1.0
+     Q_10   HO     10   0.0     1.0    1.0
+     Q_11   HO     10   0.0     1.0    1.0
+     Q_12   HO     10   0.0     1.0    1.0
+     Q_13   HO     10   0.0     1.0    1.0
+     Q_14   HO     15   0.0     1.0    1.0
+     Q_15   HO     10   0.0     1.0    1.0
+     Q_16   HO     10   0.0     1.0    1.0
+     Q_17   HO     10   0.0     1.0    1.0
+     Q_18   HO     10   0.0     1.0    1.0
+end-primitive-basis-section
+
+INTEGRATOR-SECTION
+CMF/var = 0.005 , 1.0d-5
+BS/spf  =  8  , 1.0d-5
+SIL/A   =  10 , 1.0d-5
+end-integrator-section
+
+INIT_WF-SECTION
+build
+    init_state =  1
+    Q_1     HO    0.0  0.0     1.0    1.0
+    Q_2     HO    0.0  0.0     1.0    1.0
+    Q_3     HO    0.0  0.0     1.0    1.0
+    Q_4     HO    0.0  0.0     1.0    1.0
+    Q_5     HO    0.0  0.0     1.0    1.0
+    Q_6     HO    0.0  0.0     1.0    1.0
+    Q_7     HO    0.0  0.0     1.0    1.0
+    Q_8     HO    0.0  0.0     1.0    1.0
+    Q_9     HO    0.0  0.0     1.0    1.0
+    Q_10    HO    0.0  0.0     1.0    1.0
+    Q_11    HO    0.0  0.0     1.0    1.0
+    Q_12    HO    0.0  0.0     1.0    1.0
+    Q_13    HO    0.0  0.0     1.0    1.0
+    Q_14    HO    0.0  0.0     1.0    1.0
+    Q_15    HO    0.0  0.0     1.0    1.0
+    Q_16    HO    0.0  0.0     1.0    1.0
+    Q_17    HO    0.0  0.0     1.0    1.0
+    Q_18    HO    0.0  0.0     1.0    1.0
+end-build
+end-init_wf-section
+
+end-input
