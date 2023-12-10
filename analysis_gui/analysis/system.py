@@ -179,10 +179,11 @@ class AnalysisSystem(AnalysisTab):
         1D density, so it will have to be gathered from the input file -- not
         implemented yet.
         '''
+        filepath = self.window().dir.cwd/'den2d.xyz'
         # if a plot file already exists, this won't work as we can't type
         # the option to overwrite.
-        filepath = self.window().dir.cwd/'den2d.xyz'
-        filepath.unlink(missing_ok=True)
+        if not self.window().no_command.isChecked():
+            filepath.unlink(missing_ok=True)
 
         coords = str(self.den2d_coord)
         if not coords:
@@ -316,10 +317,11 @@ class AnalysisSystem(AnalysisTab):
         shown. x.1 < x.2 < ... x.m and for contour plots, the same for y,
         otherwise it won't work.
         '''
+        filepath = self.window().dir.cwd/'pes.xyz'
         # if a plot file already exists, this won't work as we can't type
         # the option to overwrite.
-        filepath = self.window().dir.cwd/'pes.xyz'
-        filepath.unlink(missing_ok=True)
+        if not self.window().no_command.isChecked():
+            filepath.unlink(missing_ok=True)
 
         coords = str(self.showpes_coord)
         if not coords:
