@@ -11,7 +11,8 @@ This project, while standalone, depends on [*Quantics*](https://www2.chem.ucl.ac
 If you already have access to the Quantics repository, there should already be an existing (hopefully more up-to-date) version present in `source/analysis/`.
 
 + Code is stored in the `analysis_gui/` directory.
-+ Documentation is stored in the `doc/` directory.
+    + For information on installation, see the README in this directory, or read the documentation.
++ Documentation is stored in the `doc/` directory. The HTML file can be opened with a web browser.
 + The report and presentation are stored in the `report/` directory.
     + In order to compile `report.tex`, a LuaLaTeX or XeTeX engine is required as it depends on `unicode-math`.
     + `presentation.pptx` contains CMU Serif and CMU Sans-serif fonts ([Download link](https://cm-unicode.sourceforge.io/download.html)). Without these, the presentation may look strange.
