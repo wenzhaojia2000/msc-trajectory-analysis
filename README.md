@@ -2,7 +2,7 @@
 
 ![Demonstration](./demo/demo.gif)
 
-*2D density evolution for the wavefunction in the butatriene cation in the X̃ (lower excited) state, showing bifurication from the Ã (upper excited) state at a conical intersection between the two states.* See also [***Faraday Discuss.***, **2004**, 127, 307-323](https://doi.org/10.1039/b314253a), Fig. 4.
+*2D density evolution up to 100 fs for the wavefunction in the butatriene cation in the X̃ (lower excited) state, showing bifurication from the Ã (upper excited) state at a conical intersection between the two states.* See also [***Faraday Discuss.***, **2004**, 127, 307-323](https://doi.org/10.1039/b314253a), Fig. 4.
 
 This repository contains the code and report for my thesis project, *Creation of a Graphics User Interface for the Analysis of Quantum Dynamics Simulations*, as part of my degree in MSc Scientific and Data Intensive Computing. The goal of the project was to improve the pre-existing CLI analysis framework for the quantum dynamics simulation software with a new graphical user interface (GUI) using PyQT.
 

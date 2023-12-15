@@ -131,7 +131,7 @@ class AnalysisMain(QtWidgets.QMainWindow):
         '''
         Attempts to opens the User guide HTML file in the browser.
         '''
-        url = Path(__file__).parents[4]/'doc/analyse/anal_gui/user_guide.html'
+        url = Path(__file__).parents[2]/'doc/user_guide.html'
         # for windows os.startfile(url) should work but quantics doesn't run
         # on windows
         try:
@@ -141,7 +141,7 @@ class AnalysisMain(QtWidgets.QMainWindow):
             try:
                 # wsl: the best i can do is open windows explorer to the folder
                 # where the file is.
-                subprocess.run(['explorer.exe', '.'], cwd=url.parent, check=True)
+                subprocess.run(['explorer.exe', '.'], cwd=url.parent, check=False)
             except FileNotFoundError:
                 QtWidgets.QMessageBox.critical(
                     self, 'Couldn\'t open browser',
